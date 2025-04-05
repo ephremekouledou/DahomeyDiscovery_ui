@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import './Acceuil.css';
+import NavBar from "../../components/navBar/navBar";
 
 
 const Acceuil = () => {
@@ -12,7 +13,7 @@ const Acceuil = () => {
         <div className="container">
         
             <section className="one">
-                <h1>First page</h1>
+                <NavBar />
             </section>
 
             <section className="two">
