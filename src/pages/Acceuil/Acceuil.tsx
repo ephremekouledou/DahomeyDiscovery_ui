@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import './Acceuil.css';
 import NavBar from "../../components/navBar/navBar";
+import bgVideo from "../../assets/videos/bgVideo.mp4"
 
 
 const Acceuil = () => {
@@ -14,6 +15,16 @@ const Acceuil = () => {
         
             <section className="one">
                 <NavBar />
+                <video autoPlay loop muted playsInline className="background-video">
+                        <source src={bgVideo} type="video/mp4" />
+                        Your browser does not support the video tag.
+                </video>
+                {/* <div className="video-container">
+                    <video autoPlay loop muted playsInline className="background-video">
+                        <source src={bgVideo} type="video/mp4" />
+                        Your browser does not support the video tag.
+                    </video>
+                </div> */}
             </section>
 
             <section className="two">
