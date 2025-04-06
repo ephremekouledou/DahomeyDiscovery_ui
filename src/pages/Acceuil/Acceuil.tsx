@@ -14,7 +14,7 @@ const Acceuil = () => {
         <div className="container">
         
             <section className="one">
-                <NavBar />
+                <NavBar scrolled={true} />
                 <div className="video-container">
                     <video autoPlay loop muted playsInline className="background-video">
                         <source src={bgVideo} type="video/mp4" />

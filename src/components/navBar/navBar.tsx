@@ -4,13 +4,20 @@ import  logo  from "../../assets/images/Logo/logo-belge.png"
 import { CloseOutlined, MenuOutlined } from "@ant-design/icons";
 import { useState } from "react";
 
-const NavBar = () => {
+type NavBarProps = {
+  scrolled: boolean;
+};
+
+const NavBar: React.FC<NavBarProps> = ({ scrolled }) => {
     /* States */
-    const [mobileClose, setMobileClose] = useState<boolean>(false);
+  const [mobileClose, setMobileClose] = useState<boolean>(false);
+
+  // window.addEventListener('scroll', () => console.log("scrolled"));
+
   return (
-    <div className="navbar_header">
+    <div className={`navbar_header ${scrolled ? 'scrolled' : ''}`}>
       <Link to={"#"}>
-        <img className="logo"  src={logo} alt= "logo" />
+        <img className={`logo ${scrolled ? 'scrolled' : ''}`}  src={logo} alt= "logo" />
       </Link>
 
       {
