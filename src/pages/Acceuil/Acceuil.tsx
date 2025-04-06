@@ -28,7 +28,7 @@ const Acceuil = () => {
             </section>
 
             <section className="three">
-                <h1>Third page</h1>
+                <h1>Reconnectez-vous à la Terre Mère</h1>
             </section>
 
             <section className="four">
