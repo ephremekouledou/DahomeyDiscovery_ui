@@ -15,16 +15,12 @@ const Acceuil = () => {
         
             <section className="one">
                 <NavBar />
-                <video autoPlay loop muted playsInline className="background-video">
-                        <source src={bgVideo} type="video/mp4" />
-                        Your browser does not support the video tag.
-                </video>
-                {/* <div className="video-container">
+                <div className="video-container">
                     <video autoPlay loop muted playsInline className="background-video">
                         <source src={bgVideo} type="video/mp4" />
                         Your browser does not support the video tag.
                     </video>
-                </div> */}
+                </div>
             </section>
 
             <section className="two">
