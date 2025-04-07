@@ -11,8 +11,7 @@ const Acceuil = () => {
     }, []);
 
     return (
-        <div className="container">
-        
+        <>
             <section className="one">
                 <NavBar scrolled={true} />
                 <div className="video-container">
@@ -28,13 +27,15 @@ const Acceuil = () => {
             </section>
 
             <section className="three">
-                <h1>Reconnectez-vous à la Terre Mère</h1>
+                <h1 className="text-3xl font-bold underline">
+                    Hello world!
+                </h1>
             </section>
 
             <section className="four">
                 <h1>Fourth page</h1>
             </section>
-        </div>
+        </>
     )
 }
 
