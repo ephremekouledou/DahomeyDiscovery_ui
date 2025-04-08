@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import './Acceuil.css';
 import NavBar from "../../components/navBar/navBar";
 import bgVideo from "../../assets/videos/bgVideo.mp4"
+import { ThreeDCardDemo } from "../../components/dededed/dededef";
 
 
 const Acceuil = () => {
@@ -30,6 +31,7 @@ const Acceuil = () => {
                 <h1 className="text-3xl font-bold underline">
                     Hello world!
                 </h1>
+                <ThreeDCardDemo />
             </section>
 
             <section className="four">
