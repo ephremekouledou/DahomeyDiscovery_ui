@@ -16,8 +16,8 @@
     position: fixed;
     top: 0;
     left: 0;
-    /* width: 100%; */
-    width: calc(100vw - 17px);
+    width: 100%;
+    /* width: calc(100vw - 17px); */
     padding: 20px 50px;    
     background: rgba(255, 255, 255, .1);
     display: flex;
