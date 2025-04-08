@@ -4,6 +4,7 @@ import NavBar from "../../components/navBar/navBar";
 import bgVideo from "../../assets/videos/bgVideo.mp4";
 import { FlipWords } from "../../components/ui/flip-words";
 import  logo  from "../../assets/images/Logo/monoChrome-blanc.png"
+import Footer from "../../components/footer/footer";
 
 const Acceuil = () => {
   useEffect(() => {
@@ -61,7 +62,7 @@ const Acceuil = () => {
       </section>
 
       <section className="four">
-        <h1>Fourth page</h1>
+        <Footer />
       </section>
     </>
   );

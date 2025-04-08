@@ -1,6 +1,6 @@
 // import React from 'react'
-import { useRef, useEffect, useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
+// import { useRef, useEffect, useState } from 'react';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 
 import './footer.css';
 import { WhatsAppOutlined } from '@ant-design/icons';
@@ -8,7 +8,7 @@ import { FacebookOutlined } from '@ant-design/icons';
 import { InstagramOutlined } from '@ant-design/icons';
 import { TwitterOutlined } from '@ant-design/icons';
 
-import { Button } from 'antd';
+// import { Button } from 'antd';
 
 
 function Footer() {

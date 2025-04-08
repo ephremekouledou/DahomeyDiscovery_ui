@@ -1,5 +1,5 @@
 section {
-  height: 100vh;
+  /* height: 100vh; */
   scroll-snap-align: start;
 }
 
@@ -42,7 +42,8 @@ section {
 }
 
 .four {
-  background-color: #411e1c;
+  background-color: #F59F00;
+  height: fit-content;
 }
 
 .video-container {
