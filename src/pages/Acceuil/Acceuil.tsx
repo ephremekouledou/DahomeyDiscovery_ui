@@ -5,6 +5,7 @@ import bgVideo from "../../assets/videos/bgVideo.mp4";
 import { FlipWords } from "../../components/ui/flip-words";
 import  logo  from "../../assets/images/Logo/monoChrome-blanc.png"
 import Footer from "../../components/footer/footer";
+import Circuit from "../../components/circuit/circuit";
 
 const Acceuil = () => {
   useEffect(() => {
@@ -26,7 +27,7 @@ const Acceuil = () => {
       </section>
 
       <section className="two">
-        <h1>Second page</h1>
+        {/* <Circuit items={[]} /> */}
       </section>
 
       <section className="three">
