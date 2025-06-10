@@ -15,14 +15,15 @@ const NavBar: React.FC<NavBarProps> = () => {
     <Flex
       style={{
         color: "black",
-        width: "100%",
-        position: "sticky",
-        top: 0,
+        width: "fit-content",
+        // position: "sticky",
+        // top: 0,
         zIndex: 100,
         // marginTop: "30px",
-        backgroundColor: "transparent", // This will be overridden by the white background of the nav
+        // backgroundColor: "red", // This will be overridden by the white background of the nav
       }}
       justify="center"
+      align="center"
     >
       <nav style={{ maxWidth: "1200px", width: "100%" }}>
         <Flex

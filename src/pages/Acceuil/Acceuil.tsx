@@ -21,12 +21,11 @@ const Acceuil = () => {
 
   return (
     <>
-      <NavBar scrolled={true} />
       <section className="one">
         <VideoBackground />
       </section>
 
-      {/* <section className="two"><Circuit items={[]} /></section> */}
+      <section className="two"></section>
 
       {/* <section className="three">
         <img src={logo} className="Accueil_image_3" />

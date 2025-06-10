@@ -1,6 +1,7 @@
 import { Button, Flex, Typography } from "antd";
 import bgVideo from "../../assets/videos/bgVideo.mp4";
 import vector from "../../assets/icons/homeVector.png";
+import NavBar from "../navBar/navBar";
 
 const VideoBackground = () => {
   return (
@@ -9,6 +10,10 @@ const VideoBackground = () => {
         <source src={bgVideo} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
+
+      <div className="relative z-20 flex items-center justify-center p-8">
+        <NavBar scrolled={true} />
+      </div>
 
       {/* Contenu par-dessus la vidéo */}
       <div className="relative z-20 flex items-center justify-center h-full text-white">
