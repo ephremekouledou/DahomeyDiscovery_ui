@@ -3,9 +3,13 @@ section {
   scroll-snap-align: start;
 }
 
-.one {
-    /* background-color: red; */
+.fullwidth {
+  width: 100%;
 }
+
+/* .one {
+    background-color: red;
+} */
 
 .two {
   background-color: white;
