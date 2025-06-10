@@ -1,62 +1,78 @@
-// import React from 'react'
-// import { useRef, useEffect, useState } from 'react';
-// import 'bootstrap/dist/css/bootstrap.min.css';
-
-import './footer.css';
-import { WhatsAppOutlined } from '@ant-design/icons';
-import { FacebookOutlined } from '@ant-design/icons';
-import { InstagramOutlined } from '@ant-design/icons';
-import { TwitterOutlined } from '@ant-design/icons';
-
-// import { Button } from 'antd';
-
+import { Flex, Typography } from "antd";
+import background from "../../assets/images/backgroundFooter.png";
+import logo from "../../assets/images/Logo/monoChrome-blanc.png";
 
 function Footer() {
-    return (
-        <>
-            <div className='divFooter'>
-                <footer>
-                    <div>
+  return (
+    <>
+      <div
+        style={{
+          backgroundImage: `url(${background})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          width: "100%",
+          height: "448px",
+          position: "relative",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        {/* Overlay pour assombrir l'image */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)", // Overlay noir avec 50% d'opacité
+            zIndex: 1,
+          }}
+        ></div>
 
-                    </div>
-                    <div className='waves'>
-                        <div className='wave' id='wave1'></div>
-                        <div className='wave' id='wave2'></div>
-                        <div className='wave' id='wave3'></div>
-                        <div className='wave' id='wave4'></div>
-                    </div>
-                    <ul className='social_icon'>
-                        <li>
-                            <a href='#'><FacebookOutlined /></a>
-                        </li>
-                        <li>
-                            <a href='#'><WhatsAppOutlined/></a>
-                        </li>
-                        <li>
-                            <a href='#'><TwitterOutlined /></a>
-                        </li>
-                        <li>
-                            <a href='#'><InstagramOutlined /></a>
-                        </li>
-                    </ul>
-                    <ul className='menu'>
-                        <li>
-                            <a href='#'>home</a>
-                        </li>
-                        <li>
-                            <a href='#'>about</a>
-                        </li>
-                        <li>
-                            <a href='#'>service</a>
-                        </li>
-                        <li>
-                            <a href='#'>team</a>
-                        </li>
-                    </ul>
-                    <p>MI-KWABO # All Rights Reserved</p>
-                </footer>
-            </div>
-        </>
-    );
+        {/* Contenu du footer */}
+        <Flex
+          style={{
+            color: "white",
+            width: "100%",
+            height: "100%",
+            fontSize: "18px",
+            zIndex: 2, // Au-dessus de l'overlay
+          }}
+          vertical
+          justify="flex-end"
+          align="center"
+          gap="3vh"
+        >
+          <img
+            src={logo}
+            alt="Logo"
+            style={{ height: "8vw", width: "8vw" }}
+          />
+          <Typography
+            style={{
+              fontSize: "24px",
+              color: "white",
+            }}
+          >
+            dahomeydiscovery@gmail.com | +229 01 67 11 02 20
+          </Typography>
+          <span
+            style={{
+              color: "white",
+              borderTop: "1px solid white",
+              marginTop: "30px",
+              padding: "20px 0",
+              width: "20%",
+                textAlign: "center",
+            }}
+          >
+            © 2025 - Tous droits réservés
+          </span>
+        </Flex>
+      </div>
+    </>
+  );
 }
-export default Footer
+export default Footer;

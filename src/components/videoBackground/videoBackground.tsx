@@ -17,20 +17,36 @@ const VideoBackground = () => {
 
       {/* Contenu par-dessus la vidéo */}
       <div className="relative z-20 flex items-center justify-center h-full text-white">
-        <Flex vertical gap="10px" justify="center" align="center">
+        <Flex
+          vertical
+          gap="clamp(0.5rem, 2vw, 1rem)"
+          justify="center"
+          align="center"
+          style={{
+            padding: "clamp(1rem, 3vw, 2rem)",
+            textAlign: "center",
+          }}
+        >
           <Flex vertical align="flex-end">
             <img
               src={vector}
               alt="Vector"
-              style={{ height: "50px", width: "250px", paddingRight: "40px" }}
+              style={{
+                height: "clamp(2rem, 5vh, 4rem)",
+                width: "clamp(10rem, 25vw, 18rem)",
+                paddingRight: "clamp(1rem, 3vw, 2.5rem)",
+                maxWidth: "90vw",
+              }}
             />
             <Typography.Title
               level={2}
               style={{
                 color: "white",
-                marginLeft: "10px",
-                fontSize: "75px",
+                marginLeft: "clamp(0.25rem, 1vw, 0.75rem)",
+                fontSize: "clamp(2rem, 7vw, 5rem)",
                 fontWeight: "800",
+                lineHeight: "1.1",
+                margin: "0",
               }}
             >
               Reconnectez-vous à
@@ -40,9 +56,11 @@ const VideoBackground = () => {
             level={2}
             style={{
               color: "white",
-              marginLeft: "10px",
-              fontSize: "75px",
+              marginLeft: "clamp(0.25rem, 1vw, 0.75rem)",
+              fontSize: "clamp(2rem, 7vw, 5rem)",
               fontWeight: "800",
+              lineHeight: "1.1",
+              margin: "0",
             }}
           >
             la Terre Mère !
@@ -51,10 +69,16 @@ const VideoBackground = () => {
             type="primary"
             size="large"
             style={{
-              borderRadius: "100px",
-              padding: "10px 27px",
+              borderRadius: "clamp(2rem, 10vw, 6rem)",
+              padding: "clamp(0.5rem, 2vw, 1rem) clamp(1rem, 4vw, 2rem)",
               backgroundColor: "#F59F00",
               color: "black",
+              fontSize: "clamp(0.8rem, 2vw, 1.2rem)",
+              fontWeight: "600",
+              marginTop: "clamp(1rem, 3vh, 2rem)",
+              minHeight: "clamp(2.5rem, 6vh, 4rem)",
+              border: "none",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
             }}
           >
             Je choisis mon expérience

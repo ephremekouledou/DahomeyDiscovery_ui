@@ -3,10 +3,14 @@ import "./Acceuil.css";
 import { FlipWords } from "../../components/ui/flip-words";
 import backChevron from "../../assets/icons/backChevron.png";
 import vector from "../../assets/icons/homeVector.png";
+import vectorbrown from "../../assets/icons/vectorbrown.png";
+import vectorPoint from "../../assets/icons/Vector.png";
+import unity from "../../assets/images/unity.png";
 import VideoBackground from "../../components/videoBackground/videoBackground";
 import circuitImage from "../../assets/images/circuitImage.png";
-import { Divider, Flex, Typography } from "antd";
+import { Button, Divider, Flex, Typography } from "antd";
 import { InfiniteMovingCards } from "../../components/ui/infinite-moving-cards";
+import Footer from "../../components/footer/footer";
 
 const Acceuil = () => {
   const [selectedCircuit, setSelectedCircuit] =
@@ -93,7 +97,7 @@ const Acceuil = () => {
                       selectedCircuit === "Circuit Signature"
                         ? "#BF2500"
                         : "#411E1C",
-                    fontSize: "clamp(1rem, 5vw, 3rem)",
+                    fontSize: "clamp(0.3rem, 2vw, 2.5rem)",
                     // fontWeight: "800",
                     textAlign: "center",
                     paddingLeft: "clamp(0.5rem, 2vw, 1.5rem)",
@@ -143,7 +147,7 @@ const Acceuil = () => {
                       selectedCircuit === "Circuits Thématiques"
                         ? "#BF2500"
                         : "#411E1C",
-                    fontSize: "clamp(1rem, 5vw, 3rem)",
+                    fontSize: "clamp(0.3rem, 2vw, 2.5rem)",
                     // fontWeight: "800",
                     textAlign: "center",
                     paddingLeft: "clamp(0.5rem, 2vw, 1.5rem)",
@@ -195,7 +199,7 @@ const Acceuil = () => {
                       selectedCircuit === "Circuit à la carte"
                         ? "#BF2500"
                         : "#411E1C",
-                    fontSize: "clamp(1rem, 5vw, 3rem)",
+                    fontSize: "clamp(0.3rem, 2vw, 2.5rem)",
                     // fontWeight: "800",
                     textAlign: "center",
                     paddingLeft: "clamp(0.5rem, 2vw, 1.5rem)",
@@ -265,6 +269,100 @@ const Acceuil = () => {
           />
         </Flex>
       </section>
+
+      <section className="four">
+        <Flex
+          vertical
+          align="center"
+          gap="40px"
+          style={{ padding: "5vh 5vw", width: "100%" }}
+          justify="center"
+        >
+          <Flex vertical align="center" gap="10px">
+            <Typography.Title
+              level={2}
+              style={{
+                color: "#3B1B19",
+                fontSize: "clamp(1.5rem, 5vw, 3rem)",
+                fontWeight: "800",
+                textAlign: "center",
+                margin: "0",
+              }}
+            >
+              Un accueil humain, ancré dans <br /> les réalités locales
+            </Typography.Title>
+            <img src={vectorbrown} alt="Vector" />
+          </Flex>
+          <Flex gap="50px" justify="center" align="center">
+            <Flex vertical justify="center" align="center" gap="20px">
+              <Flex align="center" style={{width: "100%"}} gap="30px">
+                <img
+                  src={vectorPoint}
+                  style={{ width: "3vw", height: "30px" }}
+                  alt="Vector Point"
+                />
+                <Typography.Text
+                  style={{
+                    color: "#3B1B19",
+                    fontSize: "clamp(0.5rem, 1.5vw, 1.5rem)",
+                    marginLeft: "10px",
+                  }}
+                >
+                  Artisans, guides, <br /> restaurateurs, hôtes
+                  <br /> disponibles
+                </Typography.Text>
+              </Flex>
+              <Flex align="center" style={{width: "100%"}} gap="30px">
+                <img
+                  src={vectorPoint}
+                  style={{ width: "3vw", height: "30px" }}
+                  alt="Vector Point"
+                />
+                <Typography.Text
+                  style={{
+                    color: "#3B1B19",
+                    fontSize: "clamp(0.5rem, 1.5vw, 1.5rem)",
+                    marginLeft: "10px",
+                  }}
+                >
+                  Privatisables ou en <br /> petits groupes
+                </Typography.Text>
+              </Flex>
+              <Flex align="center" style={{width: "100%"}} gap="30px">
+                <img
+                  src={vectorPoint}
+                  style={{ width: "3vw", height: "30px" }}
+                  alt="Vector Point"
+                />
+                <Typography.Text
+                  style={{
+                    color: "#3B1B19",
+                    fontSize: "clamp(0.5rem, 1.5vw, 1.5rem)",
+                    marginLeft: "10px",
+                  }}
+                >
+                  Programmes complets, <br /> équilibrés et prêts à vivre
+                </Typography.Text>
+              </Flex>
+              <Button
+                type="primary"
+                size="large"
+                style={{
+                  borderRadius: "100px",
+                  padding: "10px 27px",
+                  backgroundColor: "#FF3100",
+                  color: "white",
+                }}
+              >
+                Réserver maintenant
+              </Button>
+            </Flex>
+            <img src={unity} alt="Unity" className="unity-image" />
+          </Flex>
+        </Flex>
+      </section>
+
+      <Footer />
     </>
   );
 };
