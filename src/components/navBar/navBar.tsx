@@ -6,11 +6,13 @@ import { Button, Flex } from "antd";
 import { useState } from "react";
 
 type NavBarProps = {
-  scrolled: boolean;
+  menu: string;
+  // Define any props you might need in the future
+  scrolled?: boolean;
 };
 
-const NavBar: React.FC<NavBarProps> = () => {
-  const [menuSelected, setMenuSelected] = useState<string>("ACCUEIL");
+const NavBar: React.FC<NavBarProps> = ({ menu }) => {
+  const [menuSelected, setMenuSelected] = useState<string>(menu);
   return (
     <Flex
       style={{

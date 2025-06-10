@@ -12,7 +12,7 @@ const VideoBackground = () => {
       </video>
 
       <div className="relative z-20 flex items-center justify-center p-8">
-        <NavBar scrolled={true} />
+        <NavBar menu="ACCUEIL" />
       </div>
 
       {/* Contenu par-dessus la vidéo */}

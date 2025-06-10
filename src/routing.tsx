@@ -1,11 +1,17 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Acceuil from './pages/Acceuil/Acceuil';
 import NotFound from './pages/NotFound';
+import Actualites from './pages/Actualites/Actualites';
 
 const router = createBrowserRouter([
     {
       path: "/",
       element: <Acceuil />,
+      errorElement: <NotFound />,
+    },
+    {
+      path: "/actualites",
+      element: <Actualites />,
       errorElement: <NotFound />,
     },
   ]);

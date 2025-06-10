@@ -1,0 +1,42 @@
+.news-section {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.news-title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.news-intro {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.news-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.news-item {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1.5rem;
+}
+
+.news-item-title {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: #444;
+  line-height: 1.4;
+}
+
+.news-item-time {
+  font-size: 0.9rem;
+  color: #888;
+  margin: 0;
+}
