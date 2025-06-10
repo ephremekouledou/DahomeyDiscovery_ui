@@ -3,9 +3,9 @@ section {
   scroll-snap-align: start;
 }
 
-/* .one {
-    background-color: #F59F00;
-} */
+.one {
+    /* background-color: red; */
+}
 
 .two {
   background-color: #fffcf2;
