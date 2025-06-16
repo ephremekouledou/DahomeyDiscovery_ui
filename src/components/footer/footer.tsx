@@ -1,8 +1,21 @@
 import { Flex, Typography } from "antd";
 import background from "../../assets/images/backgroundFooter.png";
 import logo from "../../assets/images/Logo/monoChrome-blanc.png";
+import {
+  FacebookFilled,
+  InstagramFilled,
+  WhatsAppOutlined,
+} from "@ant-design/icons";
+import { Link } from "react-router-dom";
 
 function Footer() {
+  const navItems = [
+    { key: "ACCUEIL", label: "ACCUEIL", path: "/" },
+    { key: "CIRCUITS", label: "NOS CIRCUITS", path: "/circuits" },
+    { key: "ADRESSES", label: "NOS BONNES ADRESSES", path: "/bonnes-adresses" },
+    { key: "A PROPOS", label: "À PROPOS", path: "/a-propos" },
+    { key: "ACTUALITES", label: "ACTUALITÉS", path: "/actualites" },
+  ];
   return (
     <>
       <div
@@ -45,31 +58,91 @@ function Footer() {
           align="center"
           gap="3vh"
         >
-          <img
-            src={logo}
-            alt="Logo"
-            style={{ height: "8vw", width: "8vw" }}
-          />
-          <Typography
+          <img src={logo} alt="Logo" style={{ height: "8vw", width: "8vw" }} />
+          <Flex gap={10}>
+            <Flex
+              style={{
+                backgroundColor: "#411E1C",
+                width: "50px ",
+                height: "50px",
+                borderRadius: "50%",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Link
+                to="https://www.facebook.com/dahomey.discovery"
+                target="_blank"
+                style={{ textDecoration: "none" }}
+              >
+                <FacebookFilled style={{ fontSize: "24px", color: "white" }} />
+              </Link>
+            </Flex>
+            <Flex
+              style={{
+                backgroundColor: "#411E1C",
+                width: "50px ",
+                height: "50px",
+                borderRadius: "50%",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Link
+                to="https://www.instagram.com/dahomey.discovery/"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ textDecoration: "none" }}
+              >
+                <InstagramFilled style={{ fontSize: "24px", color: "white" }} />
+              </Link>
+            </Flex>
+            <Flex
+              style={{
+                backgroundColor: "#411E1C",
+                width: "50px ",
+                height: "50px",
+                borderRadius: "50%",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Link
+                to="https://api.whatsapp.com/send?phone=22995202020"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ textDecoration: "none" }}
+              >
+                <WhatsAppOutlined
+                  style={{ fontSize: "24px", color: "white" }}
+                />
+              </Link>
+            </Flex>
+          </Flex>
+          <Flex gap={30} style={{ flexWrap: "wrap", justifyContent: "center" }}>
+            {navItems.map((item) => (
+              <Link key={item.key} to={item.path} style={{ color: "white" }}>
+                {item.label}
+              </Link>
+            ))}
+          </Flex>
+          <Flex
+            justify="space-between"
             style={{
-              fontSize: "24px",
-              color: "white",
-            }}
-          >
-            dahomeydiscovery@gmail.com | +229 01 67 11 02 20
-          </Typography>
-          <span
-            style={{
-              color: "white",
+              width: "90%",
+              margin: "0 auto",
               borderTop: "1px solid white",
-              marginTop: "30px",
-              padding: "20px 0",
-              width: "20%",
-                textAlign: "center",
+              paddingTop: "20px",
+              paddingBottom: "20px",
             }}
           >
-            © 2025 - Tous droits réservés
-          </span>
+            <Typography.Text style={{ color: "white" }}>
+              © 2025 Dahomey Discovery, Tous droits réservés
+            </Typography.Text>
+            <Typography.Text style={{ color: "white" }}>
+              Mentions légales | Conditions générales de vente
+            </Typography.Text>
+          </Flex>
         </Flex>
       </div>
     </>
