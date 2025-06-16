@@ -4,7 +4,7 @@ import { Layout, Flex, Row, Col, Image, Typography, Button } from "antd";
 import vector from "../../assets/icons/aproposVector.svg";
 import mmeDerby from "../../assets/images/mmeDerby.png";
 const { Content } = Layout;
-const { Title, Paragraph, Text } = Typography;
+const { Title, Paragraph } = Typography;
 
 const Apropos = () => {
   const images = [
