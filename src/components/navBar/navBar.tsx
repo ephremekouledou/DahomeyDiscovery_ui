@@ -17,7 +17,7 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
     <Flex
       style={{
         color: "black",
-        width: "fit-content",
+        width: "80vw",
         // position: "sticky",
         // top: 0,
         zIndex: 100,
@@ -27,7 +27,7 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
       justify="center"
       align="center"
     >
-      <nav style={{ maxWidth: "1200px", width: "100%" }}>
+      <nav style={{ width: "100%" }}>
         <Flex
           style={{
             backgroundColor: "white",
