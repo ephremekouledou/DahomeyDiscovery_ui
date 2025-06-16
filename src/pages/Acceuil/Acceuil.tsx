@@ -87,7 +87,7 @@ const Acceuil = () => {
                 padding: "clamp(0.5rem, 2vw, 1.5rem)",
                 borderRadius: "0.3rem",
               }}
-              onClick={() => setSelectedCircuit("Circuit Signature")}
+              onMouseEnter={() => setSelectedCircuit("Circuit Signature")}
             >
               <Flex align="center">
                 <Typography.Title
@@ -137,7 +137,7 @@ const Acceuil = () => {
                 padding: "clamp(0.5rem, 2vw, 1.5rem)",
                 borderRadius: "0.3rem",
               }}
-              onClick={() => setSelectedCircuit("Circuits Thématiques")}
+              onMouseEnter={() => setSelectedCircuit("Circuits Thématiques")}
             >
               <Flex align="center">
                 <Typography.Title
@@ -189,7 +189,7 @@ const Acceuil = () => {
                 padding: "clamp(0.5rem, 2vw, 1.5rem)",
                 borderRadius: "0.3rem",
               }}
-              onClick={() => setSelectedCircuit("Circuit à la carte")}
+              onMouseEnter={() => setSelectedCircuit("Circuit à la carte")}
             >
               <Flex align="center">
                 <Typography.Title
