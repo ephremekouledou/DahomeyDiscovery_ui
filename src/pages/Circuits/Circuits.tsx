@@ -49,7 +49,9 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
           width: "fit-content",
         }}
       >
-        <Typography>{circuit.duration}</Typography>
+        <Typography style={{ fontSize: "clamp(0.3rem, 1.5vw, 2rem)" }}>
+          {circuit.duration}
+        </Typography>
       </Flex>
 
       {/* Contenu principal du circuit */}
@@ -225,7 +227,11 @@ const Circuits = () => {
       </Flex>
 
       {/* Contenu principal */}
-      <Flex style={{ width: "100%", padding: "3vh 0" }} vertical gap={50}>
+      <Flex
+        style={{ width: "100%", padding: "3vh 0", paddingBottom: "0vh" }}
+        vertical
+        gap={50}
+      >
         {/* Section des circuits */}
         <Flex
           vertical
@@ -233,7 +239,7 @@ const Circuits = () => {
           style={{
             padding: "0 7vw",
             width: "100%",
-            paddingBottom: "20vh",
+            paddingBottom: "7vw",
             position: "relative",
             bottom: "7vh",
           }}
@@ -250,7 +256,7 @@ const Circuits = () => {
         </Flex>
 
         {/* Galerie d'images */}
-        <Flex style={{ backgroundColor: "#F59F00" }} vertical gap={24}>
+        <Flex style={{ backgroundColor: "#F59F00" }} vertical>
           <ImageGallery images={images} />
         </Flex>
       </Flex>

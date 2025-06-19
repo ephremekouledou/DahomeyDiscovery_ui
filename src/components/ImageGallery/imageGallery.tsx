@@ -19,7 +19,7 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
         width: "100%",
         padding: "0 5vw",
         position: "relative",
-        bottom: "15vh",
+        bottom: "5vw",
       }}
       justify="center"
     >
