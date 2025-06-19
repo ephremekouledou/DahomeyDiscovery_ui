@@ -295,7 +295,7 @@ const Acceuil = () => {
           </Flex>
           <Flex gap="50px" justify="center" align="center">
             <Flex vertical justify="center" align="center" gap="20px">
-              <Flex align="center" style={{width: "100%"}} gap="30px">
+              <Flex align="center" style={{ width: "100%" }} gap="30px">
                 <img
                   src={vectorPoint}
                   style={{ width: "3vw", height: "30px" }}
@@ -312,7 +312,7 @@ const Acceuil = () => {
                   <br /> disponibles
                 </Typography.Text>
               </Flex>
-              <Flex align="center" style={{width: "100%"}} gap="30px">
+              <Flex align="center" style={{ width: "100%" }} gap="30px">
                 <img
                   src={vectorPoint}
                   style={{ width: "3vw", height: "30px" }}
@@ -328,7 +328,7 @@ const Acceuil = () => {
                   Privatisables ou en <br /> petits groupes
                 </Typography.Text>
               </Flex>
-              <Flex align="center" style={{width: "100%"}} gap="30px">
+              <Flex align="center" style={{ width: "100%" }} gap="30px">
                 <img
                   src={vectorPoint}
                   style={{ width: "3vw", height: "30px" }}

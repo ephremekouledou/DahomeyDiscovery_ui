@@ -1,8 +1,9 @@
 import Footer from "../../components/footer/footer";
 import NavBar from "../../components/navBar/navBar";
-import { Layout, Flex, Row, Col, Image, Typography, Button } from "antd";
+import { Layout, Flex, Row, Col, Typography, Button } from "antd";
 import vector from "../../assets/icons/aproposVector.svg";
 import mmeDerby from "../../assets/images/mmeDerby.png";
+import ImageGallery from "../../components/ImageGallery/imageGallery";
 const { Content } = Layout;
 const { Title, Paragraph } = Typography;
 
@@ -151,8 +152,8 @@ const DahomeyDiscovery = () => {
                       marginBottom: "20px",
                     }}
                   >
-                    <b>Dahomey Discovery</b> est une agence de voyages engagée et
-                    immersive, née d'un rêve simple : permettre à chacun de
+                    <b>Dahomey Discovery</b> est une agence de voyages engagée
+                    et immersive, née d'un rêve simple : permettre à chacun de
                     reconnecter avec la Terre Mère à travers des séjours riches
                     en culture, émotions et rencontres humaines.
                   </Paragraph>
@@ -164,13 +165,10 @@ const DahomeyDiscovery = () => {
                       color: "#2c3e50",
                     }}
                   >
-                    Fondée par{" "}
-                    <b>
-                      Zoulfati
-                    </b>
-                    , entrepreneure franco-mahoraise vivant entre la Guyane, la
-                    France et le Bénin, Dahomey Discovery incarne un tourisme
-                    nouveau : authentique, responsable, enraciné et vibrant.
+                    Fondée par <b>Zoulfati</b>, entrepreneure franco-mahoraise
+                    vivant entre la Guyane, la France et le Bénin, Dahomey
+                    Discovery incarne un tourisme nouveau : authentique,
+                    responsable, enraciné et vibrant.
                   </Paragraph>
                 </div>
 
@@ -301,56 +299,6 @@ const DahomeyDiscovery = () => {
         </div>
       </Content>
     </Layout>
-  );
-};
-
-type ImageType = {
-  id: number;
-  src: string;
-  alt: string;
-  title?: string;
-  description?: string;
-};
-
-type ImageGalleryProps = {
-  images: ImageType[];
-};
-
-const ImageGallery = ({ images }: ImageGalleryProps) => {
-  return (
-    <Flex
-      style={{
-        width: "100%",
-        padding: "0 5vw",
-        position: "relative",
-        bottom: "15vh",
-      }}
-      justify="center"
-    >
-      {/* Galerie principale - Grid responsive */}
-      <Row gutter={[16, 16]}>
-        {images.map((image) => (
-          <Col
-            key={image.id}
-            xs={24} // 1 colonne sur très petit écran
-            sm={12} // 2 colonnes sur petit écran
-            md={8} // 3 colonnes sur écran moyen
-            lg={6} // 4 colonnes sur grand écran
-          >
-            <Image
-              src={image.src}
-              alt={image.alt}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                cursor: "pointer",
-              }}
-            />
-          </Col>
-        ))}
-      </Row>
-    </Flex>
   );
 };
 
