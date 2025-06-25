@@ -1,4 +1,5 @@
 import { Flex, Typography } from "antd";
+import { useState, useEffect } from "react";
 import background from "../../assets/images/backgroundFooter.png";
 import logo from "../../assets/images/Logo/monoChrome-blanc.png";
 import {
@@ -9,6 +10,17 @@ import {
 import { Link } from "react-router-dom";
 
 function Footer() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   const navItems = [
     { key: "ACCUEIL", label: "ACCUEIL", path: "/" },
     { key: "CIRCUITS", label: "NOS CIRCUITS", path: "/circuits" },
@@ -16,6 +28,7 @@ function Footer() {
     { key: "A PROPOS", label: "À PROPOS", path: "/a-propos" },
     { key: "ACTUALITES", label: "ACTUALITÉS", path: "/actualites" },
   ];
+
   return (
     <>
       <div
@@ -58,13 +71,15 @@ function Footer() {
           align="center"
           gap="3vh"
         >
-          <img src={logo} alt="Logo" style={{ height: "8vw", width: "8vw" }} />
-          <Flex gap={10}>
+          <img src={logo} alt="Logo" style={{ height: isMobile ? "90px" : "150px", width: isMobile ? "90px" : "150px" }} />
+
+          {/* Section 2: Social Media Icons - Responsive */}
+          <Flex gap={isMobile ? 8 : 10}>
             <Flex
               style={{
                 backgroundColor: "#411E1C",
-                width: "50px ",
-                height: "50px",
+                width: isMobile ? "40px" : "50px",
+                height: isMobile ? "40px" : "50px",
                 borderRadius: "50%",
                 justifyContent: "center",
                 alignItems: "center",
@@ -75,14 +90,19 @@ function Footer() {
                 target="_blank"
                 style={{ textDecoration: "none" }}
               >
-                <FacebookFilled style={{ fontSize: "24px", color: "white" }} />
+                <FacebookFilled
+                  style={{
+                    fontSize: isMobile ? "20px" : "24px",
+                    color: "white",
+                  }}
+                />
               </Link>
             </Flex>
             <Flex
               style={{
                 backgroundColor: "#411E1C",
-                width: "50px ",
-                height: "50px",
+                width: isMobile ? "40px" : "50px",
+                height: isMobile ? "40px" : "50px",
                 borderRadius: "50%",
                 justifyContent: "center",
                 alignItems: "center",
@@ -94,14 +114,19 @@ function Footer() {
                 rel="noopener noreferrer"
                 style={{ textDecoration: "none" }}
               >
-                <InstagramFilled style={{ fontSize: "24px", color: "white" }} />
+                <InstagramFilled
+                  style={{
+                    fontSize: isMobile ? "20px" : "24px",
+                    color: "white",
+                  }}
+                />
               </Link>
             </Flex>
             <Flex
               style={{
                 backgroundColor: "#411E1C",
-                width: "50px ",
-                height: "50px",
+                width: isMobile ? "40px" : "50px",
+                height: isMobile ? "40px" : "50px",
                 borderRadius: "50%",
                 justifyContent: "center",
                 alignItems: "center",
@@ -114,11 +139,15 @@ function Footer() {
                 style={{ textDecoration: "none" }}
               >
                 <WhatsAppOutlined
-                  style={{ fontSize: "24px", color: "white" }}
+                  style={{
+                    fontSize: isMobile ? "20px" : "24px",
+                    color: "white",
+                  }}
                 />
               </Link>
             </Flex>
           </Flex>
+
           <Flex gap={30} style={{ flexWrap: "wrap", justifyContent: "center" }}>
             {navItems.map((item) => (
               <Link key={item.key} to={item.path} style={{ color: "white" }}>
@@ -126,20 +155,37 @@ function Footer() {
               </Link>
             ))}
           </Flex>
+
+          {/* Section 4: Copyright and Legal Text - Responsive */}
           <Flex
-            justify="space-between"
+            justify={isMobile ? "center" : "space-between"}
+            align="center"
             style={{
               width: "90%",
               margin: "0 auto",
               borderTop: "1px solid white",
               paddingTop: "20px",
               paddingBottom: "20px",
+              flexDirection: isMobile ? "column" : "row",
+              gap: isMobile ? "10px" : "0",
             }}
           >
-            <Typography.Text style={{ color: "white" }}>
+            <Typography.Text
+              style={{
+                color: "white",
+                fontSize: isMobile ? "12px" : "14px",
+                textAlign: isMobile ? "center" : "left",
+              }}
+            >
               © 2025 Dahomey Discovery, Tous droits réservés
             </Typography.Text>
-            <Typography.Text style={{ color: "white" }}>
+            <Typography.Text
+              style={{
+                color: "white",
+                fontSize: isMobile ? "11px" : "14px",
+                textAlign: isMobile ? "center" : "right",
+              }}
+            >
               Mentions légales | Conditions générales de vente
             </Typography.Text>
           </Flex>
