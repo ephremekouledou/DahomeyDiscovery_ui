@@ -28,6 +28,7 @@ interface CircuitCardProps {
   isSelected: boolean;
   onHover: (circuitId: string) => void;
   showDivider: boolean;
+  isMobile: boolean;
 }
 
 const CircuitCard: React.FC<CircuitCardProps> = ({
@@ -35,6 +36,7 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
   isSelected,
   onHover,
   showDivider,
+  isMobile,
 }) => {
   const navigate = useNavigate();
 
@@ -45,18 +47,21 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
       onClick={() => navigate(`/circuits/${circuit.id}`)}
     >
       {/* Badge de durée - affiché uniquement pour le circuit sélectionné */}
-
       <Flex
         style={{
           backgroundColor: isSelected ? "#FFE0D9" : "white",
-          margin: "2vh 0 0 3vw",
-          padding: "0.6vw",
+          margin: isMobile ? "1vh 0 0 4vw" : "2vh 0 0 3vw",
+          padding: isMobile ? "0.8vw" : "0.6vw",
           border: "1px solid #999791",
           borderRadius: "46px",
           width: "fit-content",
         }}
       >
-        <Typography style={{ fontSize: "clamp(0.3rem, 1.5vw, 2rem)" }}>
+        <Typography
+          style={{
+            fontSize: isMobile ? "12px" : "16px",
+          }}
+        >
           {circuit.duration}
         </Typography>
       </Flex>
@@ -67,9 +72,9 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
         align="center"
         style={{
           width: "100%",
-          height: "clamp(3rem, 10vh, 6rem)",
+          height: isMobile ? "80px" : "120px",
           backgroundColor: "white",
-          padding: "clamp(0.5rem, 2vw, 1.5rem)",
+          padding: isMobile ? "12px" : "24px",
           borderRadius: "0.3rem",
           cursor: "pointer",
         }}
@@ -80,10 +85,11 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
             level={2}
             style={{
               color: isSelected ? "#BF2500" : "#411E1C",
-              fontSize: "clamp(0.3rem, 2vw, 2.5rem)",
+              fontSize: isMobile ? "16px" : "24px",
               textAlign: "center",
-              paddingLeft: "clamp(0.5rem, 2vw, 1.5rem)",
+              paddingLeft: isMobile ? "8px" : "24px",
               margin: "0",
+              lineHeight: isMobile ? "1.2" : "1.4",
             }}
           >
             {circuit.name}
@@ -95,12 +101,17 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
           <img
             src={circuitImage}
             style={{
-              height: "clamp(6rem, 25vh, 15rem)",
+              height: isMobile ? "60px" : "120px",
               width: "auto",
-              paddingRight: "clamp(1rem, 5vw, 4rem)",
-              maxWidth: "30vw",
+              paddingRight: isMobile ? "16px" : "64px",
+              maxWidth: isMobile ? "40vw" : "30vw",
               position: "relative",
-              bottom: circuit.id === "circuit-signature" ? "4vh" : "0",
+              bottom:
+                circuit.id === "circuit-signature"
+                  ? isMobile
+                    ? "2vh"
+                    : "4vh"
+                  : "0",
             }}
             className="Accueil_image_2"
             alt={`${circuit.name} Logo`}
@@ -115,6 +126,17 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
 };
 
 const Circuits = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   // Configuration centralisée des circuits
   const circuits: Circuit[] = [
     {
@@ -199,19 +221,19 @@ const Circuits = () => {
         <NavBar menu="CIRCUITS" />
       </div>
 
-      {/* Section héros */}
+      {/* Section héros - Responsive */}
       <Flex
         vertical
         style={{
           backgroundColor: "#FEF1D9",
-          padding: "8vh 8vw",
-          paddingBottom: "20vh",
+          padding: isMobile ? "4vh 6vw" : "8vh 8vw",
+          paddingBottom: isMobile ? "10vh" : "20vh",
         }}
       >
         <Typography.Text
           style={{
             color: "#000000",
-            fontSize: "clamp(0.3rem, 1.5vw, 1rem)",
+            fontSize: isMobile ? "12px" : "16px",
             lineHeight: "1.1",
             margin: "0",
             textTransform: "uppercase",
@@ -223,7 +245,7 @@ const Circuits = () => {
           level={1}
           style={{
             color: "#FF3100",
-            fontSize: "clamp(1rem, 5vw, 3rem)",
+            fontSize: isMobile ? "24px" : "48px",
             fontWeight: "800",
             lineHeight: "1.1",
             margin: "0",
@@ -233,22 +255,26 @@ const Circuits = () => {
         </Typography.Title>
       </Flex>
 
-      {/* Contenu principal */}
+      {/* Contenu principal - Responsive */}
       <Flex
-        style={{ width: "100%", padding: "3vh 0", paddingBottom: "0vh" }}
+        style={{
+          width: "100%",
+          padding: isMobile ? "2vh 0" : "3vh 0",
+          paddingBottom: "0vh",
+        }}
         vertical
-        gap={50}
+        gap={isMobile ? 30 : 50}
       >
-        {/* Section des circuits */}
+        {/* Section des circuits - Responsive */}
         <Flex
           vertical
           gap="20px"
           style={{
-            padding: "0 7vw",
+            padding: isMobile ? "0 4vw" : "0 7vw",
             width: "100%",
-            paddingBottom: "7vw",
+            paddingBottom: isMobile ? "4vw" : "7vw",
             position: "relative",
-            bottom: "7vh",
+            bottom: isMobile ? "4vh" : "7vh",
           }}
         >
           {circuits.map((circuit, index) => (
@@ -258,6 +284,7 @@ const Circuits = () => {
               isSelected={selectedCircuitId === circuit.id}
               onHover={handleCircuitHover}
               showDivider={index < circuits.length - 1}
+              isMobile={isMobile}
             />
           ))}
         </Flex>
