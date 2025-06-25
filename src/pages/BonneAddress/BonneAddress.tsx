@@ -1,10 +1,22 @@
 import { Card, Col, Flex, Row, Tabs, Typography, Button } from "antd";
 import { RightOutlined } from "@ant-design/icons";
+import { useEffect, useState } from "react";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
 const { Title, Text } = Typography;
 
 const BonneAddress = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   const establishments = [
     {
       id: 1,
@@ -92,12 +104,20 @@ const BonneAddress = () => {
       >
         <NavBar menu="ADRESSES" />
       </div>
-      <Flex vertical style={{ backgroundColor: "#FEF1D9", padding: "8vh 8vw" }}>
+      
+      {/* Hero Section - Responsive */}
+      <Flex 
+        vertical 
+        style={{ 
+          backgroundColor: "#FEF1D9", 
+          padding: isMobile ? "4vh 6vw" : "8vh 8vw" 
+        }}
+      >
         <Typography.Title
           level={1}
           style={{
             color: "#FF3100",
-            fontSize: "clamp(1rem, 5vw, 3rem)",
+            fontSize: isMobile ? "24px" : "48px",
             fontWeight: "800",
             lineHeight: "1.1",
             margin: "0",
@@ -108,29 +128,37 @@ const BonneAddress = () => {
         <Typography.Text
           style={{
             color: "#000000",
-            fontSize: "clamp(0.5rem, 2vw, 1.6rem)",
+            fontSize: isMobile ? "14px" : "20px",
             lineHeight: "1.1",
             margin: "0",
           }}
         >
-          Hôtels, maisons d’hôtes, écolodges & restaurants
+          Hôtels, maisons d'hôtes, écolodges & restaurants
         </Typography.Text>
       </Flex>
+      
+      {/* Main Content - Responsive */}
       <Flex
-        style={{ width: "100%", padding: "2vh 5vw", paddingBottom: "20vh" }}
+        style={{ 
+          width: "100%", 
+          padding: isMobile ? "2vh 4vw" : "2vh 5vw", 
+          paddingBottom: isMobile ? "10vh" : "20vh" 
+        }}
         vertical
-        gap={50}
+        gap={isMobile ? 30 : 50}
       >
-        <DahomeyDiscovery establishments={establishments} />
+        <DahomeyDiscovery establishments={establishments} isMobile={isMobile} />
         <HotelsSection
           hotels={hotels}
           title="Hôtels, maisons d'hôtes, écolodges"
           buttonText="Obtenir le catalogue de logements"
+          isMobile={isMobile}
         />
         <HotelsSection
           hotels={hotels}
           title="Restaurants"
           buttonText="Obtenir le catalogue des restaurants"
+          isMobile={isMobile}
         />
       </Flex>
       <Footer />
@@ -149,10 +177,12 @@ type Establishment = {
 
 interface DahomeyDiscoveryProps {
   establishments: Establishment[];
+  isMobile: boolean;
 }
 
 const DahomeyDiscovery: React.FC<DahomeyDiscoveryProps> = ({
   establishments,
+  isMobile,
 }) => {
   const EstablishmentCard = ({
     establishment,
@@ -163,7 +193,11 @@ const DahomeyDiscovery: React.FC<DahomeyDiscoveryProps> = ({
       hoverable
       cover={
         <div
-          style={{ position: "relative", height: "250px", overflow: "hidden" }}
+          style={{ 
+            position: "relative", 
+            height: isMobile ? "200px" : "250px", 
+            overflow: "hidden" 
+          }}
         >
           <img
             alt={establishment.name}
@@ -194,9 +228,9 @@ const DahomeyDiscovery: React.FC<DahomeyDiscoveryProps> = ({
               right: "0px",
               backgroundColor: "#FF8C00",
               color: "white",
-              padding: "8px 12px",
+              padding: isMobile ? "6px 10px" : "8px 12px",
               borderRadius: "4px",
-              fontSize: "12px",
+              fontSize: isMobile ? "10px" : "12px",
               fontWeight: "bold",
             }}
           >
@@ -217,13 +251,16 @@ const DahomeyDiscovery: React.FC<DahomeyDiscoveryProps> = ({
               style={{
                 color: "white",
                 margin: "0 0 8px 0",
-                fontSize: "18px",
+                fontSize: isMobile ? "16px" : "18px",
                 fontWeight: "bold",
               }}
             >
               {establishment.name}
             </Title>
-            <Text style={{ color: "white", fontSize: "14px" }}>
+            <Text style={{ 
+              color: "white", 
+              fontSize: isMobile ? "12px" : "14px" 
+            }}>
               {establishment.description}
             </Text>
           </div>
@@ -244,7 +281,7 @@ const DahomeyDiscovery: React.FC<DahomeyDiscoveryProps> = ({
       label: (
         <span
           style={{
-            fontSize: "16px",
+            fontSize: isMobile ? "14px" : "16px",
             fontWeight: "500",
           }}
         >
@@ -257,16 +294,16 @@ const DahomeyDiscovery: React.FC<DahomeyDiscoveryProps> = ({
           <Title
             level={2}
             style={{
-              marginTop: "30px",
-              marginBottom: "30px",
-              fontSize: "24px",
+              marginTop: isMobile ? "20px" : "30px",
+              marginBottom: isMobile ? "20px" : "30px",
+              fontSize: isMobile ? "18px" : "24px",
               fontWeight: "600",
               color: "#333",
             }}
           >
             Testé et approuvé par Dahomey Discovery
           </Title>
-          <Row gutter={[20, 20]}>
+          <Row gutter={[isMobile ? 15 : 20, isMobile ? 15 : 20]}>
             {establishments.map((establishment) => (
               <Col key={establishment.id} xs={24} sm={12} md={8} lg={8} xl={8}>
                 <EstablishmentCard establishment={establishment} />
@@ -279,8 +316,11 @@ const DahomeyDiscovery: React.FC<DahomeyDiscoveryProps> = ({
     {
       key: "hotels",
       label: (
-        <span style={{ fontSize: "16px", fontWeight: "500" }}>
-          Hôtels Maisons d'hôtes Ecolodges
+        <span style={{ 
+          fontSize: isMobile ? "14px" : "16px", 
+          fontWeight: "500" 
+        }}>
+          {isMobile ? "Hôtels" : "Hôtels Maisons d'hôtes Ecolodges"}
         </span>
       ),
       children: (
@@ -289,16 +329,16 @@ const DahomeyDiscovery: React.FC<DahomeyDiscoveryProps> = ({
           <Title
             level={2}
             style={{
-              marginTop: "30px",
-              marginBottom: "30px",
-              fontSize: "24px",
+              marginTop: isMobile ? "20px" : "30px",
+              marginBottom: isMobile ? "20px" : "30px",
+              fontSize: isMobile ? "18px" : "24px",
               fontWeight: "600",
               color: "#333",
             }}
           >
             Testé et approuvé par Dahomey Discovery
           </Title>
-          <Row gutter={[20, 20]}>
+          <Row gutter={[isMobile ? 15 : 20, isMobile ? 15 : 20]}>
             {establishments
               .filter((e) => e.type === "hotel")
               .map((establishment) => (
@@ -320,7 +360,12 @@ const DahomeyDiscovery: React.FC<DahomeyDiscoveryProps> = ({
     {
       key: "restaurants",
       label: (
-        <span style={{ fontSize: "16px", fontWeight: "500" }}>Restaurants</span>
+        <span style={{ 
+          fontSize: isMobile ? "14px" : "16px", 
+          fontWeight: "500" 
+        }}>
+          Restaurants
+        </span>
       ),
       children: (
         <>
@@ -328,16 +373,16 @@ const DahomeyDiscovery: React.FC<DahomeyDiscoveryProps> = ({
           <Title
             level={2}
             style={{
-              marginTop: "30px",
-              marginBottom: "30px",
-              fontSize: "24px",
+              marginTop: isMobile ? "20px" : "30px",
+              marginBottom: isMobile ? "20px" : "30px",
+              fontSize: isMobile ? "18px" : "24px",
               fontWeight: "600",
               color: "#333",
             }}
           >
             Testé et approuvé par Dahomey Discovery
           </Title>
-          <Row gutter={[20, 20]}>
+          <Row gutter={[isMobile ? 15 : 20, isMobile ? 15 : 20]}>
             {establishments
               .filter((e) => e.type === "restaurant")
               .map((establishment) => (
@@ -359,27 +404,22 @@ const DahomeyDiscovery: React.FC<DahomeyDiscoveryProps> = ({
   ];
 
   return (
-    <div
-      style={{
-        // padding: "20px",
-        // minHeight: "100vh",
-      }}
-    >
+    <div>
       {/* Onglets avec contenu */}
       <Tabs
         defaultActiveKey="all"
         items={tabItems}
-        size="large"
+        size={isMobile ? "middle" : "large"}
         style={{
           backgroundColor: "white",
           borderRadius: "8px",
-          padding: "20px",
+          padding: isMobile ? "15px" : "20px",
         }}
         tabBarStyle={{
           borderBottom: "2px solid #f0f0f0",
-          marginBottom: "30px",
+          marginBottom: isMobile ? "20px" : "30px",
         }}
-        tabBarGutter={40}
+        tabBarGutter={isMobile ? 20 : 40}
       />
     </div>
   );
@@ -396,21 +436,23 @@ interface HotelsSectionProps {
   hotels: Hotel[];
   title: string;
   buttonText: string;
+  isMobile: boolean;
 }
 
 const HotelsSection: React.FC<HotelsSectionProps> = ({
   hotels,
   title,
   buttonText,
+  isMobile,
 }) => {
   return (
-    <div style={{ padding: "40px 20px" }}>
+    <div style={{ padding: isMobile ? "20px 10px" : "40px 20px" }}>
       <div>
         {/* En-tête avec titre et lien */}
         <Row
           justify="space-between"
           align="middle"
-          style={{ marginBottom: "30px" }}
+          style={{ marginBottom: isMobile ? "20px" : "30px" }}
         >
           <Col xs={24} sm={16} md={18}>
             <Title
@@ -418,23 +460,31 @@ const HotelsSection: React.FC<HotelsSectionProps> = ({
               style={{
                 margin: 0,
                 color: "#411E1C",
-                fontSize: "clamp(1.5rem, 4vw, 2.2rem)",
+                fontSize: isMobile ? "20px" : "32px",
                 fontWeight: "600",
               }}
             >
               {title}
             </Title>
           </Col>
-          <Col xs={24} sm={8} md={6} style={{ textAlign: "right" }}>
+          <Col 
+            xs={24} 
+            sm={8} 
+            md={6} 
+            style={{ 
+              textAlign: isMobile ? "left" : "right",
+              marginTop: isMobile ? "10px" : "0"
+            }}
+          >
             <Button
               type="link"
               style={{
                 color: "#411E1C",
                 padding: 0,
-                fontSize: "14px",
+                fontSize: isMobile ? "12px" : "14px",
                 textDecoration: "underline",
               }}
-              icon={<RightOutlined style={{ fontSize: "12px" }} />}
+              icon={<RightOutlined style={{ fontSize: isMobile ? "10px" : "12px" }} />}
               iconPosition="end"
             >
               {buttonText}
@@ -443,7 +493,7 @@ const HotelsSection: React.FC<HotelsSectionProps> = ({
         </Row>
 
         {/* Grille des cartes d'hôtels */}
-        <Row gutter={[20, 20]}>
+        <Row gutter={[isMobile ? 15 : 20, isMobile ? 15 : 20]}>
           {hotels.map((hotel) => (
             <Col
               key={hotel.id}
@@ -454,7 +504,10 @@ const HotelsSection: React.FC<HotelsSectionProps> = ({
               <Card
                 hoverable
                 cover={
-                  <div style={{ height: "200px", overflow: "hidden" }}>
+                  <div style={{ 
+                    height: isMobile ? "150px" : "200px", 
+                    overflow: "hidden" 
+                  }}>
                     <img
                       alt={hotel.name}
                       src={hotel.image}
@@ -481,7 +534,7 @@ const HotelsSection: React.FC<HotelsSectionProps> = ({
                   boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                   transition: "box-shadow 0.3s ease, transform 0.3s ease",
                 }}
-                bodyStyle={{ padding: "16px" }}
+                bodyStyle={{ padding: isMobile ? "12px" : "16px" }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.boxShadow =
                     "0 4px 16px rgba(0,0,0,0.15)";
@@ -496,7 +549,7 @@ const HotelsSection: React.FC<HotelsSectionProps> = ({
                   level={4}
                   style={{
                     margin: "0 0 8px 0",
-                    fontSize: "16px",
+                    fontSize: isMobile ? "14px" : "16px",
                     fontWeight: "700",
                     color: "#333",
                   }}
@@ -506,7 +559,7 @@ const HotelsSection: React.FC<HotelsSectionProps> = ({
                 <Text
                   style={{
                     color: "#666",
-                    fontSize: "14px",
+                    fontSize: isMobile ? "12px" : "14px",
                     lineHeight: "1.4",
                   }}
                 >
