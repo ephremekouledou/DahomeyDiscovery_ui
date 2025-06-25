@@ -117,10 +117,11 @@ const BonneAddress = () => {
           level={1}
           style={{
             color: "#FF3100",
-            fontSize: isMobile ? "24px" : "48px",
+            fontSize: isMobile ? "34px" : "78px",
             fontWeight: "800",
             lineHeight: "1.1",
             margin: "0",
+            fontFamily: "DragonAngled",
           }}
         >
           RECOMMANDATIONS
@@ -128,9 +129,10 @@ const BonneAddress = () => {
         <Typography.Text
           style={{
             color: "#000000",
-            fontSize: isMobile ? "14px" : "20px",
+            fontSize: isMobile ? "24px" : "40px",
             lineHeight: "1.1",
             margin: "0",
+            fontFamily: "DragonAngled",
           }}
         >
           Hôtels, maisons d'hôtes, écolodges & restaurants

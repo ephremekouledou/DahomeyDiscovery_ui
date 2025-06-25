@@ -59,6 +59,7 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
           color: "black",
           fontSize: mobile ? "16px" : "14px",
           fontWeight: mobile ? "500" : "normal",
+          fontFamily: "GeneralSans",
         }}
       >
         {item.label}
@@ -194,6 +195,7 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
                         color: "black",
                         borderRadius: "25px",
                         border: "none",
+                        fontFamily: "GeneralSans",
                       }}
                     >
                       RÉSERVER

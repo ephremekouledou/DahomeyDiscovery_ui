@@ -15,10 +15,11 @@ function Actualites() {
           level={2}
           style={{
             color: "#411E1C",
-            fontSize: "clamp(1rem, 5vw, 3rem)",
+            fontSize: "clamp(2.5rem, 5vw, 5rem)",
             fontWeight: "800",
             lineHeight: "1.1",
             margin: "0",
+            fontFamily: "DragonAngled",
           }}
         >
           ACTUALITÉS
@@ -84,7 +85,7 @@ const NewsLayout = () => {
       {/* Main Layout */}
       <Flex gap={24} vertical={isMobile} wrap={false}>
         {/* Main Featured Article */}
-        <div style={{ flex: 2 }}>
+        <div style={{ flex: 2, fontFamily: "GeneralSans" }}>  
           <article className="overflow-hidden hover:shadow-md transition-shadow">
             <div className="relative">
               <img
@@ -109,7 +110,7 @@ const NewsLayout = () => {
         </div>
 
         {/* Side Articles */}
-        <div style={{ flex: 1 }} className="space-y-6">
+        <div style={{ flex: 1, fontFamily: "GeneralSans" }} className="space-y-6">
           {sideArticles.map((article) => (
             <article
               key={article.id}
