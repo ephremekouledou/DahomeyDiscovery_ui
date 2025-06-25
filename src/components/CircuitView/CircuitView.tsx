@@ -20,6 +20,7 @@ interface CircuitCardProps {
   circuit: Circuit;
   clicked?: boolean;
   onClick?: () => void;
+  isMobile: boolean;
 }
 
 interface Experience {
@@ -42,22 +43,26 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
   circuit,
   clicked,
   onClick,
+  isMobile,
 }) => {
   return (
     <Flex vertical style={{ backgroundColor: "white" }} onClick={onClick}>
       {/* Badge de durée - affiché uniquement pour le circuit sélectionné */}
-
       <Flex
         style={{
           backgroundColor: clicked ? "#FFE0D9" : "white",
-          margin: "2vh 0 0 3vw",
-          padding: "0.6vw",
+          margin: isMobile ? "1vh 0 0 4vw" : "2vh 0 0 3vw",
+          padding: isMobile ? "0.8vw" : "0.6vw",
           border: "1px solid #999791",
           borderRadius: "46px",
           width: "fit-content",
         }}
       >
-        <Typography style={{ fontSize: "clamp(0.3rem, 1.5vw, 2rem)" }}>
+        <Typography
+          style={{
+            fontSize: isMobile ? "12px" : "16px",
+          }}
+        >
           {circuit.duration}
         </Typography>
       </Flex>
@@ -68,9 +73,9 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
         align="center"
         style={{
           width: "100%",
-          height: "clamp(3rem, 10vh, 6rem)",
+          height: isMobile ? "80px" : "120px",
           backgroundColor: "white",
-          padding: "clamp(0.5rem, 2vw, 1.5rem)",
+          padding: isMobile ? "12px" : "24px",
           borderRadius: "0.3rem",
           cursor: "pointer",
         }}
@@ -80,10 +85,11 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
             level={2}
             style={{
               color: "#411E1C",
-              fontSize: "clamp(0.3rem, 2vw, 2.5rem)",
+              fontSize: isMobile ? "16px" : "24px",
               textAlign: "center",
-              paddingLeft: "clamp(0.5rem, 2vw, 1.5rem)",
+              paddingLeft: isMobile ? "8px" : "24px",
               margin: "0",
+              lineHeight: isMobile ? "1.2" : "1.4",
             }}
           >
             {circuit.name}
@@ -101,6 +107,15 @@ export const CircuitView = () => {
   const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Configuration centralisée des circuits
   const circuits: Circuit[] = [
@@ -146,7 +161,6 @@ export const CircuitView = () => {
   ];
 
   // Carousel slides data
-
   const slides: Slide[] = [
     {
       id: 1,
@@ -169,62 +183,62 @@ export const CircuitView = () => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
-  // Check if mobile on mount and resize
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
-
   return (
     <Flex justify="center" vertical>
-      {/* Header avec NavBar */}
+      {/* Header avec NavBar - Responsive */}
       <div
         className="relative z-20 flex items-center justify-center p-8"
-        style={{ backgroundColor: "#FEF1D9", paddingBottom: "7vw" }}
+        style={{
+          backgroundColor: "#FEF1D9",
+          paddingBottom: isMobile ? "4vw" : "7vw",
+        }}
       >
         <NavBar menu="CIRCUITS" />
       </div>
 
-      {/* Contenu principal */}
+      {/* Contenu principal - Responsive */}
       <Flex
-        style={{ width: "100%", padding: "3vh 0", paddingBottom: "0vh" }}
+        style={{
+          width: "100%",
+        }}
         vertical
         gap={0}
       >
-        {/* Section des circuits */}
+        {/* Section des circuits - Responsive */}
         <Flex
           vertical
           gap="20px"
           style={{
-            padding: "0 7vw",
+            padding: isMobile ? "0 4vw" : "0 7vw",
             width: "100%",
-            paddingBottom: "2vw",
-            // position: "relative",
-            // bottom: "7vh",
+            paddingBottom: isMobile ? "1vw" : "2vw",
           }}
         >
           {circuits
             .filter((circuit) => circuit.id === id)
             .map((circuit) => (
-              <CircuitCard key={circuit.id} circuit={circuit} clicked={true} />
+              <CircuitCard
+                key={circuit.id}
+                circuit={circuit}
+                clicked={true}
+                isMobile={isMobile}
+              />
             ))}
         </Flex>
+
         {/* Section de l'expérience culturelle */}
         <CulturalExperience experiences={experiences} slides={slides} />
+
+        {/* Section autres circuits - Responsive */}
         <Flex style={{ backgroundColor: "#411E1C" }} vertical gap="20px">
           <Typography.Title
             level={1}
             style={{
               color: "white",
-              padding: "5vw",
-              fontSize: isMobile ? "32px" : "48px",
+              padding: isMobile ? "4vw" : "5vw",
+              fontSize: isMobile ? "24px" : "48px",
               fontWeight: "800",
+              margin: "0",
             }}
           >
             Autres circuits thématiques
@@ -232,7 +246,11 @@ export const CircuitView = () => {
           <Flex
             vertical
             gap="10px"
-            style={{ width: "100%", padding: "0 7vw", paddingBottom: "7vw" }}
+            style={{
+              width: "100%",
+              padding: isMobile ? "0 4vw" : "0 7vw",
+              paddingBottom: isMobile ? "4vw" : "7vw",
+            }}
           >
             {circuits
               .filter((circuit) => circuit.id !== id)
@@ -242,6 +260,7 @@ export const CircuitView = () => {
                   circuit={circuit}
                   clicked={false}
                   onClick={() => navigate(`/circuits/${circuit.id}`)}
+                  isMobile={isMobile}
                 />
               ))}
           </Flex>
@@ -270,10 +289,8 @@ const CulturalExperience: React.FC<CulturalExperienceProps> = ({
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-
     checkMobile();
     window.addEventListener("resize", checkMobile);
-
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
@@ -331,13 +348,6 @@ const CulturalExperience: React.FC<CulturalExperienceProps> = ({
     }
   };
 
-  // Responsive styles
-  const gridColumns = isMobile ? "1fr" : "repeat(2, 1fr)";
-  const experienceGap = isMobile ? "16px" : "24px";
-  const numberFontSize = isMobile ? "32px" : "48px";
-  const textFontSize = isMobile ? "16px" : "18px";
-  const carouselHeight = isMobile ? "300px" : "450px";
-
   return (
     <div style={{}}>
       <div
@@ -346,15 +356,15 @@ const CulturalExperience: React.FC<CulturalExperienceProps> = ({
           borderRadius: "8px",
           boxShadow:
             "0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02)",
-          padding: "0 10vw",
-          paddingBottom: "5vw",
+          padding: isMobile ? "0 6vw" : "0 10vw",
+          paddingBottom: isMobile ? "3vw" : "5vw",
         }}
       >
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: gridColumns,
-            gap: "32px",
+            gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)",
+            gap: isMobile ? "24px" : "32px",
             alignItems: "center",
           }}
         >
@@ -366,18 +376,18 @@ const CulturalExperience: React.FC<CulturalExperienceProps> = ({
                 style={{
                   display: "flex",
                   alignItems: "flex-start",
-                  gap: experienceGap,
+                  gap: isMobile ? "16px" : "24px",
                   marginBottom:
                     index < experiences.length - 1 ? "24px" : "32px",
                 }}
               >
                 <span
                   style={{
-                    fontSize: numberFontSize,
+                    fontSize: isMobile ? "24px" : "48px",
                     fontWeight: "700",
                     color: "#E85D3D",
                     backgroundColor: "#FFE0D9",
-                    padding: "16px 8px",
+                    padding: isMobile ? "12px 6px" : "16px 8px",
                     lineHeight: "1",
                     fontFamily:
                       '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial',
@@ -389,8 +399,8 @@ const CulturalExperience: React.FC<CulturalExperienceProps> = ({
                 <p
                   style={{
                     color: "#262626",
-                    fontSize: textFontSize,
-                    marginTop: "8px",
+                    fontSize: isMobile ? "14px" : "18px",
+                    marginTop: isMobile ? "6px" : "8px",
                     lineHeight: "1.6",
                     fontFamily:
                       '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial',
@@ -401,15 +411,15 @@ const CulturalExperience: React.FC<CulturalExperienceProps> = ({
               </div>
             ))}
 
-            {/* Reserve Button */}
+            {/* Reserve Button - Responsive */}
             <button
               style={{
                 backgroundColor: "#F39C12",
                 color: "white",
                 border: "none",
                 borderRadius: "24px",
-                padding: "12px 32px",
-                fontSize: "16px",
+                padding: isMobile ? "10px 24px" : "12px 32px",
+                fontSize: isMobile ? "14px" : "16px",
                 fontWeight: "500",
                 cursor: "pointer",
                 transition: "all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1)",
@@ -435,7 +445,7 @@ const CulturalExperience: React.FC<CulturalExperienceProps> = ({
             </button>
           </div>
 
-          {/* Right Column - Carousel */}
+          {/* Right Column - Carousel - Responsive */}
           <div
             style={{
               position: "relative",
@@ -451,7 +461,7 @@ const CulturalExperience: React.FC<CulturalExperienceProps> = ({
                 overflow: "hidden",
                 borderRadius: "8px",
                 boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-                height: carouselHeight,
+                height: isMobile ? "250px" : "450px",
               }}
               onTouchStart={onTouchStart}
               onTouchMove={onTouchMove}
@@ -614,3 +624,4 @@ const CulturalExperience: React.FC<CulturalExperienceProps> = ({
     </div>
   );
 };
+export default CircuitView;

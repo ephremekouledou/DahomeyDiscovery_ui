@@ -259,7 +259,7 @@ const Circuits = () => {
       <Flex
         style={{
           width: "100%",
-          padding: isMobile ? "2vh 0" : "3vh 0",
+          padding: "3vh 0",
           paddingBottom: "0vh",
         }}
         vertical
