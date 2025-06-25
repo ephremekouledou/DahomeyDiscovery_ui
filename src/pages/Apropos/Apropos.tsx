@@ -96,7 +96,8 @@ const DahomeyDiscovery = () => {
                 style={{
                   margin: 0,
                   color: "#e74c3c",
-                  fontSize: "clamp(24px, 4vw, 48px)",
+                  fontSize: "clamp(44px, 4vw, 78px)",
+                  fontFamily: "DragonAngled",
                   //   fontWeight: "bold",
                   lineHeight: 1.2,
                 }}
@@ -150,6 +151,7 @@ const DahomeyDiscovery = () => {
                       lineHeight: 1.6,
                       color: "#2c3e50",
                       marginBottom: "20px",
+                      fontFamily: "GeneralSans",
                     }}
                   >
                     <b>Dahomey Discovery</b> est une agence de voyages engagée
@@ -163,6 +165,7 @@ const DahomeyDiscovery = () => {
                       fontSize: "16px",
                       lineHeight: 1.6,
                       color: "#2c3e50",
+                      fontFamily: "GeneralSans",
                     }}
                   >
                     Fondée par <b>Zoulfati</b>, entrepreneure franco-mahoraise
@@ -178,9 +181,10 @@ const DahomeyDiscovery = () => {
                     level={2}
                     style={{
                       color: "#1D0D0D",
-                      fontSize: "32px",
+                      fontSize: "clamp(34px, 4vw, 68px)",
                       marginBottom: "20px",
                       fontWeight: "bold",
+                      fontFamily: "DragonAngled",
                     }}
                   >
                     Mission
@@ -191,6 +195,7 @@ const DahomeyDiscovery = () => {
                       lineHeight: 1.6,
                       color: "#2c3e50",
                       marginBottom: "30px",
+                      fontFamily: "GeneralSans",
                     }}
                   >
                     Faire du Bénin une destination de cœur pour les voyageurs
@@ -215,6 +220,7 @@ const DahomeyDiscovery = () => {
                     boxShadow: "0 4px 15px rgba(255, 107, 53, 0.3)",
                     transition: "all 0.3s ease",
                     color: "#1D0D0D",
+                    fontFamily: "GeneralSans",
                   }}
                   onMouseEnter={(e) => {
                     const target = e.target as HTMLButtonElement;
