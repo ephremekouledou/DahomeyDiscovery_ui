@@ -13,10 +13,22 @@ import { InfiniteMovingCards } from "../../components/ui/infinite-moving-cards";
 import Footer from "../../components/footer/footer";
 
 const Acceuil = () => {
-  const [selectedCircuit, setSelectedCircuit] =
-    useState<string>("Circuit Signature");
+  const [selectedCircuit, setSelectedCircuit] = useState<string>("Circuit Signature");
+  const [isMobile, setIsMobile] = useState(false);
+
   useEffect(() => {
     document.title = "Acceuil";
+  }, []);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   return (
@@ -32,7 +44,7 @@ const Acceuil = () => {
             className="Accueil_image_2"
             alt="Dahomey Discovery Logo"
             style={{
-              width: "clamp(14rem, 5vw, 16rem)",
+              width: isMobile ? "12rem" : "16rem",
               height: "auto",
             }}
           />
@@ -40,18 +52,18 @@ const Acceuil = () => {
         <Flex
           vertical
           align="flex-start"
-          gap="clamp(0.5rem, 2vw, 1rem)"
+          gap={isMobile ? "0.5rem" : "1rem"}
           style={{
-            margin: "0 5vw",
+            margin: isMobile ? "0 4vw" : "0 5vw",
             position: "relative",
-            bottom: "clamp(6rem, 15vh, 12rem)",
+            bottom: isMobile ? "4rem" : "8rem",
           }}
         >
           <Typography.Title
             level={1}
             style={{
               color: "#3B1B19",
-              fontSize: "clamp(2rem, 5vw, 4rem)",
+              fontSize: isMobile ? "2rem" : "4rem",
               fontWeight: "800",
               textAlign: "center",
               lineHeight: "1.2",
@@ -64,16 +76,20 @@ const Acceuil = () => {
             src={vector}
             alt="Vector"
             style={{
-              height: "clamp(1rem, 3vh, 2rem)",
-              width: "clamp(12rem, 30vw, 20rem)",
-              paddingRight: "clamp(1rem, 3vw, 2.5rem)",
+              height: isMobile ? "1rem" : "2rem",
+              width: isMobile ? "10rem" : "18rem",
+              paddingRight: isMobile ? "1rem" : "2.5rem",
             }}
           />
         </Flex>
         <Flex
           vertical
-          gap="100px"
-          style={{ padding: "0 5vw", width: "100%", paddingBottom: "20vh" }}
+          gap={isMobile ? "50px" : "100px"}
+          style={{ 
+            padding: isMobile ? "0 4vw" : "0 5vw", 
+            width: "100%", 
+            paddingBottom: isMobile ? "10vh" : "20vh" 
+          }}
         >
           <Flex vertical>
             <Flex
@@ -81,10 +97,10 @@ const Acceuil = () => {
               align="center"
               style={{
                 width: "100%",
-                height: "clamp(3rem, 10vh, 6rem)",
+                height: isMobile ? "4rem" : "6rem",
                 backgroundColor:
                   selectedCircuit === "Circuit Signature" ? "#fef5e6" : "white",
-                padding: "clamp(0.5rem, 2vw, 1.5rem)",
+                padding: isMobile ? "0.8rem" : "1.5rem",
                 borderRadius: "0.3rem",
               }}
               onMouseEnter={() => setSelectedCircuit("Circuit Signature")}
@@ -97,10 +113,9 @@ const Acceuil = () => {
                       selectedCircuit === "Circuit Signature"
                         ? "#BF2500"
                         : "#411E1C",
-                    fontSize: "clamp(0.3rem, 2vw, 2.5rem)",
-                    // fontWeight: "800",
+                    fontSize: isMobile ? "1.2rem" : "2.5rem",
                     textAlign: "center",
-                    paddingLeft: "clamp(0.5rem, 2vw, 1.5rem)",
+                    paddingLeft: isMobile ? "0.8rem" : "1.5rem",
                     margin: "0",
                   }}
                 >
@@ -110,10 +125,10 @@ const Acceuil = () => {
               <img
                 src={circuitImage}
                 style={{
-                  height: "clamp(6rem, 25vh, 15rem)",
+                  height: isMobile ? "3rem" : "12rem",
                   width: "auto",
-                  paddingRight: "clamp(1rem, 5vw, 4rem)",
-                  maxWidth: "30vw",
+                  paddingRight: isMobile ? "1rem" : "4rem",
+                  maxWidth: isMobile ? "25vw" : "30vw",
                   display:
                     selectedCircuit === "Circuit Signature" ? "block" : "none",
                 }}
@@ -129,12 +144,12 @@ const Acceuil = () => {
               align="center"
               style={{
                 width: "100%",
-                height: "clamp(3rem, 10vh, 6rem)",
+                height: isMobile ? "4rem" : "6rem",
                 backgroundColor:
                   selectedCircuit === "Circuits Thématiques"
                     ? "#fef5e6"
                     : "white",
-                padding: "clamp(0.5rem, 2vw, 1.5rem)",
+                padding: isMobile ? "0.8rem" : "1.5rem",
                 borderRadius: "0.3rem",
               }}
               onMouseEnter={() => setSelectedCircuit("Circuits Thématiques")}
@@ -147,10 +162,9 @@ const Acceuil = () => {
                       selectedCircuit === "Circuits Thématiques"
                         ? "#BF2500"
                         : "#411E1C",
-                    fontSize: "clamp(0.3rem, 2vw, 2.5rem)",
-                    // fontWeight: "800",
+                    fontSize: isMobile ? "1.2rem" : "2.5rem",
                     textAlign: "center",
-                    paddingLeft: "clamp(0.5rem, 2vw, 1.5rem)",
+                    paddingLeft: isMobile ? "0.8rem" : "1.5rem",
                     margin: "0",
                   }}
                 >
@@ -160,10 +174,10 @@ const Acceuil = () => {
               <img
                 src={circuitImage}
                 style={{
-                  height: "clamp(6rem, 25vh, 15rem)",
+                  height: isMobile ? "3rem" : "12rem",
                   width: "auto",
-                  paddingRight: "clamp(1rem, 5vw, 4rem)",
-                  maxWidth: "30vw",
+                  paddingRight: isMobile ? "1rem" : "4rem",
+                  maxWidth: isMobile ? "25vw" : "30vw",
                   display:
                     selectedCircuit === "Circuits Thématiques"
                       ? "block"
@@ -181,12 +195,12 @@ const Acceuil = () => {
               align="center"
               style={{
                 width: "100%",
-                height: "clamp(3rem, 10vh, 6rem)",
+                height: isMobile ? "4rem" : "6rem",
                 backgroundColor:
                   selectedCircuit === "Circuit à la carte"
                     ? "#fef5e6"
                     : "white",
-                padding: "clamp(0.5rem, 2vw, 1.5rem)",
+                padding: isMobile ? "0.8rem" : "1.5rem",
                 borderRadius: "0.3rem",
               }}
               onMouseEnter={() => setSelectedCircuit("Circuit à la carte")}
@@ -199,10 +213,9 @@ const Acceuil = () => {
                       selectedCircuit === "Circuit à la carte"
                         ? "#BF2500"
                         : "#411E1C",
-                    fontSize: "clamp(0.3rem, 2vw, 2.5rem)",
-                    // fontWeight: "800",
+                    fontSize: isMobile ? "1.2rem" : "2.5rem",
                     textAlign: "center",
-                    paddingLeft: "clamp(0.5rem, 2vw, 1.5rem)",
+                    paddingLeft: isMobile ? "0.8rem" : "1.5rem",
                     margin: "0",
                   }}
                 >
@@ -212,10 +225,10 @@ const Acceuil = () => {
               <img
                 src={circuitImage}
                 style={{
-                  height: "clamp(6rem, 25vh, 15rem)",
+                  height: isMobile ? "3rem" : "12rem",
                   width: "auto",
-                  paddingRight: "clamp(1rem, 5vw, 4rem)",
-                  maxWidth: "30vw",
+                  paddingRight: isMobile ? "1rem" : "4rem",
+                  maxWidth: isMobile ? "25vw" : "30vw",
                   display:
                     selectedCircuit === "Circuit à la carte" ? "block" : "none",
                 }}
@@ -247,18 +260,6 @@ const Acceuil = () => {
               width: "100%",
             }}
           >
-            {/* <Typography.Title
-              level={2}
-              style={{
-                color: "white",
-                fontSize: "clamp(1.5rem, 5vw, 3rem)",
-                fontWeight: "800",
-                lineHeight: "1.2",
-                margin: "0",
-              }}
-            >
-              Nos clients en parlent !
-            </Typography.Title> */}
             <FlipWords words={["Témoignages", "Avis", "Expériences"]} /> !
           </Flex>
           <InfiniteMovingCards
@@ -274,8 +275,11 @@ const Acceuil = () => {
         <Flex
           vertical
           align="center"
-          gap="40px"
-          style={{ padding: "5vh 5vw", width: "100%" }}
+          gap={isMobile ? "20px" : "40px"}
+          style={{ 
+            padding: isMobile ? "3vh 4vw" : "5vh 5vw", 
+            width: "100%" 
+          }}
           justify="center"
         >
           <Flex vertical align="center" gap="10px">
@@ -283,7 +287,7 @@ const Acceuil = () => {
               level={2}
               style={{
                 color: "#3B1B19",
-                fontSize: "clamp(1.5rem, 5vw, 3rem)",
+                fontSize: isMobile ? "1.8rem" : "3rem",
                 fontWeight: "800",
                 textAlign: "center",
                 margin: "0",
@@ -291,54 +295,84 @@ const Acceuil = () => {
             >
               Un accueil humain, ancré dans <br /> les réalités locales
             </Typography.Title>
-            <img src={vectorbrown} alt="Vector" />
+            <img 
+              src={vectorbrown} 
+              alt="Vector" 
+              style={{
+                width: isMobile ? "120px" : "auto",
+                height: "auto"
+              }}
+            />
           </Flex>
-          <Flex gap="50px" justify="center" align="center">
-            <Flex vertical justify="center" align="center" gap="20px">
-              <Flex align="center" style={{ width: "100%" }} gap="30px">
+          <Flex 
+            gap={isMobile ? "20px" : "50px"} 
+            justify="center" 
+            align="center"
+            vertical={isMobile}
+          >
+            <Flex 
+              vertical 
+              justify="center" 
+              align={isMobile ? "flex-start" : "center"} 
+              gap={isMobile ? "15px" : "20px"}
+              style={{ order: isMobile ? 2 : 1 }}
+            >
+              <Flex align="center" style={{ width: "100%" }} gap={isMobile ? "20px" : "30px"}>
                 <img
                   src={vectorPoint}
-                  style={{ width: "3vw", height: "30px" }}
+                  style={{ 
+                    width: isMobile ? "20px" : "3vw", 
+                    height: isMobile ? "20px" : "30px",
+                    flexShrink: 0
+                  }}
                   alt="Vector Point"
                 />
                 <Typography.Text
                   style={{
                     color: "#3B1B19",
-                    fontSize: "clamp(0.5rem, 1.5vw, 1.5rem)",
-                    marginLeft: "10px",
+                    fontSize: isMobile ? "1rem" : "1.5rem",
+                    marginLeft: isMobile ? "5px" : "10px",
                   }}
                 >
                   Artisans, guides, <br /> restaurateurs, hôtes
                   <br /> disponibles
                 </Typography.Text>
               </Flex>
-              <Flex align="center" style={{ width: "100%" }} gap="30px">
+              <Flex align="center" style={{ width: "100%" }} gap={isMobile ? "20px" : "30px"}>
                 <img
                   src={vectorPoint}
-                  style={{ width: "3vw", height: "30px" }}
+                  style={{ 
+                    width: isMobile ? "20px" : "3vw", 
+                    height: isMobile ? "20px" : "30px",
+                    flexShrink: 0
+                  }}
                   alt="Vector Point"
                 />
                 <Typography.Text
                   style={{
                     color: "#3B1B19",
-                    fontSize: "clamp(0.5rem, 1.5vw, 1.5rem)",
-                    marginLeft: "10px",
+                    fontSize: isMobile ? "1rem" : "1.5rem",
+                    marginLeft: isMobile ? "5px" : "10px",
                   }}
                 >
-                  Privatisables ou en <br /> petits groupes
+                  Privatisables ou en <br /> petits groupes
                 </Typography.Text>
               </Flex>
-              <Flex align="center" style={{ width: "100%" }} gap="30px">
+              <Flex align="center" style={{ width: "100%" }} gap={isMobile ? "20px" : "30px"}>
                 <img
                   src={vectorPoint}
-                  style={{ width: "3vw", height: "30px" }}
+                  style={{ 
+                    width: isMobile ? "20px" : "3vw", 
+                    height: isMobile ? "20px" : "30px",
+                    flexShrink: 0
+                  }}
                   alt="Vector Point"
                 />
                 <Typography.Text
                   style={{
                     color: "#3B1B19",
-                    fontSize: "clamp(0.5rem, 1.5vw, 1.5rem)",
-                    marginLeft: "10px",
+                    fontSize: isMobile ? "1rem" : "1.5rem",
+                    marginLeft: isMobile ? "5px" : "10px",
                   }}
                 >
                   Programmes complets, <br /> équilibrés et prêts à vivre
@@ -346,18 +380,30 @@ const Acceuil = () => {
               </Flex>
               <Button
                 type="primary"
-                size="large"
+                size={isMobile ? "middle" : "large"}
                 style={{
                   borderRadius: "100px",
-                  padding: "10px 27px",
+                  padding: isMobile ? "8px 20px" : "10px 27px",
                   backgroundColor: "#FF3100",
                   color: "white",
+                  fontSize: isMobile ? "0.9rem" : "1rem",
+                  marginTop: isMobile ? "10px" : "0"
                 }}
               >
                 Réserver maintenant
               </Button>
             </Flex>
-            <img src={unity} alt="Unity" className="unity-image" />
+            <img 
+              src={unity} 
+              alt="Unity" 
+              className="unity-image" 
+              style={{
+                order: isMobile ? 1 : 2,
+                maxWidth: isMobile ? "100%" : "auto",
+                height: isMobile ? "200px" : "auto",
+                objectFit: "contain"
+              }}
+            />
           </Flex>
         </Flex>
       </section>
