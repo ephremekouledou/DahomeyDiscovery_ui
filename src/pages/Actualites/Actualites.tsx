@@ -3,14 +3,28 @@ import NavBar from "../../components/navBar/navBar";
 import "./Actualites.css"; // Assuming you have a CSS file for styling
 import { useEffect, useState } from "react";
 import Footer from "../../components/footer/footer";
+import { useLocation } from "react-router-dom";
 
 function Actualites() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    document.title = "Actualités";
+  }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
   return (
     <Flex justify="center" vertical>
       <div className="relative z-20 flex items-center justify-center p-8">
         <NavBar menu="ACTUALITES" />
       </div>
-      <Flex style={{ width: "100%", padding: "5vh 5vw", paddingBottom: "20vh" }} vertical gap={24}>
+      <Flex
+        style={{ width: "100%", padding: "5vh 5vw", paddingBottom: "20vh" }}
+        vertical
+        gap={24}
+      >
         <Typography.Title
           level={2}
           style={{
@@ -85,7 +99,7 @@ const NewsLayout = () => {
       {/* Main Layout */}
       <Flex gap={24} vertical={isMobile} wrap={false}>
         {/* Main Featured Article */}
-        <div style={{ flex: 2, fontFamily: "GeneralSans" }}>  
+        <div style={{ flex: 2, fontFamily: "GeneralSans" }}>
           <article className="overflow-hidden hover:shadow-md transition-shadow">
             <div className="relative">
               <img
@@ -110,7 +124,10 @@ const NewsLayout = () => {
         </div>
 
         {/* Side Articles */}
-        <div style={{ flex: 1, fontFamily: "GeneralSans" }} className="space-y-6">
+        <div
+          style={{ flex: 1, fontFamily: "GeneralSans" }}
+          className="space-y-6"
+        >
           {sideArticles.map((article) => (
             <article
               key={article.id}

@@ -4,7 +4,7 @@ import Footer from "../../components/footer/footer";
 import ImageGallery from "../../components/ImageGallery/imageGallery";
 import { useEffect, useState } from "react";
 import circuitImage from "../../assets/images/circuitImage.png";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 // Types
 interface Circuit {
@@ -129,6 +129,15 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
 
 const Circuits = () => {
   const [isMobile, setIsMobile] = useState(false);
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    document.title = "Circuits";
+  }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   useEffect(() => {
     const checkMobile = () => {

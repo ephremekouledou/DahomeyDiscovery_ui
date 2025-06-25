@@ -1,6 +1,6 @@
 import { Button, Flex, Typography } from "antd";
 import { useEffect, useState } from "react";
-import bgVideo from "../../assets/videos/bgVideo.mp4";
+import bgVideo from "../../assets/videos/background.mp4";
 import vector from "../../assets/icons/homeVector.png";
 import NavBar from "../navBar/navBar";
 import "../../assets/Fonts/font.css";

@@ -3,10 +3,20 @@ import { RightOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
+import { useLocation } from "react-router-dom";
 const { Title, Text } = Typography;
 
 const BonneAddress = () => {
   const [isMobile, setIsMobile] = useState(false);
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    document.title = "Bonne Adresse";
+  }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -104,13 +114,13 @@ const BonneAddress = () => {
       >
         <NavBar menu="ADRESSES" />
       </div>
-      
+
       {/* Hero Section - Responsive */}
-      <Flex 
-        vertical 
-        style={{ 
-          backgroundColor: "#FEF1D9", 
-          padding: isMobile ? "4vh 6vw" : "8vh 8vw" 
+      <Flex
+        vertical
+        style={{
+          backgroundColor: "#FEF1D9",
+          padding: isMobile ? "4vh 6vw" : "8vh 8vw",
         }}
       >
         <Typography.Title
@@ -138,13 +148,13 @@ const BonneAddress = () => {
           Hôtels, maisons d'hôtes, écolodges & restaurants
         </Typography.Text>
       </Flex>
-      
+
       {/* Main Content - Responsive */}
       <Flex
-        style={{ 
-          width: "100%", 
-          padding: isMobile ? "2vh 4vw" : "2vh 5vw", 
-          paddingBottom: isMobile ? "10vh" : "20vh" 
+        style={{
+          width: "100%",
+          padding: isMobile ? "2vh 4vw" : "2vh 5vw",
+          paddingBottom: isMobile ? "10vh" : "20vh",
         }}
         vertical
         gap={isMobile ? 30 : 50}
@@ -195,10 +205,10 @@ const DahomeyDiscovery: React.FC<DahomeyDiscoveryProps> = ({
       hoverable
       cover={
         <div
-          style={{ 
-            position: "relative", 
-            height: isMobile ? "200px" : "250px", 
-            overflow: "hidden" 
+          style={{
+            position: "relative",
+            height: isMobile ? "200px" : "250px",
+            overflow: "hidden",
           }}
         >
           <img
@@ -259,10 +269,12 @@ const DahomeyDiscovery: React.FC<DahomeyDiscoveryProps> = ({
             >
               {establishment.name}
             </Title>
-            <Text style={{ 
-              color: "white", 
-              fontSize: isMobile ? "12px" : "14px" 
-            }}>
+            <Text
+              style={{
+                color: "white",
+                fontSize: isMobile ? "12px" : "14px",
+              }}
+            >
               {establishment.description}
             </Text>
           </div>
@@ -318,10 +330,12 @@ const DahomeyDiscovery: React.FC<DahomeyDiscoveryProps> = ({
     {
       key: "hotels",
       label: (
-        <span style={{ 
-          fontSize: isMobile ? "14px" : "16px", 
-          fontWeight: "500" 
-        }}>
+        <span
+          style={{
+            fontSize: isMobile ? "14px" : "16px",
+            fontWeight: "500",
+          }}
+        >
           {isMobile ? "Hôtels" : "Hôtels Maisons d'hôtes Ecolodges"}
         </span>
       ),
@@ -362,10 +376,12 @@ const DahomeyDiscovery: React.FC<DahomeyDiscoveryProps> = ({
     {
       key: "restaurants",
       label: (
-        <span style={{ 
-          fontSize: isMobile ? "14px" : "16px", 
-          fontWeight: "500" 
-        }}>
+        <span
+          style={{
+            fontSize: isMobile ? "14px" : "16px",
+            fontWeight: "500",
+          }}
+        >
           Restaurants
         </span>
       ),
@@ -469,13 +485,13 @@ const HotelsSection: React.FC<HotelsSectionProps> = ({
               {title}
             </Title>
           </Col>
-          <Col 
-            xs={24} 
-            sm={8} 
-            md={6} 
-            style={{ 
+          <Col
+            xs={24}
+            sm={8}
+            md={6}
+            style={{
               textAlign: isMobile ? "left" : "right",
-              marginTop: isMobile ? "10px" : "0"
+              marginTop: isMobile ? "10px" : "0",
             }}
           >
             <Button
@@ -486,7 +502,11 @@ const HotelsSection: React.FC<HotelsSectionProps> = ({
                 fontSize: isMobile ? "12px" : "14px",
                 textDecoration: "underline",
               }}
-              icon={<RightOutlined style={{ fontSize: isMobile ? "10px" : "12px" }} />}
+              icon={
+                <RightOutlined
+                  style={{ fontSize: isMobile ? "10px" : "12px" }}
+                />
+              }
               iconPosition="end"
             >
               {buttonText}
@@ -506,10 +526,12 @@ const HotelsSection: React.FC<HotelsSectionProps> = ({
               <Card
                 hoverable
                 cover={
-                  <div style={{ 
-                    height: isMobile ? "150px" : "200px", 
-                    overflow: "hidden" 
-                  }}>
+                  <div
+                    style={{
+                      height: isMobile ? "150px" : "200px",
+                      overflow: "hidden",
+                    }}
+                  >
                     <img
                       alt={hotel.name}
                       src={hotel.image}

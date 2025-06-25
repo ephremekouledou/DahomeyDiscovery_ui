@@ -4,6 +4,8 @@ import { Layout, Flex, Row, Col, Typography, Button } from "antd";
 import vector from "../../assets/icons/aproposVector.svg";
 import mmeDerby from "../../assets/images/mmeDerby.png";
 import ImageGallery from "../../components/ImageGallery/imageGallery";
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
 const { Content } = Layout;
 const { Title, Paragraph } = Typography;
 
@@ -38,6 +40,16 @@ const Apropos = () => {
       description: "Architecture résidentielle traditionnelle",
     },
   ];
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    document.title = "A Propos";
+  }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   return (
     <Flex justify="center" vertical>
       <div className="relative z-20 flex items-center justify-center p-8">

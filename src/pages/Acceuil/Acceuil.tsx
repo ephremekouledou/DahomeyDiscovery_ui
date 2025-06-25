@@ -12,15 +12,21 @@ import { Button, Divider, Flex, Typography } from "antd";
 import { InfiniteMovingCards } from "../../components/ui/infinite-moving-cards";
 import Footer from "../../components/footer/footer";
 import "../../assets/Fonts/font.css";
+import { useLocation } from "react-router-dom";
 
 const Acceuil = () => {
   const [selectedCircuit, setSelectedCircuit] =
     useState<string>("Circuit Signature");
   const [isMobile, setIsMobile] = useState(false);
+  const { pathname } = useLocation();
 
   useEffect(() => {
     document.title = "Acceuil";
   }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   useEffect(() => {
     const checkMobile = () => {
