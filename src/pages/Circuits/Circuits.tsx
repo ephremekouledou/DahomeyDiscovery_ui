@@ -60,6 +60,7 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
         <Typography
           style={{
             fontSize: isMobile ? "12px" : "16px",
+            fontFamily: "GeneralSans",
           }}
         >
           {circuit.duration}
@@ -85,7 +86,8 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
             level={2}
             style={{
               color: isSelected ? "#BF2500" : "#411E1C",
-              fontSize: isMobile ? "16px" : "24px",
+              fontSize: isMobile ? "26px" : "44px",
+              fontFamily: "DragonAngled",
               textAlign: "center",
               paddingLeft: isMobile ? "8px" : "24px",
               margin: "0",
@@ -237,6 +239,8 @@ const Circuits = () => {
             lineHeight: "1.1",
             margin: "0",
             textTransform: "uppercase",
+            fontFamily: "GeneralSans",
+            letterSpacing: "0.3em",
           }}
         >
           CIRCUITS THÉMATIQUES
@@ -245,10 +249,11 @@ const Circuits = () => {
           level={1}
           style={{
             color: "#FF3100",
-            fontSize: isMobile ? "24px" : "48px",
+            fontSize: isMobile ? "44px" : "68px",
             fontWeight: "800",
             lineHeight: "1.1",
             margin: "0",
+            fontFamily: "DragonAngled",
           }}
         >
           DESTINATIONS CULTURELLES <br /> ET HISTORIQUES
