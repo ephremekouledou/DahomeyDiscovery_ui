@@ -4,6 +4,7 @@ import Footer from "../../components/footer/footer";
 import ImageGallery from "../../components/ImageGallery/imageGallery";
 import { useEffect, useState } from "react";
 import circuitImage from "../../assets/images/circuitImage.png";
+import { useNavigate } from "react-router-dom";
 
 // Types
 interface Circuit {
@@ -35,8 +36,14 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
   onHover,
   showDivider,
 }) => {
+  const navigate = useNavigate();
+
   return (
-    <Flex vertical style={{ backgroundColor: "white" }}>
+    <Flex
+      vertical
+      style={{ backgroundColor: "white" }}
+      onClick={() => navigate(`/circuits/${circuit.id}`)}
+    >
       {/* Badge de durée - affiché uniquement pour le circuit sélectionné */}
 
       <Flex
