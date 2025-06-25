@@ -1,0 +1,13 @@
+@font-face {
+  font-family: "DragonAngled";
+  src: url("./Dragon-Angled.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "GeneralSans";
+  src: url("./GeneralSans-Regular.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}

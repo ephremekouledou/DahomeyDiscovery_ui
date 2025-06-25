@@ -11,9 +11,11 @@ import circuitImage from "../../assets/images/circuitImage.png";
 import { Button, Divider, Flex, Typography } from "antd";
 import { InfiniteMovingCards } from "../../components/ui/infinite-moving-cards";
 import Footer from "../../components/footer/footer";
+import "../../assets/Fonts/font.css";
 
 const Acceuil = () => {
-  const [selectedCircuit, setSelectedCircuit] = useState<string>("Circuit Signature");
+  const [selectedCircuit, setSelectedCircuit] =
+    useState<string>("Circuit Signature");
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -63,11 +65,12 @@ const Acceuil = () => {
             level={1}
             style={{
               color: "#3B1B19",
-              fontSize: isMobile ? "2rem" : "4rem",
+              fontSize: isMobile ? "3rem" : "5rem",
               fontWeight: "800",
               textAlign: "center",
               lineHeight: "1.2",
               margin: "0",
+              fontFamily: "DragonAngled",
             }}
           >
             Et si vous découvriez <br /> le Bénin avec sens
@@ -85,10 +88,10 @@ const Acceuil = () => {
         <Flex
           vertical
           gap={isMobile ? "50px" : "100px"}
-          style={{ 
-            padding: isMobile ? "0 4vw" : "0 5vw", 
-            width: "100%", 
-            paddingBottom: isMobile ? "10vh" : "20vh" 
+          style={{
+            padding: isMobile ? "0 4vw" : "0 5vw",
+            width: "100%",
+            paddingBottom: isMobile ? "10vh" : "20vh",
           }}
         >
           <Flex vertical>
@@ -113,10 +116,11 @@ const Acceuil = () => {
                       selectedCircuit === "Circuit Signature"
                         ? "#BF2500"
                         : "#411E1C",
-                    fontSize: isMobile ? "1.2rem" : "2.5rem",
+                    fontSize: isMobile ? "2.2rem" : "4.5rem",
                     textAlign: "center",
                     paddingLeft: isMobile ? "0.8rem" : "1.5rem",
                     margin: "0",
+                    fontFamily: "DragonAngled",
                   }}
                 >
                   Circuit Signature
@@ -162,7 +166,8 @@ const Acceuil = () => {
                       selectedCircuit === "Circuits Thématiques"
                         ? "#BF2500"
                         : "#411E1C",
-                    fontSize: isMobile ? "1.2rem" : "2.5rem",
+                    fontSize: isMobile ? "2.2rem" : "4.5rem",
+                    fontFamily: "DragonAngled",
                     textAlign: "center",
                     paddingLeft: isMobile ? "0.8rem" : "1.5rem",
                     margin: "0",
@@ -213,7 +218,8 @@ const Acceuil = () => {
                       selectedCircuit === "Circuit à la carte"
                         ? "#BF2500"
                         : "#411E1C",
-                    fontSize: isMobile ? "1.2rem" : "2.5rem",
+                    fontSize: isMobile ? "2.2rem" : "4.5rem",
+                    fontFamily: "DragonAngled",
                     textAlign: "center",
                     paddingLeft: isMobile ? "0.8rem" : "1.5rem",
                     margin: "0",
@@ -276,9 +282,9 @@ const Acceuil = () => {
           vertical
           align="center"
           gap={isMobile ? "20px" : "40px"}
-          style={{ 
-            padding: isMobile ? "3vh 4vw" : "5vh 5vw", 
-            width: "100%" 
+          style={{
+            padding: isMobile ? "3vh 4vw" : "5vh 5vw",
+            width: "100%",
           }}
           justify="center"
         >
@@ -287,7 +293,8 @@ const Acceuil = () => {
               level={2}
               style={{
                 color: "#3B1B19",
-                fontSize: isMobile ? "1.8rem" : "3rem",
+                fontSize: isMobile ? "2.8rem" : "5rem",
+                fontFamily: "DragonAngled",
                 fontWeight: "800",
                 textAlign: "center",
                 margin: "0",
@@ -295,35 +302,39 @@ const Acceuil = () => {
             >
               Un accueil humain, ancré dans <br /> les réalités locales
             </Typography.Title>
-            <img 
-              src={vectorbrown} 
-              alt="Vector" 
+            <img
+              src={vectorbrown}
+              alt="Vector"
               style={{
                 width: isMobile ? "120px" : "auto",
-                height: "auto"
+                height: "auto",
               }}
             />
           </Flex>
-          <Flex 
-            gap={isMobile ? "20px" : "50px"} 
-            justify="center" 
+          <Flex
+            gap={isMobile ? "20px" : "50px"}
+            justify="center"
             align="center"
             vertical={isMobile}
           >
-            <Flex 
-              vertical 
-              justify="center" 
-              align={isMobile ? "flex-start" : "center"} 
+            <Flex
+              vertical
+              justify="center"
+              align={isMobile ? "flex-start" : "center"}
               gap={isMobile ? "15px" : "20px"}
               style={{ order: isMobile ? 2 : 1 }}
             >
-              <Flex align="center" style={{ width: "100%" }} gap={isMobile ? "20px" : "30px"}>
+              <Flex
+                align="center"
+                style={{ width: "100%" }}
+                gap={isMobile ? "20px" : "30px"}
+              >
                 <img
                   src={vectorPoint}
-                  style={{ 
-                    width: isMobile ? "20px" : "3vw", 
+                  style={{
+                    width: isMobile ? "20px" : "3vw",
                     height: isMobile ? "20px" : "30px",
-                    flexShrink: 0
+                    flexShrink: 0,
                   }}
                   alt="Vector Point"
                 />
@@ -332,19 +343,24 @@ const Acceuil = () => {
                     color: "#3B1B19",
                     fontSize: isMobile ? "1rem" : "1.5rem",
                     marginLeft: isMobile ? "5px" : "10px",
+                    fontFamily: "GeneralSans",
                   }}
                 >
                   Artisans, guides, <br /> restaurateurs, hôtes
                   <br /> disponibles
                 </Typography.Text>
               </Flex>
-              <Flex align="center" style={{ width: "100%" }} gap={isMobile ? "20px" : "30px"}>
+              <Flex
+                align="center"
+                style={{ width: "100%" }}
+                gap={isMobile ? "20px" : "30px"}
+              >
                 <img
                   src={vectorPoint}
-                  style={{ 
-                    width: isMobile ? "20px" : "3vw", 
+                  style={{
+                    width: isMobile ? "20px" : "3vw",
                     height: isMobile ? "20px" : "30px",
-                    flexShrink: 0
+                    flexShrink: 0,
                   }}
                   alt="Vector Point"
                 />
@@ -358,13 +374,17 @@ const Acceuil = () => {
                   Privatisables ou en <br /> petits groupes
                 </Typography.Text>
               </Flex>
-              <Flex align="center" style={{ width: "100%" }} gap={isMobile ? "20px" : "30px"}>
+              <Flex
+                align="center"
+                style={{ width: "100%" }}
+                gap={isMobile ? "20px" : "30px"}
+              >
                 <img
                   src={vectorPoint}
-                  style={{ 
-                    width: isMobile ? "20px" : "3vw", 
+                  style={{
+                    width: isMobile ? "20px" : "3vw",
                     height: isMobile ? "20px" : "30px",
-                    flexShrink: 0
+                    flexShrink: 0,
                   }}
                   alt="Vector Point"
                 />
@@ -387,21 +407,21 @@ const Acceuil = () => {
                   backgroundColor: "#FF3100",
                   color: "white",
                   fontSize: isMobile ? "0.9rem" : "1rem",
-                  marginTop: isMobile ? "10px" : "0"
+                  marginTop: isMobile ? "10px" : "0",
                 }}
               >
                 Réserver maintenant
               </Button>
             </Flex>
-            <img 
-              src={unity} 
-              alt="Unity" 
-              className="unity-image" 
+            <img
+              src={unity}
+              alt="Unity"
+              className="unity-image"
               style={{
                 order: isMobile ? 1 : 2,
                 maxWidth: isMobile ? "100%" : "auto",
                 height: isMobile ? "200px" : "auto",
-                objectFit: "contain"
+                objectFit: "contain",
               }}
             />
           </Flex>

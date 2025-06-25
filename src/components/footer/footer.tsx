@@ -8,6 +8,7 @@ import {
   WhatsAppOutlined,
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
+import "../../assets/Fonts/font.css";
 
 function Footer() {
   const [isMobile, setIsMobile] = useState(false);
@@ -71,7 +72,14 @@ function Footer() {
           align="center"
           gap="3vh"
         >
-          <img src={logo} alt="Logo" style={{ height: isMobile ? "90px" : "150px", width: isMobile ? "90px" : "150px" }} />
+          <img
+            src={logo}
+            alt="Logo"
+            style={{
+              height: isMobile ? "90px" : "150px",
+              width: isMobile ? "90px" : "150px",
+            }}
+          />
 
           {/* Section 2: Social Media Icons - Responsive */}
           <Flex gap={isMobile ? 8 : 10}>
@@ -150,7 +158,11 @@ function Footer() {
 
           <Flex gap={30} style={{ flexWrap: "wrap", justifyContent: "center" }}>
             {navItems.map((item) => (
-              <Link key={item.key} to={item.path} style={{ color: "white" }}>
+              <Link
+                key={item.key}
+                to={item.path}
+                style={{ color: "white", fontFamily: "GeneralSans" }}
+              >
                 {item.label}
               </Link>
             ))}
@@ -175,6 +187,7 @@ function Footer() {
                 color: "white",
                 fontSize: isMobile ? "12px" : "14px",
                 textAlign: isMobile ? "center" : "left",
+                fontFamily: "GeneralSans",
               }}
             >
               © 2025 Dahomey Discovery, Tous droits réservés
@@ -184,6 +197,7 @@ function Footer() {
                 color: "white",
                 fontSize: isMobile ? "11px" : "14px",
                 textAlign: isMobile ? "center" : "right",
+                fontFamily: "GeneralSans",
               }}
             >
               Mentions légales | Conditions générales de vente
