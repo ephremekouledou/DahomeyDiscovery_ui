@@ -53,7 +53,7 @@ section {
 .video-container {
   position: relative;
   width: 100%;
-  height: 100vh; /* full screen */
+  height: 88vh; /* full screen */
   overflow: hidden;
 }
 

@@ -48,39 +48,39 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
       gap="8px"
       onClick={() => handleMenuClick(item.key)}
       style={{
-      cursor: "pointer",
-      padding: mobile ? "12px 0" : "0",
-      borderBottom: mobile ? "1px solid #f0f0f0" : "none",
-      transition: "transform 0.8s ease",
+        cursor: "pointer",
+        padding: mobile ? "12px 0" : "0",
+        borderBottom: mobile ? "1px solid #f0f0f0" : "none",
+        transition: "transform 0.8s ease",
         transform: menuHover === item.key ? "scale(1.1)" : "none",
       }}
       onMouseEnter={() => setMenuHover(item.key)}
       onMouseLeave={() => setMenuHover(null)}
     >
       <Link
-      to={item.path}
-      style={{
-        textDecoration: "none",
-        color: "black",
-        fontSize: mobile ? "16px" : "14px",
-        fontWeight: mobile ? "500" : "normal",
-        fontFamily: "GeneralSans",
-      }}
+        to={item.path}
+        style={{
+          textDecoration: "none",
+          color: "black",
+          fontSize: mobile ? "16px" : "14px",
+          fontWeight: mobile ? "500" : "normal",
+          fontFamily: "GeneralSans",
+        }}
       >
-      {item.label}
+        {item.label}
       </Link>
       {!mobile && (menuSelected === item.key || menuHover === item.key) && (
-      <img
-        src={menuVector}
-        alt="Menu Vector"
-        style={{
-        height: "10px",
-        width: "30px",
-        margin: "0 auto",
-        transition: "transform 0.3s ease",
-        transform: menuHover === item.key ? "scale(1.2)" : "none",
-        }}
-      />
+        <img
+          src={menuVector}
+          alt="Menu Vector"
+          style={{
+            height: "10px",
+            width: "30px",
+            margin: "0 auto",
+            transition: "transform 0.3s ease",
+            transform: menuHover === item.key ? "scale(1.2)" : "none",
+          }}
+        />
       )}
     </Flex>
   );
@@ -98,7 +98,11 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
         header: { display: "none" },
       }}
     >
-      <Flex justify="space-between" align="center" style={{ marginBottom: "30px" }}>
+      <Flex
+        justify="space-between"
+        align="center"
+        style={{ marginBottom: "30px" }}
+      >
         <img src={logo} alt="Logo" style={{ height: "40px", width: "auto" }} />
         <Button
           type="text"
@@ -107,11 +111,11 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
           style={{ fontSize: "18px" }}
         />
       </Flex>
-      
+
       <Flex vertical gap="0">
         {navItems.map((item) => renderNavItem(item, true))}
       </Flex>
-      
+
       <Flex style={{ marginTop: "30px" }}>
         <Link to="/reserver" style={{ width: "100%" }}>
           <Button
@@ -163,18 +167,18 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
           >
             {/* Logo - Always visible */}
             {isMobile && (
-            <Flex>
-              <Link to="/">
-                <img
-                  src={logo}
-                  alt="Logo"
-                  style={{ 
-                    height: isMobile ? "35px" : "50px", 
-                    width: "auto" 
-                  }}
-                />
-              </Link>
-            </Flex>
+              <Flex>
+                <Link to="/">
+                  <img
+                    src={logo}
+                    alt="Logo"
+                    style={{
+                      height: isMobile ? "35px" : "50px",
+                      width: "auto",
+                    }}
+                  />
+                </Link>
+              </Flex>
             )}
 
             {/* Mobile Navigation */}
@@ -183,7 +187,7 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
             {!isMobile && (
               <>
                 {navItems.slice(0, 3).map((item) => renderNavItem(item))}
-                
+
                 {/* Center Logo for desktop - duplicate for centering */}
                 <Flex>
                   <Link to="/">
@@ -194,9 +198,9 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
                     />
                   </Link>
                 </Flex>
-                
+
                 {navItems.slice(3).map((item) => renderNavItem(item))}
-                
+
                 <Flex>
                   <Link to="/reserver">
                     <Button
@@ -208,6 +212,17 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
                         borderRadius: "25px",
                         border: "none",
                         fontFamily: "GeneralSans",
+                        transition: "all 0.3s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        const target = e.target as HTMLButtonElement;
+                        target.style.backgroundColor = "#ff3100"; // Rose
+                        target.style.color = "white";
+                      }}
+                      onMouseLeave={(e) => {
+                        const target = e.target as HTMLButtonElement;
+                        target.style.backgroundColor = "#F59F00"; // Orange original
+                        target.style.color = "black";
                       }}
                     >
                       RÉSERVER

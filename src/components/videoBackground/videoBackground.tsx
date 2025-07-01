@@ -23,7 +23,6 @@ const VideoBackground = () => {
         <source src={bgVideo} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
-
       {/* Overlay d'assombrissement */}
       <div
         className="video-overlay"
@@ -37,11 +36,9 @@ const VideoBackground = () => {
           zIndex: 10,
         }}
       />
-
       <div className="relative z-20 flex items-center justify-center p-8">
         <NavBar menu="ACCUEIL" />
       </div>
-
       {/* Contenu par-dessus la vidéo - Responsive */}
       <div className="relative z-20 flex items-center justify-center h-full text-white">
         <Flex
@@ -103,12 +100,22 @@ const VideoBackground = () => {
               backgroundColor: "#F59F00",
               color: "black",
               fontSize: isMobile ? "14px" : "18px",
-              fontWeight: "600",
               marginTop: isMobile ? "16px" : "32px",
               minHeight: isMobile ? "40px" : "64px",
               border: "none",
               boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
               fontFamily: "GeneralSans",
+              transition: "all 0.3s ease",
+            }}
+            onMouseEnter={(e) => {
+              const target = e.target as HTMLButtonElement;
+              target.style.backgroundColor = "#ff3100"; // Rose
+              target.style.color = "white";
+            }}
+            onMouseLeave={(e) => {
+              const target = e.target as HTMLButtonElement;
+              target.style.backgroundColor = "#F59F00"; // Orange original
+              target.style.color = "black";
             }}
           >
             Je choisis mon expérience
