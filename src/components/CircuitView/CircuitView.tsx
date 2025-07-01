@@ -430,13 +430,15 @@ const CulturalExperience: React.FC<CulturalExperienceProps> = ({
               }}
               onMouseEnter={(e) => {
                 const target = e.target as HTMLButtonElement;
-                target.style.backgroundColor = "#E67E22";
+                target.style.backgroundColor = "#ff3100"; // Rose
+                target.style.color = "white";
                 target.style.transform = "translateY(-2px)";
                 target.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.15)";
               }}
               onMouseLeave={(e) => {
                 const target = e.target as HTMLButtonElement;
-                target.style.backgroundColor = "#F39C12";
+                target.style.backgroundColor = "#F59F00"; // Orange original
+                target.style.color = "black";
                 target.style.transform = "translateY(0)";
                 target.style.boxShadow = "0 2px 0 rgba(0, 0, 0, 0.045)";
               }}

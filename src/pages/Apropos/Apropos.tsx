@@ -239,12 +239,16 @@ const DahomeyDiscovery = () => {
                     target.style.transform = "translateY(-2px)";
                     target.style.boxShadow =
                       "0 6px 20px rgba(255, 107, 53, 0.4)";
+                    target.style.backgroundColor = "#ff3100"; // Rose
+                    target.style.color = "white";
                   }}
                   onMouseLeave={(e) => {
                     const target = e.target as HTMLButtonElement;
                     target.style.transform = "translateY(0)";
                     target.style.boxShadow =
                       "0 4px 15px rgba(255, 107, 53, 0.3)";
+                    target.style.backgroundColor = "#F59F00"; // Orange original
+                    target.style.color = "black";
                   }}
                 >
                   Je choisis mon expérience

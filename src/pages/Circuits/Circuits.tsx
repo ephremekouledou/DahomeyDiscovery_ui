@@ -55,6 +55,7 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
           border: "1px solid #999791",
           borderRadius: "46px",
           width: "fit-content",
+          transition: "all 0.6s ease",
         }}
       >
         <Typography
@@ -88,10 +89,12 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
               color: isSelected ? "#BF2500" : "#411E1C",
               fontSize: isMobile ? "26px" : "44px",
               fontFamily: "DragonAngled",
+              fontWeight: "300",
               textAlign: "center",
               paddingLeft: isMobile ? "8px" : "24px",
               margin: "0",
               lineHeight: isMobile ? "1.2" : "1.4",
+              transition: "all 0.5s ease",
             }}
           >
             {circuit.name}
@@ -103,7 +106,7 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
           <img
             src={circuitImage}
             style={{
-              height: isMobile ? "60px" : "120px",
+              height: isMobile ? "5rem" : "15rem",
               width: "auto",
               paddingRight: isMobile ? "16px" : "64px",
               maxWidth: isMobile ? "40vw" : "30vw",
