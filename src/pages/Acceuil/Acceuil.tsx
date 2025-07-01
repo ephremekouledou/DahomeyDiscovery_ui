@@ -86,8 +86,8 @@ const Acceuil = () => {
             alt="Vector"
             style={{
               height: isMobile ? "1rem" : "2rem",
-              width: isMobile ? "10rem" : "18rem",
-              paddingRight: isMobile ? "1rem" : "2.5rem",
+              width: isMobile ? "9rem" : "15rem",
+              paddingLeft: isMobile ? "1rem" : "2rem",
             }}
           />
         </Flex>
@@ -95,9 +95,9 @@ const Acceuil = () => {
           vertical
           gap={isMobile ? "50px" : "100px"}
           style={{
-            padding: isMobile ? "0 4vw" : "0 5vw",
+            padding: isMobile ? "0 4vw" : "0 8vw",
             width: "100%",
-            paddingBottom: isMobile ? "10vh" : "20vh",
+            paddingBottom: isMobile ? "13vw" : "13vw",
           }}
         >
           <Flex vertical>
@@ -123,6 +123,7 @@ const Acceuil = () => {
                         ? "#BF2500"
                         : "#411E1C",
                     fontSize: isMobile ? "2.2rem" : "4.5rem",
+                    fontWeight: "200",
                     textAlign: "center",
                     paddingLeft: isMobile ? "0.8rem" : "1.5rem",
                     margin: "0",
@@ -135,7 +136,7 @@ const Acceuil = () => {
               <img
                 src={circuitImage}
                 style={{
-                  height: isMobile ? "3rem" : "12rem",
+                  height: isMobile ? "5rem" : "15rem",
                   width: "auto",
                   paddingRight: isMobile ? "1rem" : "4rem",
                   maxWidth: isMobile ? "25vw" : "30vw",
@@ -174,6 +175,7 @@ const Acceuil = () => {
                         : "#411E1C",
                     fontSize: isMobile ? "2.2rem" : "4.5rem",
                     fontFamily: "DragonAngled",
+                    fontWeight: "200",
                     textAlign: "center",
                     paddingLeft: isMobile ? "0.8rem" : "1.5rem",
                     margin: "0",
@@ -185,7 +187,7 @@ const Acceuil = () => {
               <img
                 src={circuitImage}
                 style={{
-                  height: isMobile ? "3rem" : "12rem",
+                  height: isMobile ? "5rem" : "15rem",
                   width: "auto",
                   paddingRight: isMobile ? "1rem" : "4rem",
                   maxWidth: isMobile ? "25vw" : "30vw",
@@ -226,6 +228,7 @@ const Acceuil = () => {
                         : "#411E1C",
                     fontSize: isMobile ? "2.2rem" : "4.5rem",
                     fontFamily: "DragonAngled",
+                    fontWeight: "200",
                     textAlign: "center",
                     paddingLeft: isMobile ? "0.8rem" : "1.5rem",
                     margin: "0",
@@ -237,7 +240,7 @@ const Acceuil = () => {
               <img
                 src={circuitImage}
                 style={{
-                  height: isMobile ? "3rem" : "12rem",
+                  height: isMobile ? "5rem" : "15rem",
                   width: "auto",
                   paddingRight: isMobile ? "1rem" : "4rem",
                   maxWidth: isMobile ? "25vw" : "30vw",
