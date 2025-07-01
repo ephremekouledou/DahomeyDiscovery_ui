@@ -24,6 +24,20 @@ const VideoBackground = () => {
         Your browser does not support the video tag.
       </video>
 
+      {/* Overlay d'assombrissement */}
+      <div
+        className="video-overlay"
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          backgroundColor: "rgba(0, 0, 0, 0.6)", // Filtre noir avec 60% d'opacité
+          zIndex: 10,
+        }}
+      />
+
       <div className="relative z-20 flex items-center justify-center p-8">
         <NavBar menu="ACCUEIL" />
       </div>
