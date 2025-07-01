@@ -13,6 +13,7 @@ type NavBarProps = {
 
 const NavBar: React.FC<NavBarProps> = ({ menu }) => {
   const [menuSelected, setMenuSelected] = useState<string>(menu);
+  const [menuHover, setMenuHover] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
 
@@ -47,29 +48,39 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
       gap="8px"
       onClick={() => handleMenuClick(item.key)}
       style={{
-        cursor: "pointer",
-        padding: mobile ? "12px 0" : "0",
-        borderBottom: mobile ? "1px solid #f0f0f0" : "none",
+      cursor: "pointer",
+      padding: mobile ? "12px 0" : "0",
+      borderBottom: mobile ? "1px solid #f0f0f0" : "none",
+      transition: "transform 0.8s ease",
+        transform: menuHover === item.key ? "scale(1.1)" : "none",
       }}
+      onMouseEnter={() => setMenuHover(item.key)}
+      onMouseLeave={() => setMenuHover(null)}
     >
       <Link
-        to={item.path}
-        style={{
-          textDecoration: "none",
-          color: "black",
-          fontSize: mobile ? "16px" : "14px",
-          fontWeight: mobile ? "500" : "normal",
-          fontFamily: "GeneralSans",
-        }}
+      to={item.path}
+      style={{
+        textDecoration: "none",
+        color: "black",
+        fontSize: mobile ? "16px" : "14px",
+        fontWeight: mobile ? "500" : "normal",
+        fontFamily: "GeneralSans",
+      }}
       >
-        {item.label}
+      {item.label}
       </Link>
-      {menuSelected === item.key && !mobile && (
-        <img
-          src={menuVector}
-          alt="Menu Vector"
-          style={{ height: "10px", width: "auto" }}
-        />
+      {!mobile && (menuSelected === item.key || menuHover === item.key) && (
+      <img
+        src={menuVector}
+        alt="Menu Vector"
+        style={{
+        height: "10px",
+        width: "30px",
+        margin: "0 auto",
+        transition: "transform 0.3s ease",
+        transform: menuHover === item.key ? "scale(1.2)" : "none",
+        }}
+      />
       )}
     </Flex>
   );
@@ -132,6 +143,7 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
           color: "black",
           width: isMobile ? "95vw" : "80vw",
           zIndex: 100,
+          maxWidth: "1200px",
         }}
         justify="center"
         align="center"
