@@ -21,7 +21,7 @@ const Acceuil = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    document.title = "Acceuil";
+    document.title = "Accueil";
   }, []);
 
   useEffect(() => {

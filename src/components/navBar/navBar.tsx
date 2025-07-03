@@ -42,47 +42,48 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
   ];
 
   const renderNavItem = (item: any, mobile: boolean = false) => (
-    <Flex
-      key={item.key}
-      vertical={!mobile}
-      gap="8px"
-      onClick={() => handleMenuClick(item.key)}
+    <Link
+      to={item.path}
       style={{
-        cursor: "pointer",
-        padding: mobile ? "12px 0" : "0",
-        borderBottom: mobile ? "1px solid #f0f0f0" : "none",
-        transition: "transform 0.8s ease",
-        transform: menuHover === item.key ? "scale(1.1)" : "none",
+        textDecoration: "none",
+        color: "black",
+        fontSize: mobile ? "16px" : "14px",
+        fontWeight: mobile ? "500" : "normal",
+        fontFamily: "GeneralSans",
       }}
-      onMouseEnter={() => setMenuHover(item.key)}
-      onMouseLeave={() => setMenuHover(null)}
     >
-      <Link
-        to={item.path}
+      <Flex
+        key={item.key}
+        vertical={!mobile}
+        gap="8px"
+        onClick={() => handleMenuClick(item.key)}
         style={{
-          textDecoration: "none",
-          color: "black",
-          fontSize: mobile ? "16px" : "14px",
-          fontWeight: mobile ? "500" : "normal",
-          fontFamily: "GeneralSans",
+          cursor: "pointer",
+          padding: mobile ? "12px 0" : "0",
+          borderBottom: mobile ? "1px solid #f0f0f0" : "none",
+          transition: "transform 0.8s ease",
+          // transform: menuHover === item.key ? "scale(1.1)" : "none",
         }}
+        onMouseEnter={() => setMenuHover(item.key)}
+        onMouseLeave={() => setMenuHover(null)}
       >
         {item.label}
-      </Link>
-      {!mobile && (menuSelected === item.key || menuHover === item.key) && (
-        <img
-          src={menuVector}
-          alt="Menu Vector"
-          style={{
-            height: "10px",
-            width: "30px",
-            margin: "0 auto",
-            transition: "transform 0.3s ease",
-            transform: menuHover === item.key ? "scale(1.2)" : "none",
-          }}
-        />
-      )}
-    </Flex>
+
+        {!mobile && (menuSelected === item.key || menuHover === item.key) && (
+          <img
+            src={menuVector}
+            alt="Menu Vector"
+            style={{
+              height: "10px",
+              width: "30px",
+              margin: "0 auto",
+              transition: "transform 0.3s ease",
+              transform: menuHover === item.key ? "scale(1.2)" : "none",
+            }}
+          />
+        )}
+      </Flex>
+    </Link>
   );
 
   const renderMobileMenu = () => (
@@ -147,7 +148,7 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
           color: "black",
           width: isMobile ? "95vw" : "80vw",
           zIndex: 100,
-          maxWidth: "1200px",
+          maxWidth: "1000px",
         }}
         justify="center"
         align="center"
@@ -213,6 +214,8 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
                         border: "none",
                         fontFamily: "GeneralSans",
                         transition: "all 0.3s ease",
+                        fontSize: "16px",
+                        fontWeight: "200"
                       }}
                       onMouseEnter={(e) => {
                         const target = e.target as HTMLButtonElement;
