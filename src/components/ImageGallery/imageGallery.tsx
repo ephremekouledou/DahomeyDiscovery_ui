@@ -24,7 +24,7 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
       justify="center"
     >
       {/* Galerie principale - Grid responsive */}
-      <Row gutter={[16, 16]}>
+      <Row gutter={[0, 16]}>
         {images.map((image) => (
           <Col
             key={image.id}
@@ -36,6 +36,7 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
             <Image
               src={image.src}
               alt={image.alt}
+              preview={false}
               style={{
                 width: "100%",
                 height: "100%",

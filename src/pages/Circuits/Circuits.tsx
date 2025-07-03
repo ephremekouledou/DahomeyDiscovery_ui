@@ -82,15 +82,14 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
         }}
         onMouseEnter={() => onHover(circuit.id)}
       >
-        <Flex align="center">
+        <Flex vertical>
           <Typography.Title
             level={2}
             style={{
               color: isSelected ? "#BF2500" : "#411E1C",
-              fontSize: isMobile ? "26px" : "44px",
+              fontSize: isMobile ? "26px" : "58px",
               fontFamily: "DragonAngled",
               fontWeight: "300",
-              textAlign: "center",
               paddingLeft: isMobile ? "8px" : "24px",
               margin: "0",
               lineHeight: isMobile ? "1.2" : "1.4",
@@ -99,6 +98,19 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
           >
             {circuit.name}
           </Typography.Title>
+          {isSelected && (
+            <Typography
+              style={{
+                color: "#311715",
+                fontSize: isMobile ? "26px" : "18px",
+                paddingLeft: isMobile ? "8px" : "25px",
+                fontFamily: "GeneralSans",
+                fontWeight: "300",
+              }}
+            >
+              {circuit.description}
+            </Typography>
+          )}
         </Flex>
 
         {/* Image affichée uniquement pour le circuit sélectionné */}
@@ -244,40 +256,47 @@ const Circuits = () => {
           paddingBottom: isMobile ? "10vh" : "20vh",
         }}
       >
-        <Typography.Text
-          style={{
-            color: "#000000",
-            fontSize: isMobile ? "12px" : "16px",
-            lineHeight: "1.1",
-            margin: "0",
-            textTransform: "uppercase",
-            fontFamily: "GeneralSans",
-            letterSpacing: "0.3em",
-          }}
-        >
-          CIRCUITS THÉMATIQUES
-        </Typography.Text>
-        <Typography.Title
-          level={1}
-          style={{
-            color: "#FF3100",
-            fontSize: isMobile ? "44px" : "68px",
-            fontWeight: "800",
-            lineHeight: "1.1",
-            margin: "0",
-            fontFamily: "DragonAngled",
-          }}
-        >
-          DESTINATIONS CULTURELLES <br /> ET HISTORIQUES
-        </Typography.Title>
+        <Flex style={{ maxWidth: "1050px", width: "100%", margin: "0 auto" }}>
+          <Flex vertical>
+            <Typography.Text
+              style={{
+                color: "#000000",
+                fontSize: isMobile ? "12px" : "16px",
+                lineHeight: "1.1",
+                margin: "0",
+                textTransform: "uppercase",
+                fontFamily: "GeneralSans",
+                letterSpacing: "0.3em",
+              }}
+            >
+              CIRCUITS THÉMATIQUES
+            </Typography.Text>
+            <Typography.Title
+              level={1}
+              style={{
+                color: "#FF3100",
+                fontSize: isMobile ? "44px" : "85px",
+                fontWeight: "900",
+                lineHeight: "1.1",
+                letterSpacing: "0.03em",
+                margin: "0",
+                fontFamily: "DragonAngled",
+              }}
+            >
+              DESTINATIONS CULTURELLES <br /> ET HISTORIQUES
+            </Typography.Title>
+          </Flex>
+        </Flex>
       </Flex>
 
       {/* Contenu principal - Responsive */}
       <Flex
         style={{
           width: "100%",
-          padding: "3vh 0",
+          // padding: "3vh 0",
           paddingBottom: "0vh",
+          maxWidth: "1100px",
+          margin: "0 auto",
         }}
         vertical
         gap={isMobile ? 30 : 50}
@@ -287,11 +306,11 @@ const Circuits = () => {
           vertical
           gap="20px"
           style={{
-            padding: isMobile ? "0 4vw" : "0 7vw",
+            // padding: isMobile ? "0 4vw" : "0 7vw",
             width: "100%",
-            paddingBottom: isMobile ? "4vw" : "7vw",
+            paddingBottom: isMobile ? "4vw" : "15vw",
             position: "relative",
-            bottom: isMobile ? "4vh" : "7vh",
+            bottom: isMobile ? "1vw" : "3vw",
           }}
         >
           {circuits.map((circuit, index) => (
@@ -305,11 +324,10 @@ const Circuits = () => {
             />
           ))}
         </Flex>
-
-        {/* Galerie d'images */}
-        <Flex style={{ backgroundColor: "#F59F00" }} vertical>
-          <ImageGallery images={images} />
-        </Flex>
+      </Flex>
+      {/* Galerie d'images */}
+      <Flex style={{ backgroundColor: "#F59F00" }} vertical>
+        <ImageGallery images={images} />
       </Flex>
 
       {/* Footer */}
