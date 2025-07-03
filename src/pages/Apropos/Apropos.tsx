@@ -55,7 +55,9 @@ const Apropos = () => {
       <div className="relative z-20 flex items-center justify-center p-8">
         <NavBar menu="A PROPOS" />
       </div>
-      <DahomeyDiscovery />
+      <Flex style={{maxWidth: "1600px", margin: "0 auto"}}>
+        <DahomeyDiscovery />
+      </Flex>
       <Flex
         style={{ backgroundColor: "#F59F00" /* padding: "3vh 0" */ }}
         vertical

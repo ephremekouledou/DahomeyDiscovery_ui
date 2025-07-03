@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import NavBar from "../navBar/navBar";
 import Footer from "../footer/footer";
 import React, { useState, useEffect, useRef } from "react";
+import circuitImage from "../../assets/images/circuitImage.png";
 import image1 from "../../assets/images/img1.jpeg";
 import image2 from "../../assets/images/img2.jpg";
 import image3 from "../../assets/images/img3.jpg";
@@ -16,12 +17,6 @@ interface Circuit {
 }
 
 // Composant réutilisable pour un circuit
-interface CircuitCardProps {
-  circuit: Circuit;
-  clicked?: boolean;
-  onClick?: () => void;
-  isMobile: boolean;
-}
 
 interface Experience {
   number: string;
@@ -37,6 +32,13 @@ interface Slide {
 interface CulturalExperienceProps {
   experiences: Experience[];
   slides: Slide[];
+}
+
+interface CircuitCardProps {
+  circuit: Circuit;
+  clicked?: boolean;
+  onClick?: () => void;
+  isMobile: boolean;
 }
 
 const CircuitCard: React.FC<CircuitCardProps> = ({
@@ -68,33 +70,33 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
       </Flex>
 
       {/* Contenu principal du circuit */}
-      <Flex
-        justify="space-between"
-        align="center"
-        style={{
-          width: "100%",
-          height: isMobile ? "80px" : "120px",
-          backgroundColor: "white",
-          padding: isMobile ? "12px" : "24px",
-          borderRadius: "0.3rem",
-          cursor: "pointer",
-        }}
-      >
-        <Flex align="center">
-          <Typography.Title
-            level={2}
-            style={{
-              color: "#411E1C",
-              fontSize: isMobile ? "16px" : "24px",
-              textAlign: "center",
-              paddingLeft: isMobile ? "8px" : "24px",
-              margin: "0",
-              lineHeight: isMobile ? "1.2" : "1.4",
-            }}
-          >
-            {circuit.name}
-          </Typography.Title>
-        </Flex>
+      <Flex vertical>
+        <Typography.Title
+          level={2}
+          style={{
+            color: "#411E1C",
+            fontSize: isMobile ? "26px" : "63px",
+            fontFamily: "DragonAngled",
+            fontWeight: "300",
+            paddingLeft: isMobile ? "8px" : "24px",
+            margin: "0",
+            lineHeight: isMobile ? "1.2" : "1.4",
+            transition: "all 0.5s ease",
+          }}
+        >
+          {circuit.name}
+        </Typography.Title>
+        <Typography
+          style={{
+            color: "#311715",
+            fontSize: isMobile ? "26px" : "18px",
+            paddingLeft: isMobile ? "8px" : "25px",
+            fontFamily: "GeneralSans",
+            fontWeight: "300",
+          }}
+        >
+          {circuit.description}
+        </Typography>
       </Flex>
 
       <Divider size="large" />
@@ -102,10 +104,131 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
   );
 };
 
+interface CircuitCardOtherProps {
+  circuit: Circuit;
+  isSelected: boolean;
+  onHover: (circuitId: string) => void;
+  showDivider: boolean;
+  isMobile: boolean;
+}
+
+const CircuitOtherCard: React.FC<CircuitCardOtherProps> = ({
+  circuit,
+  isSelected,
+  onHover,
+  showDivider,
+  isMobile,
+}) => {
+  const navigate = useNavigate();
+
+  return (
+    <Flex
+      vertical
+      style={{ backgroundColor: "white" }}
+      onClick={() => navigate(`/circuits/${circuit.id}`)}
+      onMouseEnter={() => onHover(circuit.id)}
+      onMouseLeave={() => onHover("")}
+    >
+      {/* Badge de durée - affiché uniquement pour le circuit sélectionné */}
+      <Flex
+        style={{
+          backgroundColor: isSelected ? "#FFE0D9" : "white",
+          margin: isMobile ? "1vh 0 0 4vw" : "2vh 0 0 3vw",
+          padding: isMobile ? "0.8vw" : "0.6vw",
+          border: "1px solid #999791",
+          borderRadius: "46px",
+          width: "fit-content",
+          transition: "all 0.6s ease",
+        }}
+      >
+        <Typography
+          style={{
+            fontSize: isMobile ? "12px" : "16px",
+            fontFamily: "GeneralSans",
+          }}
+        >
+          {circuit.duration}
+        </Typography>
+      </Flex>
+
+      {/* Contenu principal du circuit */}
+      <Flex
+        justify="space-between"
+        align="center"
+        style={{
+          width: "100%",
+          backgroundColor: "white",
+          padding: isMobile ? "12px" : "24px",
+          borderRadius: "0.3rem",
+          cursor: "pointer",
+          height: isSelected ? "100%" : (isMobile ? "80px" : "120px"),
+        }}
+        onMouseEnter={() => onHover(circuit.id)}
+      >
+        <Flex vertical>
+          <Typography.Title
+            level={2}
+            style={{
+              color: isSelected ? "#BF2500" : "#411E1C",
+              fontSize: isMobile ? "26px" : "58px",
+              fontFamily: "DragonAngled",
+              fontWeight: "300",
+              paddingLeft: isMobile ? "8px" : "24px",
+              margin: "0",
+              lineHeight: isMobile ? "1.2" : "1.4",
+              transition: "all 0.5s ease",
+            }}
+          >
+            {circuit.name}
+          </Typography.Title>
+          {isSelected && (
+            <Typography
+              style={{
+                color: "#311715",
+                fontSize: isMobile ? "26px" : "18px",
+                paddingLeft: isMobile ? "8px" : "25px",
+                fontFamily: "GeneralSans",
+                fontWeight: "300",
+              }}
+            >
+              {circuit.description}
+            </Typography>
+          )}
+        </Flex>
+
+        {/* Image affichée uniquement pour le circuit sélectionné */}
+        {isSelected && (
+          <img
+            src={circuitImage}
+            style={{
+              height: isMobile ? "5rem" : "15rem",
+              width: "auto",
+              paddingRight: isMobile ? "16px" : "64px",
+              maxWidth: isMobile ? "40vw" : "30vw",
+              position: "relative",
+              bottom:
+                circuit.id === "circuit-signature"
+                  ? isMobile
+                    ? "2vh"
+                    : "4vh"
+                  : "0",
+            }}
+            className="Accueil_image_2"
+            alt={`${circuit.name} Logo`}
+          />
+        )}
+      </Flex>
+
+      {/* Divider affiché uniquement si le circuit n'est pas sélectionné */}
+      {!isSelected && showDivider && <Divider size="large" />}
+    </Flex>
+  );
+};
+
 export const CircuitView = () => {
   const { id } = useParams();
   const [isMobile, setIsMobile] = useState(false);
-  const navigate = useNavigate();
+  const [selectedCircuitId, setSelectedCircuitId] = useState<string>("");
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -116,6 +239,10 @@ export const CircuitView = () => {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  const handleCircuitHover = (circuitId: string) => {
+    setSelectedCircuitId(circuitId);
+  };
 
   // Configuration centralisée des circuits
   const circuits: Circuit[] = [
@@ -200,6 +327,11 @@ export const CircuitView = () => {
       <Flex
         style={{
           width: "100%",
+          maxWidth: "1200px",
+          margin: "0 auto",
+          position: "relative",
+          bottom: isMobile ? "1vw" : "3vw",
+          zIndex: 100,
         }}
         vertical
         gap={0}
@@ -209,7 +341,6 @@ export const CircuitView = () => {
           vertical
           gap="20px"
           style={{
-            padding: isMobile ? "0 4vw" : "0 7vw",
             width: "100%",
             paddingBottom: isMobile ? "1vw" : "2vw",
           }}
@@ -228,17 +359,23 @@ export const CircuitView = () => {
 
         {/* Section de l'expérience culturelle */}
         <CulturalExperience experiences={experiences} slides={slides} />
+      </Flex>
 
-        {/* Section autres circuits - Responsive */}
-        <Flex style={{ backgroundColor: "#411E1C" }} vertical gap="20px">
+      {/* Section autres circuits - Responsive */}
+      <Flex style={{ backgroundColor: "#411E1C" }}>
+        <Flex
+          vertical
+          gap="20px"
+          style={{ width: "100%", maxWidth: "1300px", margin: "0 auto" }}
+        >
           <Typography.Title
             level={1}
             style={{
               color: "white",
-              padding: isMobile ? "4vw" : "5vw",
-              fontSize: isMobile ? "24px" : "48px",
+              fontFamily: "DragonAngled",
+              padding: isMobile ? "1vw" : "3vw 0 0vw 1vw",
+              fontSize: isMobile ? "24px" : "68px",
               fontWeight: "800",
-              margin: "0",
             }}
           >
             Autres circuits thématiques
@@ -248,18 +385,21 @@ export const CircuitView = () => {
             gap="10px"
             style={{
               width: "100%",
-              padding: isMobile ? "0 4vw" : "0 7vw",
+              padding: isMobile ? "0 4vw" : "0",
               paddingBottom: isMobile ? "4vw" : "7vw",
             }}
           >
             {circuits
               .filter((circuit) => circuit.id !== id)
-              .map((circuit) => (
-                <CircuitCard
+              .map((circuit, index) => (
+                <CircuitOtherCard
                   key={circuit.id}
                   circuit={circuit}
-                  clicked={false}
-                  onClick={() => navigate(`/circuits/${circuit.id}`)}
+                  // clicked={false}
+                  // onClick={() => navigate(`/circuits/${circuit.id}`)}
+                  isSelected={selectedCircuitId === circuit.id}
+                  onHover={handleCircuitHover}
+                  showDivider={index < circuits.length - 1}
                   isMobile={isMobile}
                 />
               ))}
@@ -317,10 +457,6 @@ const CulturalExperience: React.FC<CulturalExperienceProps> = ({
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
-  const goToSlide = (index: any) => {
-    setCurrentSlide(index);
-  };
-
   // Touch handlers
   const minSwipeDistance = 50;
 
@@ -356,7 +492,7 @@ const CulturalExperience: React.FC<CulturalExperienceProps> = ({
           borderRadius: "8px",
           boxShadow:
             "0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02)",
-          padding: isMobile ? "0 6vw" : "0 10vw",
+          padding: isMobile ? "0 6vw" : "0 2vw",
           paddingBottom: isMobile ? "3vw" : "5vw",
         }}
       >
@@ -376,21 +512,20 @@ const CulturalExperience: React.FC<CulturalExperienceProps> = ({
                 style={{
                   display: "flex",
                   alignItems: "flex-start",
-                  gap: isMobile ? "16px" : "24px",
+                  gap: isMobile ? "16px" : "15px",
                   marginBottom:
                     index < experiences.length - 1 ? "24px" : "32px",
                 }}
               >
                 <span
                   style={{
-                    fontSize: isMobile ? "24px" : "48px",
+                    fontSize: isMobile ? "24px" : "60px",
                     fontWeight: "700",
                     color: "#E85D3D",
                     backgroundColor: "#FFE0D9",
-                    padding: isMobile ? "12px 6px" : "16px 8px",
+                    padding: isMobile ? "12px 6px" : "3px 5px",
                     lineHeight: "1",
-                    fontFamily:
-                      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial',
+                    fontFamily: "DragonAngled",
                     flexShrink: 0,
                   }}
                 >
@@ -402,8 +537,7 @@ const CulturalExperience: React.FC<CulturalExperienceProps> = ({
                     fontSize: isMobile ? "14px" : "18px",
                     marginTop: isMobile ? "6px" : "8px",
                     lineHeight: "1.6",
-                    fontFamily:
-                      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial',
+                    fontFamily: "GeneralSans",
                   }}
                 >
                   {exp.text}
@@ -424,8 +558,7 @@ const CulturalExperience: React.FC<CulturalExperienceProps> = ({
                 cursor: "pointer",
                 transition: "all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1)",
                 boxShadow: "0 2px 0 rgba(0, 0, 0, 0.045)",
-                fontFamily:
-                  '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial',
+                fontFamily: "GeneralSans",
                 width: "fit-content",
               }}
               onMouseEnter={(e) => {
@@ -594,7 +727,7 @@ const CulturalExperience: React.FC<CulturalExperienceProps> = ({
             </div>
 
             {/* Carousel Indicators */}
-            <div
+            {/* <div
               style={{
                 display: "flex",
                 justifyContent: "center",
@@ -619,7 +752,7 @@ const CulturalExperience: React.FC<CulturalExperienceProps> = ({
                   }}
                 />
               ))}
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
