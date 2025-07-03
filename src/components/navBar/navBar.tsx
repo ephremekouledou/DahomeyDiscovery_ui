@@ -16,6 +16,7 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
   const [menuHover, setMenuHover] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Handle responsive breakpoint
   useEffect(() => {
@@ -208,25 +209,17 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
                       type="primary"
                       size="large"
                       style={{
-                        backgroundColor: "#F59F00",
-                        color: "black",
+                        backgroundColor: isHovered ? "#ff3100" : "#F59F00",
+                        color: isHovered ? "white" : "black",
                         borderRadius: "25px",
                         border: "none",
                         fontFamily: "GeneralSans",
                         transition: "all 0.3s ease",
                         fontSize: "16px",
-                        fontWeight: "200"
+                        fontWeight: "200",
                       }}
-                      onMouseEnter={(e) => {
-                        const target = e.target as HTMLButtonElement;
-                        target.style.backgroundColor = "#ff3100"; // Rose
-                        target.style.color = "white";
-                      }}
-                      onMouseLeave={(e) => {
-                        const target = e.target as HTMLButtonElement;
-                        target.style.backgroundColor = "#F59F00"; // Orange original
-                        target.style.color = "black";
-                      }}
+                      onMouseEnter={() => setIsHovered(true)}
+                      onMouseLeave={() => setIsHovered(false)}
                     >
                       RÉSERVER
                     </Button>

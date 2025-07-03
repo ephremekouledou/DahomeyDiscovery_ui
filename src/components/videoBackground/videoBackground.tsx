@@ -7,6 +7,7 @@ import "../../assets/Fonts/font.css";
 
 const VideoBackground = () => {
   const [isMobile, setIsMobile] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -32,7 +33,7 @@ const VideoBackground = () => {
           left: 0,
           width: "100%",
           height: "100%",
-          backgroundColor: "rgba(0, 0, 0, 0.6)", // Filtre noir avec 60% d'opacité
+          backgroundColor: "rgba(0, 0, 0, 0.4)", // Filtre noir avec 60% d'opacité
           zIndex: 10,
         }}
       />
@@ -95,28 +96,21 @@ const VideoBackground = () => {
             type="primary"
             size="large"
             style={{
+              backgroundColor: isHovered ? "#ff3100" : "#F59F00",
+              color: isHovered ? "white" : "black",
+              border: "none",
+              fontFamily: "GeneralSans",
+              transition: "all 0.3s ease",
+              fontWeight: "200",
               borderRadius: isMobile ? "32px" : "96px",
               padding: isMobile ? "8px 16px" : "16px 32px",
-              backgroundColor: "#F59F00",
-              color: "black",
               fontSize: isMobile ? "14px" : "18px",
               marginTop: isMobile ? "16px" : "32px",
               minHeight: isMobile ? "40px" : "64px",
-              border: "none",
               boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-              fontFamily: "GeneralSans",
-              transition: "all 0.3s ease",
             }}
-            onMouseEnter={(e) => {
-              const target = e.target as HTMLButtonElement;
-              target.style.backgroundColor = "#ff3100"; // Rose
-              target.style.color = "white";
-            }}
-            onMouseLeave={(e) => {
-              const target = e.target as HTMLButtonElement;
-              target.style.backgroundColor = "#F59F00"; // Orange original
-              target.style.color = "black";
-            }}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
           >
             Je choisis mon expérience
           </Button>
