@@ -121,40 +121,48 @@ const BonneAddress = () => {
         style={{
           backgroundColor: "#FEF1D9",
           padding: isMobile ? "4vh 6vw" : "8vh 8vw",
+          paddingBottom: isMobile ? "10vh" : "20vh",
         }}
       >
-        <Typography.Title
-          level={1}
-          style={{
-            color: "#FF3100",
-            fontSize: isMobile ? "34px" : "78px",
-            fontWeight: "800",
-            lineHeight: "1.1",
-            margin: "0",
-            fontFamily: "DragonAngled",
-          }}
-        >
-          RECOMMANDATIONS
-        </Typography.Title>
-        <Typography.Text
-          style={{
-            color: "#000000",
-            fontSize: isMobile ? "24px" : "40px",
-            lineHeight: "1.1",
-            margin: "0",
-            fontFamily: "DragonAngled",
-          }}
-        >
-          Hôtels, maisons d'hôtes, écolodges & restaurants
-        </Typography.Text>
+        <Flex style={{ maxWidth: "1050px", width: "100%", margin: "0 auto" }}>
+          <Flex vertical>
+            <Typography.Title
+              level={1}
+              style={{
+                color: "#FF3100",
+                fontSize: isMobile ? "44px" : "85px",
+                fontWeight: "900",
+                lineHeight: "1.1",
+                letterSpacing: "0.03em",
+                margin: "0",
+                fontFamily: "DragonAngled",
+              }}
+            >
+              RECOMMANDATIONS
+            </Typography.Title>
+            <Typography.Text
+              style={{
+                color: "#000000",
+                fontSize: isMobile ? "24px" : "45px",
+                lineHeight: "1.1",
+                margin: "0",
+                fontFamily: "DragonAngled",
+              }}
+            >
+              Hôtels, maisons d'hôtes, écolodges & restaurants
+            </Typography.Text>
+          </Flex>
+        </Flex>
       </Flex>
 
       {/* Main Content - Responsive */}
       <Flex
         style={{
           width: "100%",
-          padding: isMobile ? "2vh 4vw" : "2vh 5vw",
+          padding: isMobile ? "2vw 4vw" : "2vw 0",
           paddingBottom: isMobile ? "10vh" : "20vh",
+          maxWidth: "1200px",
+          margin: "0 auto",
         }}
         vertical
         gap={isMobile ? 30 : 50}
@@ -295,8 +303,9 @@ const DahomeyDiscovery: React.FC<DahomeyDiscoveryProps> = ({
       label: (
         <span
           style={{
-            fontSize: isMobile ? "14px" : "16px",
+            fontSize: isMobile ? "14px" : "20px",
             fontWeight: "500",
+            fontFamily: "GeneralSans",
           }}
         >
           Tout
@@ -310,8 +319,9 @@ const DahomeyDiscovery: React.FC<DahomeyDiscoveryProps> = ({
             style={{
               marginTop: isMobile ? "20px" : "30px",
               marginBottom: isMobile ? "20px" : "30px",
-              fontSize: isMobile ? "18px" : "24px",
+              fontSize: isMobile ? "18px" : "20px",
               fontWeight: "600",
+              fontFamily: "GeneralSans",
               color: "#333",
             }}
           >
@@ -332,8 +342,9 @@ const DahomeyDiscovery: React.FC<DahomeyDiscoveryProps> = ({
       label: (
         <span
           style={{
-            fontSize: isMobile ? "14px" : "16px",
+            fontSize: isMobile ? "14px" : "20px",
             fontWeight: "500",
+            fontFamily: "GeneralSans",
           }}
         >
           {isMobile ? "Hôtels" : "Hôtels Maisons d'hôtes Ecolodges"}
@@ -347,9 +358,10 @@ const DahomeyDiscovery: React.FC<DahomeyDiscoveryProps> = ({
             style={{
               marginTop: isMobile ? "20px" : "30px",
               marginBottom: isMobile ? "20px" : "30px",
-              fontSize: isMobile ? "18px" : "24px",
+              fontSize: isMobile ? "18px" : "20px",
               fontWeight: "600",
               color: "#333",
+              fontFamily: "GeneralSans",
             }}
           >
             Testé et approuvé par Dahomey Discovery
@@ -378,8 +390,9 @@ const DahomeyDiscovery: React.FC<DahomeyDiscoveryProps> = ({
       label: (
         <span
           style={{
-            fontSize: isMobile ? "14px" : "16px",
+            fontSize: isMobile ? "14px" : "20px",
             fontWeight: "500",
+            fontFamily: "GeneralSans",
           }}
         >
           Restaurants
@@ -393,9 +406,10 @@ const DahomeyDiscovery: React.FC<DahomeyDiscoveryProps> = ({
             style={{
               marginTop: isMobile ? "20px" : "30px",
               marginBottom: isMobile ? "20px" : "30px",
-              fontSize: isMobile ? "18px" : "24px",
+              fontSize: isMobile ? "18px" : "20px",
               fontWeight: "600",
               color: "#333",
+              fontFamily: "GeneralSans",
             }}
           >
             Testé et approuvé par Dahomey Discovery
@@ -470,7 +484,7 @@ const HotelsSection: React.FC<HotelsSectionProps> = ({
         <Row
           justify="space-between"
           align="middle"
-          style={{ marginBottom: isMobile ? "20px" : "30px" }}
+          style={{ marginBottom: isMobile ? "10px" : "15px" }}
         >
           <Col xs={24} sm={16} md={18}>
             <Title
@@ -478,7 +492,8 @@ const HotelsSection: React.FC<HotelsSectionProps> = ({
               style={{
                 margin: 0,
                 color: "#411E1C",
-                fontSize: isMobile ? "20px" : "32px",
+                fontSize: isMobile ? "20px" : "20px",
+                fontFamily: "GeneralSans",
                 fontWeight: "600",
               }}
             >
@@ -576,6 +591,7 @@ const HotelsSection: React.FC<HotelsSectionProps> = ({
                     fontSize: isMobile ? "14px" : "16px",
                     fontWeight: "700",
                     color: "#333",
+                    fontFamily: "GeneralSans",
                   }}
                 >
                   {hotel.name}
@@ -585,6 +601,7 @@ const HotelsSection: React.FC<HotelsSectionProps> = ({
                     color: "#666",
                     fontSize: isMobile ? "12px" : "14px",
                     lineHeight: "1.4",
+                    fontFamily: "GeneralSans",
                   }}
                 >
                   {hotel.description}
