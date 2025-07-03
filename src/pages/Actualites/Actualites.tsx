@@ -20,25 +20,27 @@ function Actualites() {
       <div className="relative z-20 flex items-center justify-center p-8">
         <NavBar menu="ACTUALITES" />
       </div>
-      <Flex
-        style={{ width: "100%", padding: "5vh 5vw", paddingBottom: "20vh" }}
-        vertical
-        gap={24}
-      >
-        <Typography.Title
-          level={2}
-          style={{
-            color: "#411E1C",
-            fontSize: "clamp(2.5rem, 5vw, 5rem)",
-            fontWeight: "800",
-            lineHeight: "1.1",
-            margin: "0",
-            fontFamily: "DragonAngled",
-          }}
+      <Flex style={{maxWidth: "1300px", margin: "0 auto"}}>
+        <Flex
+          style={{ width: "100%", padding: "5vw 0", paddingBottom: "12vw" }}
+          vertical
+          gap={24}
         >
-          ACTUALITÉS
-        </Typography.Title>
-        <NewsLayout />
+          <Typography.Title
+            level={2}
+            style={{
+              color: "#411E1C",
+              fontSize: "clamp(2.5rem, 5vw, 5rem)",
+              fontWeight: "800",
+              lineHeight: "1.1",
+              margin: "0",
+              fontFamily: "DragonAngled",
+            }}
+          >
+            ACTUALITÉS
+          </Typography.Title>
+          <NewsLayout />
+        </Flex>
       </Flex>
       <Footer />
     </Flex>
