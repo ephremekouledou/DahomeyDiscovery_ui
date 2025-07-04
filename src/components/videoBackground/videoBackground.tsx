@@ -37,7 +37,7 @@ const VideoBackground = () => {
           zIndex: 10,
         }}
       />
-      <div className="relative z-20 flex items-center justify-center p-8">
+      <div id="navBar" className="relative z-20 flex items-center justify-center p-8">
         <NavBar menu="ACCUEIL" />
       </div>
       {/* Contenu par-dessus la vidéo - Responsive */}
@@ -51,6 +51,7 @@ const VideoBackground = () => {
             padding: isMobile ? "16px" : "32px",
             textAlign: "center",
           }}
+          id="videoContent"
         >
           <Flex vertical align="flex-end">
             <img
