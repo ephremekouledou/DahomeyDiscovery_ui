@@ -96,6 +96,11 @@ const Acceuil = () => {
       const isFirstLoad = location.pathname === "/";
       if (!hasRun && isFirstLoad && container.current) {
         gsap.set("#mask-wrapper", {
+          position: "absolute",
+          zIndex: 0,
+          overflow: "hidden",
+        });
+        gsap.set("#mask-wrapper", {
           clipPath: "polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%)",
         });
         gsap.set("#navBar", {
@@ -195,7 +200,7 @@ const Acceuil = () => {
         </div>
         <div
           id="mask-wrapper"
-          className="absolute z-0 inset-0 origin-center overflow-hidden"
+          className="absolute z-0 inset-0 origin-center"
         >
           <Flex vertical>
             <section className="one">
