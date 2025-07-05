@@ -33,7 +33,7 @@ const VideoBackground = () => {
           left: 0,
           width: "100%",
           height: "100%",
-          backgroundColor: "rgba(0, 0, 0, 0.4)", // Filtre noir avec 60% d'opacité
+          backgroundColor: "rgba(0, 0, 0, 0.3)", // Filtre noir avec 60% d'opacité
           zIndex: 10,
         }}
       />
