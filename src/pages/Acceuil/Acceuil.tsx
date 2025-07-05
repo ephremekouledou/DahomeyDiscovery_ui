@@ -11,7 +11,7 @@ import { Button, Divider, Flex, Typography } from "antd";
 import Footer from "../../components/footer/footer";
 import "../../assets/Fonts/font.css";
 import { useLocation } from "react-router-dom";
-import logo from "../../assets/images/Logo/logo-blanc.png";
+import logo from "../../assets/images/Logo/logo-belge.png";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useRef } from "react";
@@ -586,7 +586,7 @@ const Acceuil = () => {
 
         <Footer />
       </Flex> */}
-      <div ref={container} className="h-screen relative bg-[#411e1c]">
+      <div ref={container} className="h-screen relative bg-white">
         <div style={{ width: "100%" }}>
           <div
             style={{
@@ -596,16 +596,18 @@ const Acceuil = () => {
               top: "20vh",
             }}
           >
-            <img src={logo} style={{ width: "160px", height: "auto" }} />
+            <img src={logo} style={{ width: "80px", height: "auto" }} />
           </div>
         </div>
 
         <div
           style={{
             position: "absolute",
-            top: "50vh",
-            color: "white",
+            top: "45vh",
+            left: "34vw",
+            color: "#411E1C",
             fontSize: "4rem",
+            fontFamily: "DragonAngled",
           }}
         >
           100 %
@@ -613,13 +615,14 @@ const Acceuil = () => {
         <div
           style={{
             position: "absolute",
-            right: "0",
-            top: "50vh",
-            color: "white",
+            top: "45vh",
+            right: "34vw",
+            color: "#411E1C",
             fontSize: "4rem",
+            fontFamily: "DragonAngled",
           }}
         >
-          Locales
+          locales
         </div>
         <div
           id="mask-wrapper"
