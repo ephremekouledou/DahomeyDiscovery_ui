@@ -1,9 +1,8 @@
 import { Divider, Flex, Typography } from "antd";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import NavBar from "../navBar/navBar";
 import Footer from "../footer/footer";
 import React, { useState, useEffect, useRef } from "react";
-import circuitImage from "../../assets/images/circuitImage.png";
 import image1 from "../../assets/images/img1.jpeg";
 import image2 from "../../assets/images/img2.jpg";
 import image3 from "../../assets/images/img3.jpg";
