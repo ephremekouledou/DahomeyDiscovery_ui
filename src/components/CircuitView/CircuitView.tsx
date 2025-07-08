@@ -125,7 +125,7 @@ const CircuitOtherCard: React.FC<CircuitCardOtherProps> = ({
     <Flex
       vertical
       style={{ backgroundColor: "white" }}
-      onClick={() => navigate(`/circuits/${circuit.id}`)}
+      onClick={() => navigate(`/circuits-thematiques/${circuit.id}`)}
       onMouseEnter={() => onHover(circuit.id)}
       onMouseLeave={() => onHover("")}
     >

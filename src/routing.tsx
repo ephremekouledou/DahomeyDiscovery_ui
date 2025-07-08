@@ -6,6 +6,7 @@ import BonneAddress from "./pages/BonneAddress/BonneAddress";
 import Apropos from "./pages/Apropos/Apropos";
 import Circuits from "./pages/Circuits/Circuits";
 import { CircuitView } from "./components/CircuitView/CircuitView";
+import CircuitsCartes from "./pages/Circuits/CircuitsCartes";
 
 const router = createBrowserRouter([
   {
@@ -14,13 +15,18 @@ const router = createBrowserRouter([
     errorElement: <NotFound />,
   },
   {
-    path: "/circuits",
+    path: "/circuits-thematiques",
     element: <Circuits />,
     errorElement: <NotFound />,
   },
   {
+    path: "/circuits-a-la-carte",
+    element: <CircuitsCartes />,
+    errorElement: <NotFound />,
+  },
+  {
     // This will match /circuits/circuit-signature/view or any /circuits/:id/view pattern
-    path: "/circuits/:id",
+    path: "/circuits-thematiques/:id",
     element: <CircuitView />,
     errorElement: <NotFound />,
   },

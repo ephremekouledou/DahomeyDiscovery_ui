@@ -44,7 +44,7 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
     <Flex
       vertical
       style={{ backgroundColor: "white" }}
-      onClick={() => navigate(`/circuits/${circuit.id}`)}
+      onClick={() => navigate(`/circuits-thematiques/${circuit.id}`)}
     >
       {/* Badge de durée - affiché uniquement pour le circuit sélectionné */}
       <Flex

@@ -36,7 +36,7 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
 
   const navItems = [
     { key: "ACCUEIL", label: "ACCUEIL", path: "/" },
-    { key: "CIRCUITS", label: "NOS CIRCUITS", path: "/circuits" },
+    { key: "CIRCUITS", label: "NOS CIRCUITS", path: "/circuits-thematiques" },
     { key: "ADRESSES", label: "NOS BONNES ADRESSES", path: "/bonnes-adresses" },
     { key: "A PROPOS", label: "À PROPOS", path: "/a-propos" },
     { key: "ACTUALITES", label: "ACTUALITÉS", path: "/actualites" },
