@@ -7,6 +7,7 @@ import Apropos from "./pages/Apropos/Apropos";
 import Circuits from "./pages/Circuits/Circuits";
 import { CircuitView } from "./components/CircuitView/CircuitView";
 import CircuitsCartes from "./pages/Circuits/CircuitsCartes";
+import CircuitCarteView from "./components/CircuitView/CircuitCarteView";
 
 const router = createBrowserRouter([
   {
@@ -20,14 +21,20 @@ const router = createBrowserRouter([
     errorElement: <NotFound />,
   },
   {
+    // This will match /circuits/circuit-signature/view or any /circuits/:id/view pattern
+    path: "/circuits-thematiques/:id",
+    element: <CircuitView />,
+    errorElement: <NotFound />,
+  },
+  {
     path: "/circuits-a-la-carte",
     element: <CircuitsCartes />,
     errorElement: <NotFound />,
   },
+  // This will match /circuits-a-la-carte/:id/view
   {
-    // This will match /circuits/circuit-signature/view or any /circuits/:id/view pattern
-    path: "/circuits-thematiques/:id",
-    element: <CircuitView />,
+    path: "/circuits-a-la-carte/:id",
+    element: <CircuitCarteView />,
     errorElement: <NotFound />,
   },
   {

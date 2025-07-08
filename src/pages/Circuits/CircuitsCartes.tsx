@@ -32,9 +32,12 @@ const CityCard: React.FC<CityCardProps> = ({
       : Array.isArray(description)
       ? description
       : [description];
-
+  const navigate = useNavigate();
   return (
-    <div className="relative w-64 h-80 rounded-lg overflow-hidden shadow-lg cursor-pointer group">
+    <div
+      className="relative w-64 h-80 rounded-lg overflow-hidden shadow-lg cursor-pointer group"
+      onClick={() => navigate(`/circuits-a-la-carte/${ville}`)}
+    >
       {/* Image de fond */}
       <div className="absolute inset-0 bg-cover bg-center group-hover:opacity-0 transition-opacity duration-500">
         <img src={image} alt={ville} className="w-full h-full object-cover" />
@@ -86,9 +89,7 @@ const CityCard: React.FC<CityCardProps> = ({
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-500 delay-300 z-10">
         <div>
           {descriptionLines.map((line, index) => (
-            <p key={index}>
-              {line}
-            </p>
+            <p key={index}>{line}</p>
           ))}
         </div>
       </div>
