@@ -2,9 +2,22 @@ import { Link } from "react-router-dom";
 import "./navBar.css";
 import logo from "../../assets/images/Logo/logo-belge.png";
 import menuVector from "../../assets/icons/menuVector.png";
-import { Button, Flex, Drawer } from "antd";
+import { Button, Flex, Drawer, Dropdown } from "antd";
 import { useState, useEffect } from "react";
-import { MenuOutlined, CloseOutlined } from "@ant-design/icons";
+import { MenuOutlined, CloseOutlined, DownOutlined } from "@ant-design/icons";
+
+type SubMenuItem = {
+  key: string;
+  label: string;
+  path: string;
+};
+
+type NavItem = {
+  key: string;
+  label: string;
+  path?: string;
+  subItems?: SubMenuItem[];
+};
 
 type NavBarProps = {
   menu: string;
@@ -17,6 +30,7 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>(null);
 
   // Handle responsive breakpoint
   useEffect(() => {
@@ -34,58 +48,229 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
     setDrawerVisible(false); // Close mobile menu when item is clicked
   };
 
-  const navItems = [
+  const handleMobileMenuToggle = (menuKey: string) => {
+    setExpandedMobileMenu(expandedMobileMenu === menuKey ? null : menuKey);
+  };
+
+  const navItems: NavItem[] = [
     { key: "ACCUEIL", label: "ACCUEIL", path: "/" },
-    { key: "CIRCUITS", label: "NOS CIRCUITS", path: "/circuits-thematiques" },
+    { 
+      key: "CIRCUITS", 
+      label: "NOS CIRCUITS",
+      subItems: [
+        { key: "CIRCUIT_SIGNATURE", label: "Circuit Signature", path: "/circuits-signature" },
+        { key: "CIRCUITS_THEMATIQUES", label: "Circuits Thématiques", path: "/circuits-thematiques" },
+        { key: "CIRCUIT_CARTE", label: "Circuit à la carte", path: "/circuits-a-la-carte" },
+      ]
+    },
     { key: "ADRESSES", label: "NOS BONNES ADRESSES", path: "/bonnes-adresses" },
     { key: "A PROPOS", label: "À PROPOS", path: "/a-propos" },
     { key: "ACTUALITES", label: "ACTUALITÉS", path: "/actualites" },
   ];
 
-  const renderNavItem = (item: any, mobile: boolean = false) => (
-    <Link
-      to={item.path}
-      style={{
-        textDecoration: "none",
-        color: "black",
-        fontSize: mobile ? "16px" : "14px",
-        fontWeight: mobile ? "500" : "normal",
-        fontFamily: "GeneralSans",
-      }}
-    >
-      <Flex
-        key={item.key}
-        vertical={!mobile}
-        gap="8px"
-        onClick={() => handleMenuClick(item.key)}
-        style={{
-          cursor: "pointer",
-          padding: mobile ? "12px 0" : "0",
-          borderBottom: mobile ? "1px solid #f0f0f0" : "none",
-          transition: "transform 0.8s ease",
-          // transform: menuHover === item.key ? "scale(1.1)" : "none",
-        }}
-        onMouseEnter={() => setMenuHover(item.key)}
-        onMouseLeave={() => setMenuHover(null)}
-      >
-        {item.label}
+  const renderDesktopNavItem = (item: NavItem) => {
+    const hasSubItems = item.subItems && item.subItems.length > 0;
 
-        {!mobile && (menuSelected === item.key || menuHover === item.key) && (
-          <img
-            src={menuVector}
-            alt="Menu Vector"
-            style={{
-              height: "10px",
-              width: "30px",
-              margin: "0 auto",
-              transition: "transform 0.3s ease",
-              transform: menuHover === item.key ? "scale(1.2)" : "none",
+    if (hasSubItems) {
+      const dropdownItems = item.subItems!.map((subItem) => ({
+        key: subItem.key,
+        label: (
+          <Link 
+            to={subItem.path}
+            style={{ 
+              textDecoration: "none", 
+              color: "black",
+              fontFamily: "GeneralSans",
+              fontSize: "14px"
             }}
-          />
-        )}
-      </Flex>
-    </Link>
-  );
+            onClick={() => handleMenuClick(subItem.key)}
+          >
+            {subItem.label}
+          </Link>
+        ),
+      }));
+
+      return (
+        <Dropdown
+          menu={{ items: dropdownItems }}
+          trigger={['hover']}
+          placement="bottomCenter"
+          overlayStyle={{ paddingTop: "15px" }}
+        >
+          <Flex
+            vertical
+            gap="8px"
+            style={{
+              cursor: "pointer",
+              transition: "transform 0.8s ease",
+            }}
+            onMouseEnter={() => setMenuHover(item.key)}
+            onMouseLeave={() => setMenuHover(null)}
+          >
+            <Flex align="center" gap="4px">
+              <span style={{
+                textDecoration: "none",
+                color: "black",
+                fontSize: "14px",
+                fontFamily: "GeneralSans",
+              }}>
+                {item.label}
+              </span>
+              <DownOutlined style={{ fontSize: "10px" }} />
+            </Flex>
+
+            {(menuSelected === item.key || menuHover === item.key) && (
+              <img
+                src={menuVector}
+                alt="Menu Vector"
+                style={{
+                  height: "10px",
+                  width: "30px",
+                  margin: "0 auto",
+                  transition: "transform 0.3s ease",
+                  transform: menuHover === item.key ? "scale(1.2)" : "none",
+                }}
+              />
+            )}
+          </Flex>
+        </Dropdown>
+      );
+    }
+
+    // Regular menu item with link
+    return (
+      <Link
+        to={item.path!}
+        style={{
+          textDecoration: "none",
+          color: "black",
+          fontSize: "14px",
+          fontFamily: "GeneralSans",
+        }}
+      >
+        <Flex
+          vertical
+          gap="8px"
+          onClick={() => handleMenuClick(item.key)}
+          style={{
+            cursor: "pointer",
+            transition: "transform 0.8s ease",
+          }}
+          onMouseEnter={() => setMenuHover(item.key)}
+          onMouseLeave={() => setMenuHover(null)}
+        >
+          {item.label}
+
+          {(menuSelected === item.key || menuHover === item.key) && (
+            <img
+              src={menuVector}
+              alt="Menu Vector"
+              style={{
+                height: "10px",
+                width: "30px",
+                margin: "0 auto",
+                transition: "transform 0.3s ease",
+                transform: menuHover === item.key ? "scale(1.2)" : "none",
+              }}
+            />
+          )}
+        </Flex>
+      </Link>
+    );
+  };
+
+  const renderMobileNavItem = (item: NavItem) => {
+    const hasSubItems = item.subItems && item.subItems.length > 0;
+
+    if (hasSubItems) {
+      const isExpanded = expandedMobileMenu === item.key;
+      
+      return (
+        <div key={item.key}>
+          <Flex
+            justify="space-between"
+            align="center"
+            onClick={() => handleMobileMenuToggle(item.key)}
+            style={{
+              cursor: "pointer",
+              padding: "12px 0",
+              borderBottom: "1px solid #f0f0f0",
+            }}
+          >
+            <span style={{
+              fontSize: "16px",
+              fontWeight: "500",
+              fontFamily: "GeneralSans",
+              color: "black",
+            }}>
+              {item.label}
+            </span>
+            <DownOutlined 
+              style={{ 
+                fontSize: "12px",
+                transition: "transform 0.3s ease",
+                transform: isExpanded ? "rotate(180deg)" : "none"
+              }} 
+            />
+          </Flex>
+          
+          {isExpanded && (
+            <div style={{ paddingLeft: "16px", marginBottom: "8px" }}>
+              {item.subItems!.map((subItem) => (
+                <Link
+                  key={subItem.key}
+                  to={subItem.path}
+                  style={{
+                    textDecoration: "none",
+                    color: "black",
+                  }}
+                >
+                  <div
+                    onClick={() => handleMenuClick(subItem.key)}
+                    style={{
+                      padding: "8px 0",
+                      fontSize: "14px",
+                      fontFamily: "GeneralSans",
+                      borderBottom: "1px solid #f8f8f8",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {subItem.label}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Regular menu item with link
+    return (
+      <Link
+        key={item.key}
+        to={item.path!}
+        style={{
+          textDecoration: "none",
+          color: "black",
+        }}
+      >
+        <div
+          onClick={() => handleMenuClick(item.key)}
+          style={{
+            cursor: "pointer",
+            padding: "12px 0",
+            borderBottom: "1px solid #f0f0f0",
+            fontSize: "16px",
+            fontWeight: "500",
+            fontFamily: "GeneralSans",
+          }}
+        >
+          {item.label}
+        </div>
+      </Link>
+    );
+  };
 
   const renderMobileMenu = () => (
     <Drawer
@@ -115,7 +300,7 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
       </Flex>
 
       <Flex vertical gap="0">
-        {navItems.map((item) => renderNavItem(item, true))}
+        {navItems.map((item) => renderMobileNavItem(item))}
       </Flex>
 
       <Flex style={{ marginTop: "30px" }}>
@@ -183,14 +368,12 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
               </Flex>
             )}
 
-            {/* Mobile Navigation */}
-
             {/* Desktop Navigation */}
             {!isMobile && (
               <>
-                {navItems.slice(0, 3).map((item) => renderNavItem(item))}
+                {navItems.slice(0, 3).map((item) => renderDesktopNavItem(item))}
 
-                {/* Center Logo for desktop - duplicate for centering */}
+                {/* Center Logo for desktop */}
                 <Flex>
                   <Link to="/">
                     <img
@@ -201,7 +384,7 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
                   </Link>
                 </Flex>
 
-                {navItems.slice(3).map((item) => renderNavItem(item))}
+                {navItems.slice(3).map((item) => renderDesktopNavItem(item))}
 
                 <Flex>
                   <Link to="/reserver">
