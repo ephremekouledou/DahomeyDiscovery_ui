@@ -8,6 +8,7 @@ import Circuits from "./pages/Circuits/Circuits";
 import { CircuitView } from "./components/CircuitView/CircuitView";
 import CircuitsCartes from "./pages/Circuits/CircuitsCartes";
 import CircuitCarteView from "./components/CircuitView/CircuitCarteView";
+import CircuitsSignature from "./pages/Circuits/CircuitsSignature";
 
 const router = createBrowserRouter([
   {
@@ -35,6 +36,11 @@ const router = createBrowserRouter([
   {
     path: "/circuits-a-la-carte/:id",
     element: <CircuitCarteView />,
+    errorElement: <NotFound />,
+  },
+  {
+    path: "/circuits-signature",
+    element: <CircuitsSignature />,
     errorElement: <NotFound />,
   },
   {
