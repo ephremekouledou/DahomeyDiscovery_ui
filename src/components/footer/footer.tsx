@@ -12,6 +12,9 @@ import "../../assets/Fonts/font.css";
 
 function Footer() {
   const [isMobile, setIsMobile] = useState(false);
+  const [isHovered1, setIsHovered1] = useState(false);
+  const [isHovered2, setIsHovered2] = useState(false);
+  const [isHovered3, setIsHovered3] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -24,7 +27,7 @@ function Footer() {
 
   const navItems = [
     { key: "ACCUEIL", label: "ACCUEIL", path: "/" },
-    { key: "CIRCUITS", label: "NOS CIRCUITS", path: "/circuits" },
+    { key: "CIRCUITS", label: "NOS CIRCUITS", path: "/circuits-thematiques" },
     { key: "ADRESSES", label: "NOS BONNES ADRESSES", path: "/bonnes-adresses" },
     { key: "A PROPOS", label: "À PROPOS", path: "/a-propos" },
     { key: "ACTUALITES", label: "ACTUALITÉS", path: "/actualites" },
@@ -85,13 +88,15 @@ function Footer() {
           <Flex gap={isMobile ? 8 : 10}>
             <Flex
               style={{
-                backgroundColor: "#411E1C",
+                backgroundColor: isHovered1 ? "#ff3100" : "#411E1C",
                 width: isMobile ? "40px" : "50px",
                 height: isMobile ? "40px" : "50px",
                 borderRadius: "50%",
                 justifyContent: "center",
                 alignItems: "center",
               }}
+              onMouseEnter={() => setIsHovered1(true)}
+              onMouseLeave={() => setIsHovered1(false)}
             >
               <Link
                 to="https://www.facebook.com/dahomey.discovery"
@@ -108,13 +113,15 @@ function Footer() {
             </Flex>
             <Flex
               style={{
-                backgroundColor: "#411E1C",
+                backgroundColor: isHovered2 ? "#ff3100" : "#411E1C",
                 width: isMobile ? "40px" : "50px",
                 height: isMobile ? "40px" : "50px",
                 borderRadius: "50%",
                 justifyContent: "center",
                 alignItems: "center",
               }}
+              onMouseEnter={() => setIsHovered2(true)}
+              onMouseLeave={() => setIsHovered2(false)}
             >
               <Link
                 to="https://www.instagram.com/dahomey.discovery/"
@@ -132,13 +139,15 @@ function Footer() {
             </Flex>
             <Flex
               style={{
-                backgroundColor: "#411E1C",
+                backgroundColor: isHovered3 ? "#ff3100" : "#411E1C",
                 width: isMobile ? "40px" : "50px",
                 height: isMobile ? "40px" : "50px",
                 borderRadius: "50%",
                 justifyContent: "center",
                 alignItems: "center",
               }}
+              onMouseEnter={() => setIsHovered3(true)}
+              onMouseLeave={() => setIsHovered3(false)}
             >
               <Link
                 to="https://api.whatsapp.com/send?phone=22995202020"
