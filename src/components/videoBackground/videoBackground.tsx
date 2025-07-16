@@ -4,6 +4,7 @@ import bgVideo from "../../assets/videos/background.mp4";
 import vector from "../../assets/icons/homeVector.png";
 import NavBar from "../navBar/navBar";
 import "../../assets/Fonts/font.css";
+import { FlipWords } from "../ui/flip-words";
 
 const VideoBackground = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -37,7 +38,10 @@ const VideoBackground = () => {
           zIndex: 10,
         }}
       />
-      <div id="navBar" className="relative z-20 flex items-center justify-center p-8">
+      <div
+        id="navBar"
+        className="relative z-20 flex items-center justify-center p-8"
+      >
         <NavBar menu="ACCUEIL" />
       </div>
       {/* Contenu par-dessus la vidéo - Responsive */}
@@ -71,28 +75,15 @@ const VideoBackground = () => {
                 marginLeft: isMobile ? "4px" : "12px",
                 fontSize: isMobile ? "72px" : "120px",
                 fontWeight: "1000",
-                lineHeight: "1.1",
+                lineHeight: "1",
                 margin: "0",
                 fontFamily: "DragonAngled",
               }}
             >
-              Reconnectez-vous à
+              Reconnectez-vous à <br /> <FlipWords words={["la Terre Mère", "vos racines", "l'energie des ancestres", "la vie"]} />{" "}
+              !
             </Typography.Title>
           </Flex>
-          <Typography.Title
-            level={2}
-            style={{
-              color: "white",
-              marginLeft: isMobile ? "4px" : "12px",
-              fontSize: isMobile ? "72px" : "120px",
-              fontWeight: "1000",
-              lineHeight: "1.1",
-              margin: "0",
-              fontFamily: "DragonAngled",
-            }}
-          >
-            la Terre Mère !
-          </Typography.Title>
           <Button
             type="primary"
             size="large"
@@ -106,7 +97,7 @@ const VideoBackground = () => {
               borderRadius: isMobile ? "32px" : "96px",
               padding: isMobile ? "8px 16px" : "16px 32px",
               fontSize: isMobile ? "14px" : "18px",
-              marginTop: isMobile ? "16px" : "32px",
+              marginTop: isMobile ? "8px" : "8px",
               minHeight: isMobile ? "40px" : "64px",
               boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
             }}
