@@ -42,6 +42,13 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
                 height: "100%",
                 objectFit: "cover",
                 cursor: "pointer",
+                transition: "transform 0.3s ease",
+              }}
+              onMouseOver={(e) => {
+                (e.target as HTMLImageElement).style.transform = "scale(1.05)";
+              }}
+              onMouseOut={(e) => {
+                (e.target as HTMLImageElement).style.transform = "scale(1)";
               }}
             />
           </Col>
