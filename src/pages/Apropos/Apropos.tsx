@@ -5,7 +5,7 @@ import vector from "../../assets/icons/aproposVector.svg";
 import mmeDerby from "../../assets/images/mmeDerby.png";
 import ImageGallery from "../../components/ImageGallery/imageGallery";
 import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 const { Content } = Layout;
 const { Title, Paragraph } = Typography;
 
@@ -55,7 +55,7 @@ const Apropos = () => {
       <div className="relative z-20 flex items-center justify-center p-8">
         <NavBar menu="A PROPOS" />
       </div>
-      <Flex style={{maxWidth: "1600px", margin: "0 auto"}}>
+      <Flex style={{ maxWidth: "1600px", margin: "0 auto" }}>
         <DahomeyDiscovery />
       </Flex>
       <Flex
@@ -71,6 +71,7 @@ const Apropos = () => {
 };
 
 const DahomeyDiscovery = () => {
+  const [isHovered, setIsHovered] = useState(false);
   return (
     <Layout
       style={{ background: "white", padding: "10vh 0", marginBottom: "20vh" }}
@@ -195,9 +196,9 @@ const DahomeyDiscovery = () => {
                     level={2}
                     style={{
                       color: "#1D0D0D",
-                      fontSize: "clamp(34px, 4vw, 68px)",
+                      fontSize: "clamp(34px, 4vw, 58px)",
                       marginBottom: "20px",
-                      fontWeight: "bold",
+                      // fontWeight: "bold",
                       fontFamily: "DragonAngled",
                     }}
                   >
@@ -224,7 +225,7 @@ const DahomeyDiscovery = () => {
                   type="primary"
                   size="large"
                   style={{
-                    background: "#F59F00",
+                    backgroundColor: isHovered ? "#ff3100" : "#F59F00",
                     border: "none",
                     borderRadius: "30px",
                     padding: "12px 30px",
@@ -233,25 +234,11 @@ const DahomeyDiscovery = () => {
                     fontWeight: "500",
                     boxShadow: "0 4px 15px rgba(255, 107, 53, 0.3)",
                     transition: "all 0.3s ease",
-                    color: "#1D0D0D",
+                    color: isHovered ? "white" : "black",
                     fontFamily: "GeneralSans",
                   }}
-                  onMouseEnter={(e) => {
-                    const target = e.target as HTMLButtonElement;
-                    target.style.transform = "translateY(-2px)";
-                    target.style.boxShadow =
-                      "0 6px 20px rgba(255, 107, 53, 0.4)";
-                    target.style.backgroundColor = "#ff3100"; // Rose
-                    target.style.color = "white";
-                  }}
-                  onMouseLeave={(e) => {
-                    const target = e.target as HTMLButtonElement;
-                    target.style.transform = "translateY(0)";
-                    target.style.boxShadow =
-                      "0 4px 15px rgba(255, 107, 53, 0.3)";
-                    target.style.backgroundColor = "#F59F00"; // Orange original
-                    target.style.color = "black";
-                  }}
+                  onMouseEnter={() => setIsHovered(true)}
+                  onMouseLeave={() => setIsHovered(false)}
                 >
                   Je choisis mon expérience
                 </Button>
