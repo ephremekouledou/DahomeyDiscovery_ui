@@ -221,7 +221,7 @@ const Acceuil = () => {
               </Flex>
               <Flex
                 vertical
-                align="flex-start"
+                align="center"
                 gap={isMobile ? "0.5rem" : "1rem"}
                 style={{
                   margin: isMobile ? "0 4vw" : "0 5vw",
@@ -452,6 +452,7 @@ const Acceuil = () => {
                     lineHeight: "1.2",
                     margin: "0",
                     width: "100%",
+                    textAlign: "center"
                   }}
                 >
                   <Typography.Title
@@ -638,42 +639,6 @@ const Acceuil = () => {
             <Footer />
           </Flex>
         </div>
-        {/* <div id="main" className="relative z-50 h-full">
-          <div className="absolute top-2 left-1/2 -translate-x-1/2">
-            <p className="quote">kcsldflsmk,fnjrkdfrdkslieslsjekfjsehjk</p>
-          </div>
-
-          <div className="h-full flex flex-col justify-center items-center leading-none">
-            <div className="overflow-hidden">
-              <h1 className="main-text text-[6rem] text-zinc-100">
-                EXTRAORDINARY
-              </h1>
-            </div>
-            <div className="overflow-hidden">
-              <h1 className="sub-text text-6xl text-zinc-100">WORLD</h1>
-            </div>
-          </div>
-          <div className="quote absolute bottom-4 left-4">
-            <p className="text-3xl text-zinc-100 leading-none">
-              "Your quote here"
-            </p>
-            <p className="text-3xl text-zinc-100 leading-none">
-              "Your quote here"
-            </p>
-            <p className="text-3xl text-zinc-100 leading-none">
-              "Your quote here"
-            </p>
-          </div>
-          <div className="btn-explore absolute bottom-4 right-4">
-            <button
-              className="px-4 py-1 bg-zinc-100 text-black 
-        cursor-pointer text-xl rounded hover:bg-transparent 
-        hover:border-2 hover:border-zinc-100 hover:text-white"
-            >
-              {"EXPLORE =>"}
-            </button>
-          </div>
-        </div> */}
       </div>
     </>
   );
