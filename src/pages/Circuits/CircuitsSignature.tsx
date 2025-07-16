@@ -1,7 +1,7 @@
 import { Button, Flex, Typography } from "antd";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import circuitImage from "../../assets/images/circuitImage.png";
 import { Link, useLocation } from "react-router-dom";
 
@@ -12,151 +12,13 @@ type TimelineItemProps = {
   details?: string[];
   position: "left" | "right" | string;
   index: number;
-};
-
-const TimelineItem = ({
-  title,
-  subtitle,
-  times,
-  details,
-  position,
-  index,
-}: TimelineItemProps) => {
-  const isLeft = position === "left";
-
-  return (
-    <div className="relative flex items-center mb-12">
-      {/* Contenu à gauche */}
-      <div className={`w-5/12`}>
-        {isLeft && (
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
-            <h3
-              className="font-semibold text-gray-900 mb-2"
-              style={{ fontFamily: "DragonAngled", fontSize: "38px" }}
-            >
-              {title}
-            </h3>
-            <p
-              className="text-gray-500 mb-3"
-              style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
-            >
-              {subtitle}
-            </p>
-            {times &&
-              times.map((time, i) => (
-                <p
-                  key={i}
-                  className="text-gray-600 mb-1"
-                  style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
-                >
-                  {time}
-                </p>
-              ))}
-            {details &&
-              details.map((detail, i) => (
-                <p
-                  key={i}
-                  className="text-sm text-gray-700 mt-2"
-                  style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
-                >
-                  {detail}
-                </p>
-              ))}
-          </div>
-        )}
-      </div>
-
-      {/* Ligne centrale avec numéro */}
-      <div className="w-2/12 flex justify-center relative">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-0.5 h-full bg-gray-300"></div>
-        </div>
-        <div className="relative z-10 w-12 h-12 bg-[#F59F00] rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-md">
-          {index.toString().padStart(2, "0")}
-        </div>
-      </div>
-
-      {/* Contenu à droite */}
-      <div className={`w-5/12`}>
-        {!isLeft && (
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
-            <h3
-              className="text-xl font-semibold text-gray-900 mb-2"
-              style={{ fontFamily: "DragonAngled", fontSize: "38px" }}
-            >
-              {title}
-            </h3>
-            <p
-              className="text-gray-500 mb-3"
-              style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
-            >
-              {subtitle}
-            </p>
-            {times &&
-              times.map((time, i) => (
-                <p
-                  key={i}
-                  className="text-gray-600 mb-1"
-                  style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
-                >
-                  {time}
-                </p>
-              ))}
-            {details &&
-              details.map((detail, i) => (
-                <p
-                  key={i}
-                  className="text-gray-700 mt-2"
-                  style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
-                >
-                  {detail}
-                </p>
-              ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-const FinalElement = () => {
-  return (
-    <div className="relative flex justify-center items-center pt-8 pb-12">
-      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 h-16 bg-gray-300"></div>
-      <div className="relative z-10 bg-white rounded-lg shadow-lg p-8 border border-gray-100 max-w-2xl text-center mt-16">
-        <div className="w-16 h-16 bg-[#F59F00] rounded-full flex items-center justify-center text-white font-bold text-2xl shadow-md mx-auto -mt-16 mb-6">
-          ✓
-        </div>
-        <h3
-          className="font-bold text-gray-900 mb-4"
-          style={{ fontFamily: "DragonAngled", fontSize: "38px" }}
-        >
-          Fin du voyage
-        </h3>
-        <p
-          className="text-gray-600 mb-2"
-          style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
-        >
-          Retour à l'aéroport de Cotonou
-        </p>
-        <p
-          className="text-gray-500"
-          style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
-        >
-          Transfert organisé • Assistance jusqu'au départ
-        </p>
-        <p
-          className="text-gray-500 mt-4"
-          style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
-        >
-          Merci pour ce magnifique voyage au Bénin !
-        </p>
-      </div>
-    </div>
-  );
+  isActive: boolean;
 };
 
 const DetailedTimeline = () => {
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const timelineRef = useRef<HTMLDivElement | null>(null);
+
   const timelineData = [
     {
       title: "Bienvenue au Bénin !",
@@ -246,21 +108,239 @@ const DetailedTimeline = () => {
     },
   ];
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (timelineRef.current) {
+        const element = timelineRef.current;
+        const rect = element.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+
+        // Calculer la progression du scroll pour cet élément
+        const elementTop = rect.top;
+        const elementHeight = rect.height;
+
+        // Commencer l'animation dès que l'élément commence à entrer dans la vue
+        const startOffset = windowHeight; // Commencer dès que le haut de l'élément touche le bas de l'écran
+        const endOffset = -elementHeight; // Finir quand l'élément sort complètement de la vue
+
+        // Calculer la progression de 0 à 1
+        const totalDistance = startOffset - endOffset;
+        const currentDistance = startOffset - elementTop;
+        const progress = Math.max(
+          0,
+          Math.min(1, currentDistance / totalDistance)
+        );
+
+        setScrollProgress(progress);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    handleScroll(); // Appeler une fois au montage
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <div className="min-h-screen  py-12 w-full">
+    <div className="min-h-screen py-12 w-full" ref={timelineRef}>
       <div className="px-4">
         <div className="relative">
-          {/* Ligne verticale continue */}
+          {/* Ligne verticale de base (grise) */}
           <div className="absolute left-1/2 transform -translate-x-1/2 w-0.5 h-full bg-gray-300"></div>
 
+          {/* Ligne verticale animée (orange) */}
+          <div
+            className="absolute left-1/2 transform -translate-x-1/2 w-0.5 bg-[#F59F00] transition-all duration-300 ease-out"
+            style={{
+              height: `${scrollProgress * 100}%`,
+              top: 0,
+            }}
+          ></div>
+
           {/* Items de la timeline */}
-          {timelineData.map((item, index) => (
-            <TimelineItem key={index} {...item} index={index + 1} />
-          ))}
+          {timelineData.map((item, index) => {
+            // Calculer si cet item spécifique est actif basé sur sa position dans la timeline
+            const itemProgress = (index + 1) / (timelineData.length + 1);
+            const isActive = scrollProgress >= itemProgress * 0.7; // Activation plus précoce
+
+            return (
+              <TimelineItem
+                key={index}
+                {...item}
+                index={index + 1}
+                isActive={isActive}
+              />
+            );
+          })}
 
           {/* Élément final centré */}
-          <FinalElement />
+          <FinalElement isActive={scrollProgress >= 0.6} />
         </div>
+      </div>
+    </div>
+  );
+};
+
+// Mise à jour du composant TimelineItem pour inclure l'animation
+const TimelineItem = ({
+  title,
+  subtitle,
+  times,
+  details,
+  position,
+  index,
+  isActive,
+}: TimelineItemProps) => {
+  const isLeft = position === "left";
+
+  return (
+    <div className="relative flex items-center mb-12">
+      {/* Contenu à gauche */}
+      <div
+        className={`w-5/12 transition-all duration-500 ${
+          isActive ? "opacity-100 translate-y-0" : "opacity-70 translate-y-2"
+        }`}
+      >
+        {isLeft && (
+          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
+            <h3
+              className="font-semibold text-gray-900 mb-2"
+              style={{ fontFamily: "DragonAngled", fontSize: "38px" }}
+            >
+              {title}
+            </h3>
+            <p
+              className="text-gray-500 mb-3"
+              style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+            >
+              {subtitle}
+            </p>
+            {times &&
+              times.map((time, i) => (
+                <p
+                  key={i}
+                  className="text-gray-600 mb-1"
+                  style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+                >
+                  {time}
+                </p>
+              ))}
+            {details &&
+              details.map((detail, i) => (
+                <p
+                  key={i}
+                  className="text-sm text-gray-700 mt-2"
+                  style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+                >
+                  {detail}
+                </p>
+              ))}
+          </div>
+        )}
+      </div>
+
+      {/* Ligne centrale avec numéro */}
+      <div className="w-2/12 flex justify-center relative">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-0.5 h-full bg-transparent"></div>
+        </div>
+        <div
+          className={`relative z-10 w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-md transition-all duration-500 ${
+            isActive ? "bg-[#F59F00] scale-110" : "bg-gray-400 scale-100"
+          }`}
+        >
+          {index.toString().padStart(2, "0")}
+        </div>
+      </div>
+
+      {/* Contenu à droite */}
+      <div
+        className={`w-5/12 transition-all duration-500 ${
+          isActive ? "opacity-100 translate-y-0" : "opacity-70 translate-y-2"
+        }`}
+      >
+        {!isLeft && (
+          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
+            <h3
+              className="text-xl font-semibold text-gray-900 mb-2"
+              style={{ fontFamily: "DragonAngled", fontSize: "38px" }}
+            >
+              {title}
+            </h3>
+            <p
+              className="text-gray-500 mb-3"
+              style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+            >
+              {subtitle}
+            </p>
+            {times &&
+              times.map((time, i) => (
+                <p
+                  key={i}
+                  className="text-gray-600 mb-1"
+                  style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+                >
+                  {time}
+                </p>
+              ))}
+            {details &&
+              details.map((detail, i) => (
+                <p
+                  key={i}
+                  className="text-gray-700 mt-2"
+                  style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+                >
+                  {detail}
+                </p>
+              ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Mise à jour du composant FinalElement
+const FinalElement = ({ isActive }: { isActive: boolean }) => {
+  return (
+    <div className="relative flex justify-center items-center pt-8 pb-12">
+      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 h-16 bg-transparent"></div>
+      <div
+        className={`relative z-10 bg-white rounded-lg shadow-lg p-8 border border-gray-100 max-w-2xl text-center mt-16 transition-all duration-500 ${
+          isActive ? "opacity-100 translate-y-0" : "opacity-70 translate-y-4"
+        }`}
+      >
+        <div
+          className={`w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-2xl shadow-md mx-auto -mt-16 mb-6 transition-all duration-500 ${
+            isActive ? "bg-[#F59F00] scale-110" : "bg-gray-400 scale-100"
+          }`}
+        >
+          ✓
+        </div>
+        <h3
+          className="font-bold text-gray-900 mb-4"
+          style={{ fontFamily: "DragonAngled", fontSize: "38px" }}
+        >
+          Fin du voyage
+        </h3>
+        <p
+          className="text-gray-600 mb-2"
+          style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+        >
+          Retour à l'aéroport de Cotonou
+        </p>
+        <p
+          className="text-gray-500"
+          style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+        >
+          Transfert organisé • Assistance jusqu'au départ
+        </p>
+        <p
+          className="text-gray-500 mt-4"
+          style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+        >
+          Merci pour ce magnifique voyage au Bénin !
+        </p>
       </div>
     </div>
   );
