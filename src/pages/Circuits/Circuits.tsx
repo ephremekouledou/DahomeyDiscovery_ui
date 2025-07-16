@@ -1,4 +1,4 @@
-import { Divider, Flex, Typography } from "antd";
+import { Flex, Typography } from "antd";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
 import ImageGallery from "../../components/ImageGallery/imageGallery";
@@ -43,7 +43,11 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
   return (
     <Flex
       vertical
-      style={{ backgroundColor: "white" }}
+      style={{
+        backgroundColor: "white",
+        borderBottom:
+          !isSelected && showDivider ? "1px solid black" : "0px solid black",
+      }}
       onClick={() => navigate(`/circuits-thematiques/${circuit.id}`)}
     >
       {/* Badge de durée - affiché uniquement pour le circuit sélectionné */}
@@ -55,7 +59,7 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
           border: "1px solid #999791",
           borderRadius: "46px",
           width: "fit-content",
-          transition: "all 0.6s ease",
+          transition: "all 1s ease",
         }}
       >
         <Typography
@@ -93,7 +97,7 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
               paddingLeft: isMobile ? "8px" : "24px",
               margin: "0",
               lineHeight: isMobile ? "1.2" : "1.4",
-              transition: "all 0.5s ease",
+              transition: "all 1s ease",
             }}
           >
             {circuit.name}
@@ -137,7 +141,7 @@ const CircuitCard: React.FC<CircuitCardProps> = ({
       </Flex>
 
       {/* Divider affiché uniquement si le circuit n'est pas sélectionné */}
-      {!isSelected && showDivider && <Divider size="large" />}
+      {/* {!isSelected && showDivider && <Divider size="large" />} */}
     </Flex>
   );
 };
