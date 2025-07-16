@@ -450,6 +450,7 @@ const CircuitsCartes = () => {
           width: "100%",
           margin: "0 auto",
           paddingTop: "60px",
+          paddingBottom: "60px"
         }}
       >
         <StaggeredGrid cities={cities} /* minItemWidth={4} */ />
