@@ -1,9 +1,9 @@
-import { Flex, Typography } from "antd";
+import { Button, Flex, Typography } from "antd";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
 import { useEffect, useState } from "react";
 import circuitImage from "../../assets/images/circuitImage.png";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 type TimelineItemProps = {
   title: string;
@@ -27,22 +27,38 @@ const TimelineItem = ({
   return (
     <div className="relative flex items-center mb-12">
       {/* Contenu à gauche */}
-      <div className={`w-5/12 ${isLeft ? "pr-8 text-right" : "invisible"}`}>
+      <div className={`w-5/12`}>
         {isLeft && (
           <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <h3
+              className="font-semibold text-gray-900 mb-2"
+              style={{ fontFamily: "DragonAngled", fontSize: "38px" }}
+            >
               {title}
             </h3>
-            <p className="text-sm text-gray-500 mb-3">{subtitle}</p>
+            <p
+              className="text-gray-500 mb-3"
+              style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+            >
+              {subtitle}
+            </p>
             {times &&
               times.map((time, i) => (
-                <p key={i} className="text-sm text-gray-600 mb-1">
+                <p
+                  key={i}
+                  className="text-gray-600 mb-1"
+                  style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+                >
                   {time}
                 </p>
               ))}
             {details &&
               details.map((detail, i) => (
-                <p key={i} className="text-sm text-gray-700 mt-2">
+                <p
+                  key={i}
+                  className="text-sm text-gray-700 mt-2"
+                  style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+                >
                   {detail}
                 </p>
               ))}
@@ -61,22 +77,38 @@ const TimelineItem = ({
       </div>
 
       {/* Contenu à droite */}
-      <div className={`w-5/12 ${!isLeft ? "pl-8 text-left" : "invisible"}`}>
+      <div className={`w-5/12`}>
         {!isLeft && (
           <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <h3
+              className="text-xl font-semibold text-gray-900 mb-2"
+              style={{ fontFamily: "DragonAngled", fontSize: "38px" }}
+            >
               {title}
             </h3>
-            <p className="text-sm text-gray-500 mb-3">{subtitle}</p>
+            <p
+              className="text-gray-500 mb-3"
+              style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+            >
+              {subtitle}
+            </p>
             {times &&
               times.map((time, i) => (
-                <p key={i} className="text-sm text-gray-600 mb-1">
+                <p
+                  key={i}
+                  className="text-gray-600 mb-1"
+                  style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+                >
                   {time}
                 </p>
               ))}
             {details &&
               details.map((detail, i) => (
-                <p key={i} className="text-sm text-gray-700 mt-2">
+                <p
+                  key={i}
+                  className="text-gray-700 mt-2"
+                  style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+                >
                   {detail}
                 </p>
               ))}
@@ -95,12 +127,28 @@ const FinalElement = () => {
         <div className="w-16 h-16 bg-[#F59F00] rounded-full flex items-center justify-center text-white font-bold text-2xl shadow-md mx-auto -mt-16 mb-6">
           ✓
         </div>
-        <h3 className="text-2xl font-bold text-gray-900 mb-4">Fin du voyage</h3>
-        <p className="text-gray-600 mb-2">Retour à l'aéroport de Cotonou</p>
-        <p className="text-sm text-gray-500">
+        <h3
+          className="font-bold text-gray-900 mb-4"
+          style={{ fontFamily: "DragonAngled", fontSize: "38px" }}
+        >
+          Fin du voyage
+        </h3>
+        <p
+          className="text-gray-600 mb-2"
+          style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+        >
+          Retour à l'aéroport de Cotonou
+        </p>
+        <p
+          className="text-gray-500"
+          style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+        >
           Transfert organisé • Assistance jusqu'au départ
         </p>
-        <p className="text-sm text-gray-500 mt-4">
+        <p
+          className="text-gray-500 mt-4"
+          style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+        >
           Merci pour ce magnifique voyage au Bénin !
         </p>
       </div>
@@ -241,11 +289,13 @@ const InclusNonInclusComponent = () => {
     <div className="w-full px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* Section INCLUS */}
-        <div style={{
+        <div
+          style={{
             backgroundColor: "#EAFFEF",
             padding: "25px 30px",
             height: "fit-content",
-        }}>
+          }}
+        >
           <Typography.Title
             level={2}
             style={{
@@ -262,7 +312,7 @@ const InclusNonInclusComponent = () => {
           <ul className="space-y-1">
             {inclus.map((item, index) => (
               <li key={index} className="flex items-start">
-                <span style={{paddingRight: "10px"}}>•</span>
+                <span style={{ paddingRight: "10px" }}>•</span>
                 <Typography.Text
                   style={{
                     fontSize: "16px",
@@ -277,11 +327,13 @@ const InclusNonInclusComponent = () => {
         </div>
 
         {/* Section NON INCLUS */}
-        <div style={{
+        <div
+          style={{
             backgroundColor: "#FFE6E6",
             padding: "25px 30px",
             height: "fit-content",
-        }}>
+          }}
+        >
           <Typography.Title
             level={2}
             style={{
@@ -293,12 +345,12 @@ const InclusNonInclusComponent = () => {
               letterSpacing: "0.05em",
             }}
           >
-            NON INCLUS 
+            NON INCLUS
           </Typography.Title>
           <ul className="space-y-1">
             {nonInclus.map((item, index) => (
               <li key={index} className="flex items-start">
-                <span style={{paddingRight: "10px"}}>•</span>
+                <span style={{ paddingRight: "10px" }}>•</span>
                 <Typography.Text
                   style={{
                     fontSize: "16px",
@@ -318,6 +370,7 @@ const InclusNonInclusComponent = () => {
 
 const CircuitsSignature = () => {
   const [isMobile, setIsMobile] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -358,7 +411,7 @@ const CircuitsSignature = () => {
         style={{
           backgroundColor: "#FEF1D9",
           padding: isMobile ? "4vh 6vw" : "8vh 8vw",
-          paddingBottom: isMobile ? "10vw" : "9vw",
+          paddingBottom: isMobile ? "10vw" : "8vw",
         }}
       >
         <Flex style={{ maxWidth: "1050px", width: "100%", margin: "0 auto" }}>
@@ -382,9 +435,10 @@ const CircuitsSignature = () => {
                 color: "#FF3100",
                 fontSize: isMobile ? "44px" : "85px",
                 fontWeight: "900",
-                lineHeight: "1.1",
+                lineHeight: "1",
                 letterSpacing: "0.03em",
                 marginTop: "20px",
+                marginBottom: "15px",
                 fontFamily: "DragonAngled",
                 textTransform: "uppercase",
               }}
@@ -395,7 +449,7 @@ const CircuitsSignature = () => {
               style={{
                 color: "#000000",
                 fontSize: isMobile ? "24px" : "45px",
-                lineHeight: "1.1",
+                lineHeight: "1",
                 marginTop: "0",
                 fontFamily: "DragonAngled",
               }}
@@ -517,7 +571,30 @@ const CircuitsSignature = () => {
           <DetailedTimeline />
         </Flex>
 
-        <Flex style={{ width: "100%" }}>
+        <Flex justify="center">
+          <Link to="/reserver">
+            <Button
+              type="primary"
+              size="large"
+              style={{
+                backgroundColor: isHovered ? "#ff3100" : "#F59F00",
+                color: isHovered ? "white" : "black",
+                borderRadius: "25px",
+                border: "none",
+                fontFamily: "GeneralSans",
+                transition: "all 0.3s ease",
+                fontSize: "17px",
+                fontWeight: "200",
+              }}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+            >
+              RÉSERVER
+            </Button>
+          </Link>
+        </Flex>
+
+        <Flex style={{ width: "100%", paddingBottom: "60px" }}>
           <InclusNonInclusComponent />
         </Flex>
       </Flex>
