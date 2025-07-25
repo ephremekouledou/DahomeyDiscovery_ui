@@ -1,6 +1,5 @@
 import { Flex, Typography } from "antd";
 import { useState, useEffect } from "react";
-import background from "../../assets/images/backgroundFooter.png";
 import logo from "../../assets/images/Logo/monoChrome-blanc.png";
 import {
   FacebookFilled,
@@ -37,9 +36,7 @@ function Footer() {
     <>
       <div
         style={{
-          backgroundImage: `url(${background})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
+          background: "#401715",
           width: "100%",
           height: "448px",
           position: "relative",
@@ -48,18 +45,6 @@ function Footer() {
           alignItems: "center",
         }}
       >
-        {/* Overlay pour assombrir l'image */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.5)", // Overlay noir avec 50% d'opacité
-            zIndex: 1,
-          }}
-        ></div>
 
         {/* Contenu du footer */}
         <Flex

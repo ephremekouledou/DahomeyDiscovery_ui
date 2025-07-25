@@ -30,7 +30,10 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>(null);
+  const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>(
+    null
+  );
+  const [scrolled, setScrolled] = useState<boolean>(false);
 
   // Handle responsive breakpoint
   useEffect(() => {
@@ -41,6 +44,17 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
     handleResize(); // Check initial size
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setScrolled(scrollPosition > 50);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleMenuClick = (menuItem: string) => {
@@ -54,16 +68,43 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
 
   const navItems: NavItem[] = [
     { key: "ACCUEIL", label: "ACCUEIL", path: "/" },
-    { 
-      key: "CIRCUITS", 
+    {
+      key: "CIRCUITS",
       label: "NOS CIRCUITS",
       subItems: [
-        { key: "CIRCUIT_SIGNATURE", label: "Circuit Signature", path: "/circuits-signature" },
-        { key: "CIRCUITS_THEMATIQUES", label: "Circuits Thématiques", path: "/circuits-thematiques" },
-        { key: "CIRCUIT_CARTE", label: "Circuit à la carte", path: "/circuits-a-la-carte" },
-      ]
+        {
+          key: "CIRCUIT_SIGNATURE",
+          label: "Circuit Signature",
+          path: "/circuits-signature",
+        },
+        {
+          key: "CIRCUITS_THEMATIQUES",
+          label: "Circuits Thématiques",
+          path: "/circuits-thematiques",
+        },
+        {
+          key: "CIRCUIT_CARTE",
+          label: "Circuit à la carte",
+          path: "/circuits-a-la-carte",
+        },
+      ],
     },
-    { key: "ADRESSES", label: "NOS BONNES ADRESSES", path: "/bonnes-adresses" },
+    {
+      key: "OFFRES",
+      label: "NOS OFFRES",
+      subItems: [
+        {
+          key: "HÉBERGEMENT",
+          label: "Hébergement",
+          path: "/hebergement",
+        },
+        {
+          key: "LOCATION",
+          label: "Location de voiture",
+          path: "/location de voiture",
+        },
+      ],
+    },
     { key: "A PROPOS", label: "À PROPOS", path: "/a-propos" },
     { key: "ACTUALITES", label: "ACTUALITÉS", path: "/actualites" },
   ];
@@ -75,13 +116,13 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
       const dropdownItems = item.subItems!.map((subItem) => ({
         key: subItem.key,
         label: (
-          <Link 
+          <Link
             to={subItem.path}
-            style={{ 
-              textDecoration: "none", 
+            style={{
+              textDecoration: "none",
               color: "black",
               fontFamily: "GeneralSans",
-              fontSize: "14px"
+              fontSize: "14px",
             }}
             onClick={() => handleMenuClick(subItem.key)}
           >
@@ -93,7 +134,7 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
       return (
         <Dropdown
           menu={{ items: dropdownItems }}
-          trigger={['hover']}
+          trigger={["hover"]}
           placement="bottomCenter"
           overlayStyle={{ paddingTop: "15px" }}
         >
@@ -108,12 +149,16 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
             onMouseLeave={() => setMenuHover(null)}
           >
             <Flex align="center" gap="4px">
-              <span style={{
-                textDecoration: "none",
-                color: "black",
-                fontSize: "14px",
-                fontFamily: "GeneralSans",
-              }}>
+              <span
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: scrolled ? "13px" : "14px",
+                  fontFamily: "GeneralSans",
+                  fontWeight: "500",
+                  transition: "font-size 0.3s ease",
+                }}
+              >
                 {item.label}
               </span>
               <DownOutlined style={{ fontSize: "10px" }} />
@@ -144,8 +189,6 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
         style={{
           textDecoration: "none",
           color: "black",
-          fontSize: "14px",
-          fontFamily: "GeneralSans",
         }}
       >
         <Flex
@@ -159,7 +202,16 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
           onMouseEnter={() => setMenuHover(item.key)}
           onMouseLeave={() => setMenuHover(null)}
         >
-          {item.label}
+          <span
+            style={{
+              fontSize: scrolled ? "13px" : "14px",
+              fontFamily: "GeneralSans",
+              fontWeight: "500",
+              transition: "font-size 0.3s ease",
+            }}
+          >
+            {item.label}
+          </span>
 
           {(menuSelected === item.key || menuHover === item.key) && (
             <img
@@ -184,7 +236,7 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
 
     if (hasSubItems) {
       const isExpanded = expandedMobileMenu === item.key;
-      
+
       return (
         <div key={item.key}>
           <Flex
@@ -197,23 +249,25 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
               borderBottom: "1px solid #f0f0f0",
             }}
           >
-            <span style={{
-              fontSize: "16px",
-              fontWeight: "500",
-              fontFamily: "GeneralSans",
-              color: "black",
-            }}>
+            <span
+              style={{
+                fontSize: "16px",
+                fontWeight: "500",
+                fontFamily: "GeneralSans",
+                color: "black",
+              }}
+            >
               {item.label}
             </span>
-            <DownOutlined 
-              style={{ 
+            <DownOutlined
+              style={{
                 fontSize: "12px",
                 transition: "transform 0.3s ease",
-                transform: isExpanded ? "rotate(180deg)" : "none"
-              }} 
+                transform: isExpanded ? "rotate(180deg)" : "none",
+              }}
             />
           </Flex>
-          
+
           {isExpanded && (
             <div style={{ paddingLeft: "16px", marginBottom: "8px" }}>
               {item.subItems!.map((subItem) => (
@@ -329,105 +383,153 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
 
   return (
     <>
-      <Flex
+      <div
         style={{
-          color: "black",
-          width: isMobile ? "95vw" : "80vw",
-          zIndex: 100,
-          maxWidth: "1000px",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 1000,
+          transition: "all 0.3s ease",
+          backgroundColor: "white",
+          backdropFilter: scrolled ? "blur(10px)" : "none",
+          borderBottom: scrolled ? "1px solid rgba(0, 0, 0, 0.1)" : "none",
+          padding: scrolled ? "8px 0" : "16px 0",
         }}
-        justify="center"
-        align="center"
       >
-        <nav style={{ width: "100%" }}>
-          <Flex
-            style={{
-              backgroundColor: "white",
-              width: "100%",
-              padding: isMobile ? "10px 16px" : "10px 20px",
-              borderRadius: isMobile ? "20px" : "100px",
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-            }}
-            justify="space-between"
-            align="center"
-            gap={isMobile ? "16px" : "36px"}
-          >
-            {/* Logo - Always visible */}
-            {isMobile && (
-              <Flex>
-                <Link to="/">
-                  <img
-                    src={logo}
-                    alt="Logo"
-                    style={{
-                      height: isMobile ? "35px" : "50px",
-                      width: "auto",
-                    }}
-                  />
-                </Link>
-              </Flex>
-            )}
-
-            {/* Desktop Navigation */}
-            {!isMobile && (
-              <>
-                {navItems.slice(0, 3).map((item) => renderDesktopNavItem(item))}
-
-                {/* Center Logo for desktop */}
+        <Flex
+          style={{
+            color: "black",
+            width: "100%",
+            maxWidth: "1200px",
+            margin: "0 auto",
+            padding: "0 20px",
+          }}
+          justify="center"
+          align="center"
+        >
+          <nav style={{ width: "100%" }}>
+            <Flex
+              style={{
+                backgroundColor: "white",
+                width: "100%",
+                padding: scrolled
+                  ? isMobile
+                    ? "8px 16px"
+                    : "12px 40px"
+                  : isMobile
+                  ? "12px 16px"
+                  : "16px 40px",
+                transition: "all 0.3s ease",
+                height: scrolled
+                  ? isMobile
+                    ? "50px"
+                    : "60px"
+                  : isMobile
+                  ? "60px"
+                  : "70px",
+              }}
+              justify="space-between"
+              align="center"
+              gap={isMobile ? "16px" : "36px"}
+            >
+              {/* Logo - Always visible */}
+              {isMobile && (
                 <Flex>
                   <Link to="/">
                     <img
                       src={logo}
                       alt="Logo"
-                      style={{ height: "50px", width: "auto" }}
+                      style={{
+                        height: scrolled ? "30px" : "35px",
+                        width: "auto",
+                        transition: "height 0.3s ease",
+                      }}
                     />
                   </Link>
                 </Flex>
+              )}
 
-                {navItems.slice(3).map((item) => renderDesktopNavItem(item))}
+              {/* Desktop Navigation */}
+              {!isMobile && (
+                <>
+                  {navItems
+                    .slice(0, 3)
+                    .map((item) => renderDesktopNavItem(item))}
 
-                <Flex>
-                  <Link to="/reserver">
-                    <Button
-                      type="primary"
-                      size="large"
-                      style={{
-                        backgroundColor: isHovered ? "#ff3100" : "#F59F00",
-                        color: isHovered ? "white" : "black",
-                        borderRadius: "25px",
-                        border: "none",
-                        fontFamily: "GeneralSans",
-                        transition: "all 0.3s ease",
-                        fontSize: "16px",
-                        fontWeight: "200",
-                      }}
-                      onMouseEnter={() => setIsHovered(true)}
-                      onMouseLeave={() => setIsHovered(false)}
-                    >
-                      RÉSERVER
-                    </Button>
-                  </Link>
-                </Flex>
-              </>
-            )}
+                  {/* {navItems
+                    .slice(2, 3)
+                    .map((item) => renderDesktopNavItem(item))} */}
 
-            {/* Mobile Menu Button */}
-            {isMobile && (
-              <Button
-                type="text"
-                icon={<MenuOutlined />}
-                onClick={() => setDrawerVisible(true)}
-                style={{
-                  fontSize: "20px",
-                  padding: "8px",
-                  height: "auto",
-                  color: "black",
-                }}
-              />
-            )}
-          </Flex>
-        </nav>
-      </Flex>
+                  {/* Center Logo for desktop */}
+                  <Flex>
+                    <Link to="/">
+                      <img
+                        src={logo}
+                        alt="Logo"
+                        style={{
+                          height: scrolled ? "40px" : "50px",
+                          width: "auto",
+                          transition: "height 0.3s ease",
+                        }}
+                      />
+                    </Link>
+                  </Flex>
+
+                  {navItems.slice(3).map((item) => renderDesktopNavItem(item))}
+
+                  <Flex>
+                    <Link to="/reserver">
+                      <Button
+                        type="primary"
+                        size={scrolled ? "middle" : "large"}
+                        style={{
+                          backgroundColor: isHovered ? "#ff3100" : "#F59F00",
+                          color: isHovered ? "white" : "black",
+                          borderRadius: "25px",
+                          border: "none",
+                          fontFamily: "GeneralSans",
+                          transition: "all 0.3s ease",
+                          fontSize: scrolled ? "14px" : "16px",
+                          height: scrolled ? "36px" : "40px",
+                          padding: scrolled ? "0 16px" : "0 20px",
+                        }}
+                        onMouseEnter={() => setIsHovered(true)}
+                        onMouseLeave={() => setIsHovered(false)}
+                      >
+                        RÉSERVER
+                      </Button>
+                    </Link>
+                  </Flex>
+                </>
+              )}
+
+              {/* Mobile Menu Button */}
+              {isMobile && (
+                <Button
+                  type="text"
+                  icon={<MenuOutlined />}
+                  onClick={() => setDrawerVisible(true)}
+                  style={{
+                    fontSize: "20px",
+                    padding: "8px",
+                    height: "auto",
+                    color: "black",
+                  }}
+                />
+              )}
+            </Flex>
+          </nav>
+        </Flex>
+      </div>
+
+      {/* Spacer to prevent content from being hidden behind fixed navbar */}
+      <div
+        style={{
+          height: scrolled ? "76px" : "102px",
+          transition: "height 0.3s ease",
+        }}
+      />
 
       {/* Mobile Drawer Menu */}
       {isMobile && renderMobileMenu()}

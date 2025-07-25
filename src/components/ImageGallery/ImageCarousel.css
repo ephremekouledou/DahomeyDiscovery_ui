@@ -1,0 +1,45 @@
+.carousel-container {
+  display: flex;
+  max-width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.main-image {
+  flex: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000;
+}
+
+.main-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbnail-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  padding: 10px;
+  background-color: #f5f5f5;
+}
+
+.thumbnail {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border 0.3s ease;
+  flex-grow: 1;
+}
+
+.thumbnail.active,
+.thumbnail:hover {
+  border: 2px solid #007aff;
+}

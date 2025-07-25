@@ -40,7 +40,7 @@ const VideoBackground = () => {
       />
       <div
         id="navBar"
-        className="relative z-20 flex items-center justify-center p-8"
+        className="relative  flex items-center justify-center p-8"
       >
         <NavBar menu="ACCUEIL" />
       </div>

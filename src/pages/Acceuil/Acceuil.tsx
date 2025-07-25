@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import "./Acceuil.css";
 import backChevron from "../../assets/icons/backChevron.png";
 import vector from "../../assets/icons/homeVector.png";
-import vectorbrown from "../../assets/icons/vectorbrown.png";
-import vectorPoint from "../../assets/icons/Vector.png";
-import unity from "../../assets/images/unity.png";
+
+import img3 from "../../assets/images/3.jpg";
+import img4 from "../../assets/images/4.jpg";
+import img12 from "../../assets/images/12.jpg";
+import img14 from "../../assets/images/14.png";
+import img15 from "../../assets/images/15.jpg";
 import VideoBackground from "../../components/videoBackground/videoBackground";
-import circuitImage from "../../assets/images/circuitImage.png";
-import { Button, Divider, Flex, Typography } from "antd";
+import { Flex, Typography } from "antd";
 import Footer from "../../components/footer/footer";
 import "../../assets/Fonts/font.css";
 import { useLocation } from "react-router-dom";
@@ -16,10 +18,57 @@ import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useRef } from "react";
 import { useAnimation } from "../../context/animationContext";
+import { CardBody, CardContainer, CardItem } from "../../components/ui/3d-card";
+import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
+
+type CircuitCardProps = {
+  imageUrl: string;
+  title: string;
+  alt: string;
+  isMobile: boolean;
+};
+
+const CircuitCard = ({ imageUrl, title, alt, isMobile }: CircuitCardProps) => {
+  return (
+    <>
+      <CardContainer>
+        <CardBody className="bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer">
+          <CardItem
+            className="relative overflow-hidden"
+            style={{ aspectRatio: "5/7", height: "320px", width: "100%" }}
+          >
+            <img
+              src={imageUrl}
+              alt={alt}
+              className="w-full h-full object-cover rounded-b-2xl group-hover/card:shadow-xl"
+              style={{ objectFit: "cover", height: "100%", width: "100%" }}
+            />
+          </CardItem>
+          {/* Title section */}
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <CardItem className="p-3">
+              <Typography.Title
+                level={2}
+                style={{
+                  color: "#3B1B19",
+                  fontSize: isMobile ? "1.2rem" : "2.5rem",
+                  fontWeight: "200",
+                  textAlign: "center",
+                  margin: "0",
+                  fontFamily: "DragonAngled",
+                }}
+              >
+                {title}
+              </Typography.Title>
+            </CardItem>
+          </div>
+        </CardBody>
+      </CardContainer>
+    </>
+  );
+};
 
 const Acceuil = () => {
-  const [selectedCircuit, setSelectedCircuit] =
-    useState<string>("Circuit Signature");
   const [isMobile, setIsMobile] = useState(false);
   const { pathname } = useLocation();
 
@@ -198,241 +247,128 @@ const Acceuil = () => {
         >
           locales
         </div>
-        <div
-          id="mask-wrapper"
-          className="absolute z-0 inset-0 origin-center"
-        >
-          <Flex vertical>
+        <div id="mask-wrapper" className="absolute z-0 inset-0 origin-center">
+          <Flex vertical gap={0}>
             <section className="one">
               <VideoBackground />
             </section>
 
-            <section className="two">
-              <Flex>
-                <img
-                  src={backChevron}
-                  className="Accueil_image_2"
-                  alt="Dahomey Discovery Logo"
-                  style={{
-                    width: isMobile ? "12rem" : "12vw",
-                    height: "auto",
-                  }}
-                />
-              </Flex>
-              <Flex
-                vertical
-                align="center"
-                gap={isMobile ? "0.5rem" : "1rem"}
+            <section
+              className="two"
+              style={{
+                backgroundImage: `url(${img15})`,
+                backgroundSize: "cover",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center",
+                width: "100%",
+                minHeight: "100vh",
+                position: "relative", // important pour l'overlay
+              }}
+            >
+              {/* Overlay blanc semi-transparent */}
+              <div
                 style={{
-                  margin: isMobile ? "0 4vw" : "0 5vw",
-                  position: "relative",
-                  bottom: isMobile ? "4rem" : "8rem",
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  backgroundColor: "rgba(255, 255, 255, 0.7)", // Ajuste l'opacité ici
+                  zIndex: 1,
                 }}
-              >
-                <Typography.Title
-                  level={1}
+              />
+
+              {/* Contenu principal au-dessus de l'overlay */}
+              <div style={{ position: "relative", zIndex: 2 }}>
+                <Flex>
+                  <img
+                    src={backChevron}
+                    className="Accueil_image_2"
+                    alt="Dahomey Discovery Logo"
+                    style={{
+                      width: isMobile ? "12rem" : "12vw",
+                      height: "auto",
+                    }}
+                  />
+                </Flex>
+
+                <Flex
+                  vertical
+                  align="center"
+                  gap={isMobile ? "0.5rem" : "1rem"}
                   style={{
-                    color: "#3B1B19",
-                    fontSize: isMobile ? "3rem" : "5rem",
-                    fontWeight: "800",
-                    textAlign: "center",
-                    lineHeight: "1.2",
-                    margin: "0",
-                    fontFamily: "DragonAngled",
+                    margin: isMobile ? "0 4vw" : "0 5vw",
+                    position: "relative",
+                    bottom: isMobile ? "4rem" : "8rem",
                   }}
                 >
-                  Et si vous découvriez le Bénin avec sens
-                </Typography.Title>
-                <img
-                  src={vector}
-                  alt="Vector"
+                  <Typography.Title
+                    level={1}
+                    style={{
+                      color: "#3B1B19",
+                      fontSize: isMobile ? "3rem" : "5rem",
+                      fontWeight: "800",
+                      textAlign: "center",
+                      lineHeight: "1",
+                      margin: "0",
+                      fontFamily: "DragonAngled",
+                    }}
+                  >
+                    Et si vous découvriez
+                    <br />
+                    le Bénin avec sens
+                  </Typography.Title>
+                  <img
+                    src={vector}
+                    alt="Vector"
+                    style={{
+                      height: isMobile ? "1rem" : "2rem",
+                      width: isMobile ? "5rem" : "10rem",
+                    }}
+                  />
+                </Flex>
+
+                <Flex
+                  align="center"
+                  justify="center"
                   style={{
-                    height: isMobile ? "1rem" : "2rem",
-                    width: isMobile ? "9rem" : "15rem",
-                    paddingLeft: isMobile ? "1rem" : "2rem",
-                    marginLeft: "20vw",
+                    maxWidth: "1500px",
+                    width: "100%",
+                    margin: "0 auto",
+                    position: "relative",
+                    bottom: isMobile ? "4rem" : "8rem",
                   }}
-                />
-              </Flex>
-              <Flex
-                vertical
-                gap={isMobile ? "50px" : "100px"}
-                style={{
-                  padding: isMobile ? "0 4vw" : "0 8vw",
-                  width: "100%",
-                  paddingBottom: isMobile ? "13vw" : "13vw",
-                }}
-              >
-                <Flex vertical>
+                >
                   <Flex
-                    justify="space-between"
+                    style={{ paddingTop: "0px" }}
+                    gap={"50px"}
+                    justify="center"
                     align="center"
-                    style={{
-                      maxWidth: isMobile ? "100%" : "1200px",
-                      margin: "0 auto",
-                      width: "100%",
-                      height: isMobile ? "4rem" : "6rem",
-                      backgroundColor:
-                        selectedCircuit === "Circuit Signature"
-                          ? "#fef5e6"
-                          : "white",
-                      padding: isMobile ? "0.8rem" : "1.5rem",
-                      borderRadius: "0.3rem",
-                    }}
-                    onMouseEnter={() => setSelectedCircuit("Circuit Signature")}
+                    vertical={isMobile}
                   >
-                    <Flex align="center">
-                      <Typography.Title
-                        level={2}
-                        style={{
-                          color:
-                            selectedCircuit === "Circuit Signature"
-                              ? "#BF2500"
-                              : "#411E1C",
-                          fontSize: isMobile ? "2.2rem" : "4.5rem",
-                          fontWeight: "200",
-                          textAlign: "center",
-                          paddingLeft: isMobile ? "0.8rem" : "1.5rem",
-                          margin: "0",
-                          fontFamily: "DragonAngled",
-                        }}
-                      >
-                        Circuit Signature
-                      </Typography.Title>
+                    <CircuitCard
+                      imageUrl={img4}
+                      title="Circuit Signature"
+                      alt="Circuit Signature"
+                      isMobile={isMobile}
+                    />
+                    <Flex style={{ marginTop: isMobile ? "0px" : "110px" }}>
+                      <CircuitCard
+                        imageUrl={img12}
+                        title="Circuits Thématiques"
+                        alt="Circuit Thématiques"
+                        isMobile={isMobile}
+                      />
                     </Flex>
-                    <img
-                      src={circuitImage}
-                      style={{
-                        height: isMobile ? "5rem" : "15rem",
-                        width: "auto",
-                        paddingRight: isMobile ? "1rem" : "4rem",
-                        maxWidth: isMobile ? "25vw" : "30vw",
-                        display:
-                          selectedCircuit === "Circuit Signature"
-                            ? "block"
-                            : "none",
-                      }}
-                      className="Accueil_image_2"
-                      alt="Dahomey Discovery Logo"
+                    <CircuitCard
+                      imageUrl={img14}
+                      title="Circuit à la carte"
+                      alt="Circuit à la carte"
+                      isMobile={isMobile}
                     />
                   </Flex>
-                  {selectedCircuit !== "Circuit Signature" && <Divider />}
                 </Flex>
-                <Flex vertical>
-                  <Flex
-                    justify="space-between"
-                    align="center"
-                    style={{
-                      maxWidth: isMobile ? "100%" : "1200px",
-                      margin: "0 auto",
-                      width: "100%",
-                      height: isMobile ? "4rem" : "6rem",
-                      backgroundColor:
-                        selectedCircuit === "Circuits Thématiques"
-                          ? "#fef5e6"
-                          : "white",
-                      padding: isMobile ? "0.8rem" : "1.5rem",
-                      borderRadius: "0.3rem",
-                    }}
-                    onMouseEnter={() =>
-                      setSelectedCircuit("Circuits Thématiques")
-                    }
-                  >
-                    <Flex align="center">
-                      <Typography.Title
-                        level={2}
-                        style={{
-                          color:
-                            selectedCircuit === "Circuits Thématiques"
-                              ? "#BF2500"
-                              : "#411E1C",
-                          fontSize: isMobile ? "2.2rem" : "4.5rem",
-                          fontFamily: "DragonAngled",
-                          fontWeight: "200",
-                          textAlign: "center",
-                          paddingLeft: isMobile ? "0.8rem" : "1.5rem",
-                          margin: "0",
-                        }}
-                      >
-                        Circuits Thématiques
-                      </Typography.Title>
-                    </Flex>
-                    <img
-                      src={circuitImage}
-                      style={{
-                        height: isMobile ? "5rem" : "15rem",
-                        width: "auto",
-                        paddingRight: isMobile ? "1rem" : "4rem",
-                        maxWidth: isMobile ? "25vw" : "30vw",
-                        display:
-                          selectedCircuit === "Circuits Thématiques"
-                            ? "block"
-                            : "none",
-                      }}
-                      className="Accueil_image_2"
-                      alt="Dahomey Discovery Logo"
-                    />
-                  </Flex>
-                  {selectedCircuit !== "Circuits Thématiques" && <Divider />}
-                </Flex>
-                <Flex vertical>
-                  <Flex
-                    justify="space-between"
-                    align="center"
-                    style={{
-                      maxWidth: isMobile ? "100%" : "1200px",
-                      margin: "0 auto",
-                      width: "100%",
-                      height: isMobile ? "4rem" : "6rem",
-                      backgroundColor:
-                        selectedCircuit === "Circuit à la carte"
-                          ? "#fef5e6"
-                          : "white",
-                      padding: isMobile ? "0.8rem" : "1.5rem",
-                      borderRadius: "0.3rem",
-                    }}
-                    onMouseEnter={() =>
-                      setSelectedCircuit("Circuit à la carte")
-                    }
-                  >
-                    <Flex align="center">
-                      <Typography.Title
-                        level={2}
-                        style={{
-                          color:
-                            selectedCircuit === "Circuit à la carte"
-                              ? "#BF2500"
-                              : "#411E1C",
-                          fontSize: isMobile ? "2.2rem" : "4.5rem",
-                          fontFamily: "DragonAngled",
-                          fontWeight: "200",
-                          textAlign: "center",
-                          paddingLeft: isMobile ? "0.8rem" : "1.5rem",
-                          margin: "0",
-                        }}
-                      >
-                        Circuit à la carte
-                      </Typography.Title>
-                    </Flex>
-                    <img
-                      src={circuitImage}
-                      style={{
-                        height: isMobile ? "5rem" : "15rem",
-                        width: "auto",
-                        paddingRight: isMobile ? "1rem" : "4rem",
-                        maxWidth: isMobile ? "25vw" : "30vw",
-                        display:
-                          selectedCircuit === "Circuit à la carte"
-                            ? "block"
-                            : "none",
-                      }}
-                      className="Accueil_image_2"
-                      alt="Dahomey Discovery Logo"
-                    />
-                  </Flex>
-                  {selectedCircuit !== "Circuit à la carte" && <Divider />}
-                </Flex>
-              </Flex>
+              </div>
             </section>
 
             <section className="three">
@@ -452,7 +388,7 @@ const Acceuil = () => {
                     lineHeight: "1.2",
                     margin: "0",
                     width: "100%",
-                    textAlign: "center"
+                    textAlign: "center",
                   }}
                 >
                   <Typography.Title
@@ -474,166 +410,20 @@ const Acceuil = () => {
               </Flex>
             </section>
 
+            <section style={{ height: "45vw" }}>
+              <ImageCarousel />
+            </section>
+
             <section className="four">
-              <Flex
-                vertical
-                align="center"
-                gap={isMobile ? "20px" : "40px"}
+              <img
+                src={img3}
                 style={{
-                  padding: isMobile ? "3vh 4vw" : "5vh 5vw",
                   width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
                 }}
-                justify="center"
-              >
-                <Flex vertical align="center" gap="10px">
-                  <Typography.Title
-                    level={2}
-                    style={{
-                      color: "#3B1B19",
-                      fontSize: isMobile ? "2.8rem" : "5rem",
-                      fontFamily: "DragonAngled",
-                      fontWeight: "800",
-                      textAlign: "center",
-                      margin: "0",
-                    }}
-                  >
-                    Un accueil humain, ancré dans <br /> les réalités locales
-                  </Typography.Title>
-                  <img
-                    src={vectorbrown}
-                    alt="Vector"
-                    style={{
-                      width: isMobile ? "120px" : "auto",
-                      height: "auto",
-                    }}
-                  />
-                </Flex>
-                <Flex
-                  gap={isMobile ? "20px" : "50px"}
-                  justify="center"
-                  align="center"
-                  vertical={isMobile}
-                >
-                  <Flex
-                    vertical
-                    justify="center"
-                    align={isMobile ? "flex-start" : "center"}
-                    gap={isMobile ? "15px" : "20px"}
-                    style={{ order: isMobile ? 2 : 1 }}
-                  >
-                    <Flex
-                      align="center"
-                      style={{ width: "100%" }}
-                      gap={isMobile ? "20px" : "30px"}
-                    >
-                      <img
-                        src={vectorPoint}
-                        style={{
-                          width: isMobile ? "20px" : "3vw",
-                          height: isMobile ? "20px" : "30px",
-                          flexShrink: 0,
-                        }}
-                        alt="Vector Point"
-                      />
-                      <Typography.Text
-                        style={{
-                          color: "#3B1B19",
-                          fontSize: isMobile ? "1rem" : "1.5rem",
-                          marginLeft: isMobile ? "5px" : "10px",
-                          fontFamily: "GeneralSans",
-                        }}
-                      >
-                        Artisans, guides, <br /> restaurateurs, hôtes
-                        <br /> disponibles
-                      </Typography.Text>
-                    </Flex>
-                    <Flex
-                      align="center"
-                      style={{ width: "100%" }}
-                      gap={isMobile ? "20px" : "30px"}
-                    >
-                      <img
-                        src={vectorPoint}
-                        style={{
-                          width: isMobile ? "20px" : "3vw",
-                          height: isMobile ? "20px" : "30px",
-                          flexShrink: 0,
-                        }}
-                        alt="Vector Point"
-                      />
-                      <Typography.Text
-                        style={{
-                          color: "#3B1B19",
-                          fontSize: isMobile ? "1rem" : "1.5rem",
-                          marginLeft: isMobile ? "5px" : "10px",
-                        }}
-                      >
-                        Privatisables ou en <br /> petits groupes
-                      </Typography.Text>
-                    </Flex>
-                    <Flex
-                      align="center"
-                      style={{ width: "100%" }}
-                      gap={isMobile ? "20px" : "30px"}
-                    >
-                      <img
-                        src={vectorPoint}
-                        style={{
-                          width: isMobile ? "20px" : "3vw",
-                          height: isMobile ? "20px" : "30px",
-                          flexShrink: 0,
-                        }}
-                        alt="Vector Point"
-                      />
-                      <Typography.Text
-                        style={{
-                          color: "#3B1B19",
-                          fontSize: isMobile ? "1rem" : "1.5rem",
-                          marginLeft: isMobile ? "5px" : "10px",
-                        }}
-                      >
-                        Programmes complets, <br /> équilibrés et prêts à vivre
-                      </Typography.Text>
-                    </Flex>
-                    <Button
-                      type="primary"
-                      size={isMobile ? "middle" : "large"}
-                      style={{
-                        borderRadius: isMobile ? "32px" : "96px",
-                        padding: isMobile ? "8px 16px" : "16px 32px",
-                        minHeight: isMobile ? "40px" : "64px",
-                        fontSize: isMobile ? "14px" : "18px",
-                        backgroundColor: "#FF3100",
-                        color: "white",
-                        marginTop: isMobile ? "10px" : "0",
-                        fontFamily: "GeneralSans",
-                        transition: "all 0.3s ease",
-                      }}
-                      onMouseEnter={(e) => {
-                        const target = e.target as HTMLButtonElement;
-                        target.style.backgroundColor = "#b22200"; // Rose
-                      }}
-                      onMouseLeave={(e) => {
-                        const target = e.target as HTMLButtonElement;
-                        target.style.backgroundColor = "#FF3100"; // Orange original
-                      }}
-                    >
-                      Réserver maintenant
-                    </Button>
-                  </Flex>
-                  <img
-                    src={unity}
-                    alt="Unity"
-                    className="unity-image"
-                    style={{
-                      order: isMobile ? 1 : 2,
-                      maxWidth: isMobile ? "100%" : "auto",
-                      height: isMobile ? "200px" : "auto",
-                      objectFit: "contain",
-                    }}
-                  />
-                </Flex>
-              </Flex>
+                alt="Image 4"
+              />
             </section>
 
             <Footer />
