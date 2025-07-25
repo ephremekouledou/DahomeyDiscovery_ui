@@ -76,6 +76,7 @@ const VideoBackground = () => {
                 fontSize: isMobile ? "72px" : "120px",
                 fontWeight: "1000",
                 lineHeight: "1",
+                letterSpacing: "0.05em",
                 margin: "0",
                 fontFamily: "DragonAngled",
               }}
