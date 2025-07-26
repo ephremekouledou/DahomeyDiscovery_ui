@@ -1,148 +1,134 @@
 import { Flex, Typography } from "antd";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
-import ImageGallery from "../../components/ImageGallery/imageGallery";
 import { useEffect, useState } from "react";
-import circuitImage from "../../assets/images/circuitImage.png";
+import img from "../../assets/images/13.jpg";
+import video from "../../assets/videos/usagevid1.mp4";
 import { useLocation, useNavigate } from "react-router-dom";
+import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
 
-// Types
-interface Circuit {
+interface TravelCardProps {
   id: string;
-  name: string;
-  duration: string;
-  description?: string;
-}
-
-interface GalleryImage {
-  id: number;
-  src: string;
-  alt: string;
+  image: string;
+  video: string;
   title: string;
   description: string;
+  days: number;
+  nights: number;
+  price: string | number;
 }
 
-// Composant réutilisable pour un circuit
-interface CircuitCardProps {
-  circuit: Circuit;
-  isSelected: boolean;
-  onHover: (circuitId: string) => void;
-  showDivider: boolean;
-  isMobile: boolean;
-}
-
-const CircuitCard: React.FC<CircuitCardProps> = ({
-  circuit,
-  isSelected,
-  onHover,
-  showDivider,
-  isMobile,
-}) => {
+const TravelCard = ({
+  id,
+  image,
+  video,
+  title,
+  description,
+  days,
+  nights,
+  price,
+}: TravelCardProps) => {
+  const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
 
   return (
-    <Flex
-      vertical
-      style={{
-        backgroundColor: "white",
-        borderBottom:
-          !isSelected && showDivider ? "1px solid black" : "0px solid black",
-      }}
-      onClick={() => navigate(`/circuits-thematiques/${circuit.id}`)}
+    <div
+      className="relative bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl cursor-pointer
+             w-full max-w-[320px] min-w-[280px] 
+             sm:max-w-[300px] sm:min-w-[280px]
+             md:max-w-[320px] md:min-w-[300px]
+             lg:flex-1 lg:max-w-[350px] lg:min-w-[320px] flex flex-col h-[500px]" // 👈 hauteur totale définie ici
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onClick={() => navigate(`/circuits-thematiques/${id}`)}
     >
-      {/* Badge de durée - affiché uniquement pour le circuit sélectionné */}
-      <Flex
-        style={{
-          backgroundColor: isSelected ? "#FFE0D9" : "white",
-          margin: isMobile ? "1vh 0 0 4vw" : "2vh 0 0 3vw",
-          padding: isMobile ? "0.8vw" : "0.6vw",
-          border: "1px solid #999791",
-          borderRadius: "46px",
-          width: "fit-content",
-          transition: "all 1s ease",
-        }}
-      >
-        <Typography
-          style={{
-            fontSize: isMobile ? "12px" : "16px",
-            fontFamily: "GeneralSans",
-          }}
-        >
-          {circuit.duration}
-        </Typography>
-      </Flex>
-
-      {/* Contenu principal du circuit */}
-      <Flex
-        justify="space-between"
-        align="center"
-        style={{
-          width: "100%",
-          height: isMobile ? "80px" : "120px",
-          backgroundColor: "white",
-          padding: isMobile ? "12px" : "24px",
-          borderRadius: "0.3rem",
-          cursor: "pointer",
-        }}
-        onMouseEnter={() => onHover(circuit.id)}
-      >
-        <Flex vertical>
-          <Typography.Title
-            level={2}
-            style={{
-              color: isSelected ? "#BF2500" : "#411E1C",
-              fontSize: isMobile ? "26px" : "58px",
-              fontFamily: "DragonAngled",
-              fontWeight: "300",
-              paddingLeft: isMobile ? "8px" : "24px",
-              margin: "0",
-              lineHeight: isMobile ? "1.2" : "1.4",
-              transition: "all 1s ease",
-            }}
-          >
-            {circuit.name}
-          </Typography.Title>
-          {isSelected && (
-            <Typography
-              style={{
-                color: "#311715",
-                fontSize: isMobile ? "26px" : "18px",
-                paddingLeft: isMobile ? "8px" : "25px",
-                fontFamily: "GeneralSans",
-                fontWeight: "300",
-              }}
-            >
-              {circuit.description}
-            </Typography>
-          )}
-        </Flex>
-
-        {/* Image affichée uniquement pour le circuit sélectionné */}
-        {isSelected && (
-          <img
-            src={circuitImage}
-            style={{
-              height: isMobile ? "5rem" : "15rem",
-              width: "auto",
-              paddingRight: isMobile ? "16px" : "64px",
-              maxWidth: isMobile ? "40vw" : "30vw",
-              position: "relative",
-              bottom:
-                circuit.id === "circuit-signature"
-                  ? isMobile
-                    ? "2vh"
-                    : "4vh"
-                  : "0",
-            }}
-            className="Accueil_image_2"
-            alt={`${circuit.name} Logo`}
+      {/* Section Media (Image/Video) */}
+      <div className="relative h-1/2 overflow-hidden">
+        <img
+          src={image}
+          alt={title}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
+            isHovered ? "opacity-0" : "opacity-100"
+          }`}
+        />
+        {isHovered && (
+          <video
+            src={video}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
           />
         )}
-      </Flex>
 
-      {/* Divider affiché uniquement si le circuit n'est pas sélectionné */}
-      {/* {!isSelected && showDivider && <Divider size="large" />} */}
-    </Flex>
+        {/* Badge Jours/Nuits */}
+        <div className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-white bg-opacity-95 px-2 py-1.5 sm:px-3 sm:py-2 rounded-full shadow-md flex items-center gap-1.5 sm:gap-2 backdrop-blur-sm">
+          <div className="flex items-center gap-1">
+            <svg
+              className="w-3 h-3 sm:w-4 sm:h-4 text-amber-500"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm..." />
+            </svg>
+            <span className="text-xs sm:text-sm font-semibold text-gray-700">
+              {days}J
+            </span>
+          </div>
+          <div className="w-px h-3 sm:h-4 bg-gray-300"></div>
+          <div className="flex items-center gap-1">
+            <svg
+              className="w-3 h-3 sm:w-4 sm:h-4 text-indigo-500"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+            </svg>
+            <span className="text-xs sm:text-sm font-semibold text-gray-700">
+              {nights}N
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Contenu principal */}
+      <div className="flex flex-col h-1/2 p-4 sm:p-5 md:p-6">
+        <div className="flex-grow">
+          <h3 className="text-lg sm:text-xl font-bold text-[#411E1C] mb-2 line-clamp-2">
+            {title}
+          </h3>
+          <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">
+            {description}
+          </p>
+        </div>
+
+        <div className="flex items-center justify-between mt-auto pt-2">
+          <div>
+            <p className="text-xs text-gray-500">À partir de</p>
+            <p className="text-xl sm:text-2xl font-bold text-[#411E1C]">
+              {price}
+            </p>
+          </div>
+          <button className="bg-[#f6aa1d] text-black px-3 py-2 sm:px-4 sm:py-2 rounded-lg font-medium hover:bg-[#ff3100] hover:text-white transition-colors duration-200 flex items-center gap-2 text-sm sm:text-base cursor-pointer">
+            Découvrir
+            <svg
+              className="w-3 h-3 sm:w-4 sm:h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -167,87 +153,58 @@ const Circuits = () => {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Configuration centralisée des circuits
-  const circuits: Circuit[] = [
+  const voyages = [
     {
       id: "circuit-signature",
-      name: "Esprit des Femmes - Féminin sacré et créatif",
-      duration: "9 jours / 8 nuits",
-      description: "Groupes de femmes, voyages entre amies, militantes",
-    },
-    {
-      id: "circuits-thematiques",
-      name: "Immersion & Savoir-Faire",
-      duration: "9 jours / 8 nuits",
-      description: "Circuits spécialisés selon vos centres d'intérêt",
-    },
-    {
-      id: "circuit-a-la-carte",
-      name: "Spiritualité & Traditions Vodoun",
-      duration: "9 jours / 8 nuits",
-      description: "Créez votre propre parcours personnalisé",
+      image: img,
+      video: video,
+      title: "Esprit des Femmes - Féminin sacré et créatif",
+      description: "Groupes de femmes, voyages entre amies, militantes.",
+      days: 9,
+      nights: 8,
+      price: "50.000 FCFA",
     },
     {
       id: "circuit",
-      name: "Racines & Héritage sur les traces de l'histoire",
-      duration: "9 jours / 8 nuits",
+      image: img,
+      video: video,
+      title: "Racines & Héritage sur les traces de l'histoire",
+      description: "Créez votre propre parcours personnalisé.",
+      days: 9,
+      nights: 8,
+      price: "50.000 FCFA",
+    },
+    {
+      id: "circuit-thematiques",
+      image: img,
+      video: video,
+      title: "Immersion & Savoir-Faire",
+      description: "Circuits spécialisés selon vos centres d'intérêt.",
+      days: 9,
+      nights: 8,
+      price: "50.000 FCFA",
+    },
+    {
+      id: "circuit-a-la-carte",
+      image: img,
+      video: video,
+      title: "Spiritualité & Traditions Vodoun",
       description: "Créez votre propre parcours personnalisé",
+      days: 9,
+      nights: 8,
+      price: "50.000 FCFA",
     },
   ];
-
-  // Configuration de la galerie d'images (inchangée)
-  const images: GalleryImage[] = [
-    {
-      id: 1,
-      src: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
-      alt: "Artisanat traditionnel",
-      title: "Artisanat Local",
-      description: "Découvrez l'artisanat traditionnel local",
-    },
-    {
-      id: 2,
-      src: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400&h=300&fit=crop",
-      alt: "Architecture sur pilotis",
-      title: "Villages Lacustres",
-      description: "Architecture traditionnelle sur l'eau",
-    },
-    {
-      id: 3,
-      src: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=400&h=300&fit=crop",
-      alt: "Art contemporain",
-      title: "Art Moderne",
-      description: "Œuvres d'art contemporain",
-    },
-    {
-      id: 4,
-      src: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=300&fit=crop",
-      alt: "Architecture traditionnelle",
-      title: "Habitations Locales",
-      description: "Architecture résidentielle traditionnelle",
-    },
-  ];
-
-  // État local pour le circuit sélectionné
-  const [selectedCircuitId, setSelectedCircuitId] =
-    useState<string>("circuit-signature");
 
   // Effet pour définir le titre de la page
   useEffect(() => {
     document.title = "Circuits Thématiques";
   }, []);
 
-  // Gestionnaire de survol
-  const handleCircuitHover = (circuitId: string) => {
-    setSelectedCircuitId(circuitId);
-  };
-
   return (
     <Flex justify="center" vertical>
       {/* Header avec NavBar */}
-      <div
-        className="relative z-20 flex items-center justify-center p-8"
-        style={{ backgroundColor: "#FEF1D9" }}
-      >
+      <div>
         <NavBar menu="CIRCUITS" />
       </div>
 
@@ -255,16 +212,50 @@ const Circuits = () => {
       <Flex
         vertical
         style={{
-          backgroundColor: "#FEF1D9",
+          position: "relative",
+          overflow: "hidden",
           padding: isMobile ? "4vh 6vw" : "8vh 8vw",
           paddingBottom: isMobile ? "10vh" : "20vh",
+          backgroundColor: "black", // Fallback background
         }}
       >
-        <Flex style={{ maxWidth: "1050px", width: "100%", margin: "0 auto" }}>
+        {/* Optimized Video Background */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto" // Ensures early loading
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            zIndex: 0,
+          }}
+          onError={(e) => {
+            console.error("Video error:", e);
+          }}
+        >
+          <source src={video} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+
+        {/* Content Layer */}
+        <Flex
+          style={{
+            maxWidth: "1050px",
+            width: "100%",
+            margin: "0 auto",
+            zIndex: 1,
+          }}
+        >
           <Flex vertical>
             <Typography.Text
               style={{
-                color: "#000000",
+                color: "white",
                 fontSize: isMobile ? "12px" : "16px",
                 lineHeight: "1.1",
                 margin: "0",
@@ -297,42 +288,23 @@ const Circuits = () => {
       <Flex
         style={{
           width: "100%",
-          // padding: "3vh 0",
-          paddingBottom: "0vh",
+          padding: "50px 0",
           maxWidth: "1100px",
           margin: "0 auto",
+          flexWrap: "wrap", // Permet le passage à la ligne
+          justifyContent: "center", // Centre les éléments
         }}
-        vertical
-        gap={isMobile ? 30 : 50}
+        gap={isMobile ? 15 : 25} // Gap réduit pour mobile
       >
         {/* Section des circuits - Responsive */}
-        <Flex
-          vertical
-          gap="20px"
-          style={{
-            // padding: isMobile ? "0 4vw" : "0 7vw",
-            width: "100%",
-            paddingBottom: isMobile ? "4vw" : "15vw",
-            position: "relative",
-            bottom: isMobile ? "1vw" : "3vw",
-          }}
-        >
-          {circuits.map((circuit, index) => (
-            <CircuitCard
-              key={circuit.id}
-              circuit={circuit}
-              isSelected={selectedCircuitId === circuit.id}
-              onHover={handleCircuitHover}
-              showDivider={index < circuits.length - 1}
-              isMobile={isMobile}
-            />
-          ))}
-        </Flex>
+        {voyages.map((voyage, index) => (
+          <TravelCard key={index} {...voyage} />
+        ))}
       </Flex>
-      {/* Galerie d'images */}
-      <Flex style={{ backgroundColor: "#F59F00" }} vertical>
-        <ImageGallery images={images} />
-      </Flex>
+
+      <section style={{ height: "45vw" }}>
+        <ImageCarousel />
+      </section>
 
       {/* Footer */}
       <Footer />
