@@ -2,8 +2,39 @@ import { Button, Flex, Typography } from "antd";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
 import { useEffect, useRef, useState } from "react";
-import circuitImage from "../../assets/images/circuitImage.png";
 import { Link, useLocation } from "react-router-dom";
+import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
+// import img1 from "../../assets/images/1.jpg";
+import img2 from "../../assets/images/2.jpg";
+// import img3 from "../../assets/images/3.jpg";
+import img4 from "../../assets/images/4.jpg";
+// import img5 from "../../assets/images/5.jpg";
+import img6 from "../../assets/images/6.jpg";
+// import img7 from "../../assets/images/7.jpg";
+import img8 from "../../assets/images/8.jpg";
+// import img9 from "../../assets/images/9.jpg";
+import img10 from "../../assets/images/10.jpg";
+/* import img11 from "../../assets/images/11.jpg";
+import img12 from "../../assets/images/12.jpg";
+import img13 from "../../assets/images/13.jpg";
+import img14 from "../../assets/images/14.png"; */
+
+const images = [
+  // img1,
+  img2,
+  // img3,
+  img4,
+  // img5,
+  img6,
+  // img7,
+  img8,
+  // img9,
+  img10,
+  // img11,
+  // img12,
+  // img13,
+  // img14,
+];
 
 type TimelineItemProps = {
   title: string;
@@ -202,15 +233,25 @@ const TimelineItem = ({
         }`}
       >
         {isLeft && (
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
+          <div
+            className={`rounded-lg shadow-sm p-6 border transition-all duration-500 ${
+              isActive
+                ? "bg-[#F59F00] border-[#F59F00]"
+                : "bg-white border-gray-100"
+            }`}
+          >
             <h3
-              className="font-semibold text-gray-900 mb-2"
+              className={`font-semibold mb-2 transition-colors duration-500 ${
+                isActive ? "text-white" : "text-[#F59F00]"
+              }`}
               style={{ fontFamily: "DragonAngled", fontSize: "38px" }}
             >
               {title}
             </h3>
             <p
-              className="text-gray-500 mb-3"
+              className={`mb-3 transition-colors duration-500 ${
+                isActive ? "text-white/90" : "text-gray-500"
+              }`}
               style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
             >
               {subtitle}
@@ -219,7 +260,9 @@ const TimelineItem = ({
               times.map((time, i) => (
                 <p
                   key={i}
-                  className="text-gray-600 mb-1"
+                  className={`mb-1 transition-colors duration-500 ${
+                    isActive ? "text-white/85" : "text-gray-600"
+                  }`}
                   style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
                 >
                   {time}
@@ -229,7 +272,9 @@ const TimelineItem = ({
               details.map((detail, i) => (
                 <p
                   key={i}
-                  className="text-sm text-gray-700 mt-2"
+                  className={`text-sm mt-2 transition-colors duration-500 ${
+                    isActive ? "text-white/85" : "text-gray-700"
+                  }`}
                   style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
                 >
                   {detail}
@@ -260,15 +305,25 @@ const TimelineItem = ({
         }`}
       >
         {!isLeft && (
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
+          <div
+            className={`rounded-lg shadow-sm p-6 border transition-all duration-500 ${
+              isActive
+                ? "bg-[#F59F00] border-[#F59F00]"
+                : "bg-white border-gray-100"
+            }`}
+          >
             <h3
-              className="text-xl font-semibold text-gray-900 mb-2"
+              className={`text-xl font-semibold mb-2 transition-colors duration-500 ${
+                isActive ? "text-white" : "text-[#F59F00]"
+              }`}
               style={{ fontFamily: "DragonAngled", fontSize: "38px" }}
             >
               {title}
             </h3>
             <p
-              className="text-gray-500 mb-3"
+              className={`mb-3 transition-colors duration-500 ${
+                isActive ? "text-white/90" : "text-gray-500"
+              }`}
               style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
             >
               {subtitle}
@@ -277,7 +332,9 @@ const TimelineItem = ({
               times.map((time, i) => (
                 <p
                   key={i}
-                  className="text-gray-600 mb-1"
+                  className={`mb-1 transition-colors duration-500 ${
+                    isActive ? "text-white/85" : "text-gray-600"
+                  }`}
                   style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
                 >
                   {time}
@@ -287,7 +344,9 @@ const TimelineItem = ({
               details.map((detail, i) => (
                 <p
                   key={i}
-                  className="text-gray-700 mt-2"
+                  className={`mt-2 transition-colors duration-500 ${
+                    isActive ? "text-white/85" : "text-gray-700"
+                  }`}
                   style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
                 >
                   {detail}
@@ -306,8 +365,10 @@ const FinalElement = ({ isActive }: { isActive: boolean }) => {
     <div className="relative flex justify-center items-center pt-8 pb-12">
       <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 h-16 bg-transparent"></div>
       <div
-        className={`relative z-10 bg-white rounded-lg shadow-lg p-8 border border-gray-100 max-w-2xl text-center mt-16 transition-all duration-500 ${
-          isActive ? "opacity-100 translate-y-0" : "opacity-70 translate-y-4"
+        className={`relative z-10 rounded-lg shadow-lg p-8 border max-w-2xl text-center mt-16 transition-all duration-500 ${
+          isActive
+            ? "bg-[#F59F00] border-[#F59F00] opacity-100 translate-y-0"
+            : "bg-white border-gray-100 opacity-70 translate-y-4"
         }`}
       >
         <div
@@ -318,25 +379,33 @@ const FinalElement = ({ isActive }: { isActive: boolean }) => {
           ✓
         </div>
         <h3
-          className="font-bold text-gray-900 mb-4"
+          className={`font-bold mb-4 transition-colors duration-500 ${
+            isActive ? "text-white" : "text-gray-900"
+          }`}
           style={{ fontFamily: "DragonAngled", fontSize: "38px" }}
         >
           Fin du voyage
         </h3>
         <p
-          className="text-gray-600 mb-2"
+          className={`mb-2 transition-colors duration-500 ${
+            isActive ? "text-white/90" : "text-gray-600"
+          }`}
           style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
         >
           Retour à l'aéroport de Cotonou
         </p>
         <p
-          className="text-gray-500"
+          className={`transition-colors duration-500 ${
+            isActive ? "text-white/85" : "text-gray-500"
+          }`}
           style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
         >
           Transfert organisé • Assistance jusqu'au départ
         </p>
         <p
-          className="text-gray-500 mt-4"
+          className={`mt-4 transition-colors duration-500 ${
+            isActive ? "text-white/85" : "text-gray-500"
+          }`}
           style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
         >
           Merci pour ce magnifique voyage au Bénin !
@@ -472,29 +541,49 @@ const CircuitsSignature = () => {
 
   // Effet pour définir le titre de la page
   useEffect(() => {
-    document.title = "Circuits Thématiques";
+    document.title = "Circuits Signature";
   }, []);
 
   return (
     <Flex justify="center" vertical>
       {/* Header avec NavBar */}
-      <div
-        className="relative z-20 flex items-center justify-center p-8"
-        style={{ backgroundColor: "#FEF1D9" }}
-      >
+      <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="CIRCUITS" />
       </div>
 
       {/* Section héros - Responsive */}
       <Flex
         vertical
+        className="relative w-full overflow-hidden"
         style={{
-          backgroundColor: "#FEF1D9",
+          backgroundImage: `url(${img2})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
           padding: isMobile ? "4vh 6vw" : "8vh 8vw",
           paddingBottom: isMobile ? "10vw" : "8vw",
         }}
       >
-        <Flex style={{ maxWidth: "1050px", width: "100%", margin: "0 auto" }}>
+        {/* Gradient overlay - de la couleur beige/crème vers transparent */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(to right, 
+            rgba(250, 235, 215, 0.95) 0%,
+            rgba(250, 235, 215, 0.85) 20%,
+            rgba(250, 235, 215, 0.6) 40%,
+            rgba(250, 235, 215, 0.3) 60%,
+            rgba(250, 235, 215, 0.1) 80%,
+            transparent 100%)`,
+          }}
+        />
+        <Flex
+          style={{
+            maxWidth: "1050px",
+            width: "100%",
+            margin: "0 auto",
+            zIndex: 1,
+          }}
+        >
           <Flex vertical gap={0}>
             <Typography.Text
               style={{
@@ -555,6 +644,7 @@ const CircuitsSignature = () => {
       >
         {/* Section des circuits - Responsive */}
         <Flex
+          className="bg-white rounded-lg shadow-md border border-gray-200 p-6"
           vertical
           gap="20px"
           style={{
@@ -565,7 +655,11 @@ const CircuitsSignature = () => {
             bottom: isMobile ? "1vw" : "3vw",
           }}
         >
-          <Flex vertical style={{ backgroundColor: "white" }}>
+          <Flex
+            vertical
+            style={{ backgroundColor: "white" }}
+            className="bg-white rounded-lg shadow-md border border-gray-200 p-6"
+          >
             {/* Badge de durée - affiché uniquement pour le circuit sélectionné */}
             <Flex
               style={{
@@ -594,7 +688,7 @@ const CircuitsSignature = () => {
               align="center"
               style={{
                 width: "100%",
-                height: isMobile ? "80px" : "120px",
+                height: isMobile ? "80px" : "150px",
                 backgroundColor: "white",
                 padding: isMobile ? "12px" : "24px",
                 borderRadius: "0.3rem",
@@ -630,19 +724,6 @@ const CircuitsSignature = () => {
                   Voyageurs curieux, familles, groupes DOM-TOM, premiers séjours
                 </Typography>
               </Flex>
-
-              {/* Image affichée uniquement pour le circuit sélectionné */}
-              <img
-                src={circuitImage}
-                style={{
-                  height: isMobile ? "5rem" : "15rem",
-                  width: "auto",
-                  paddingRight: isMobile ? "16px" : "64px",
-                  maxWidth: isMobile ? "40vw" : "30vw",
-                  position: "relative",
-                }}
-                className="Accueil_image_2"
-              />
             </Flex>
           </Flex>
         </Flex>
@@ -678,6 +759,10 @@ const CircuitsSignature = () => {
           <InclusNonInclusComponent />
         </Flex>
       </Flex>
+
+      <section style={{ height: "45vw" }}>
+        <ImageCarousel images={images} />
+      </section>
 
       {/* Footer */}
       <Footer />
