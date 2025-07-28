@@ -248,7 +248,7 @@ const Circuits = () => {
           overflow: "hidden",
           padding: isMobile ? "4vh 6vw" : "8vh 8vw",
           paddingBottom: isMobile ? "10vh" : "20vh",
-          backgroundColor: "black", // Fallback background
+          backgroundColor: "#FEF1D9", // Fallback background
         }}
       >
         {/* Optimized Video Background */}
