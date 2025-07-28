@@ -4,6 +4,38 @@ import "./Actualites.css"; // Assuming you have a CSS file for styling
 import { useEffect, useState } from "react";
 import Footer from "../../components/footer/footer";
 import { useLocation } from "react-router-dom";
+import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
+// import img1 from "../../assets/images/1.jpg";
+import img2 from "../../assets/images/2.jpg";
+// import img3 from "../../assets/images/3.jpg";
+import img4 from "../../assets/images/4.jpg";
+// import img5 from "../../assets/images/5.jpg";
+import img6 from "../../assets/images/6.jpg";
+// import img7 from "../../assets/images/7.jpg";
+import img8 from "../../assets/images/8.jpg";
+// import img9 from "../../assets/images/9.jpg";
+import img10 from "../../assets/images/10.jpg";
+/* import img11 from "../../assets/images/11.jpg";
+import img12 from "../../assets/images/12.jpg";
+import img13 from "../../assets/images/13.jpg";
+import img14 from "../../assets/images/14.png"; */
+
+const images = [
+  // img1,
+  img2,
+  // img3,
+  img4,
+  // img5,
+  img6,
+  // img7,
+  img8,
+  // img9,
+  img10,
+  // img11,
+  // img12,
+  // img13,
+  // img14,
+];
 
 function Actualites() {
   const { pathname } = useLocation();
@@ -17,12 +49,12 @@ function Actualites() {
   }, [pathname]);
   return (
     <Flex justify="center" vertical>
-      <div className="relative z-20 flex items-center justify-center p-8">
+      <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="ACTUALITES" />
       </div>
-      <Flex style={{maxWidth: "1300px", margin: "0 auto"}}>
+      <Flex style={{ maxWidth: "1300px", margin: "0 auto" }}>
         <Flex
-          style={{ width: "100%", padding: "5vw 0", paddingBottom: "12vw" }}
+          style={{ width: "100%", paddingTop: "50px", paddingBottom: "90px" }}
           vertical
           gap={24}
         >
@@ -42,6 +74,9 @@ function Actualites() {
           <NewsLayout />
         </Flex>
       </Flex>
+      <section style={{ height: "45vw" }}>
+        <ImageCarousel images={images} />
+      </section>
       <Footer />
     </Flex>
   );
