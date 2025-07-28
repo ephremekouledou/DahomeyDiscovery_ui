@@ -218,15 +218,6 @@ const Acceuil = () => {
         gsap.set("#videoContent", {
           opacity: 0,
         });
-        gsap.set([".main-text", ".sub-text"], {
-          y: 100,
-        });
-        gsap.set(".quote", {
-          opacity: 0,
-        });
-        gsap.set(".btn-explore", {
-          opacity: 0,
-        });
 
         const tl = gsap.timeline();
         tl.to("#mask-wrapper", {
