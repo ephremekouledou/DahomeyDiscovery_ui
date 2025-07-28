@@ -170,6 +170,36 @@ const Acceuil = () => {
   const { hasRun, setHasRun } = useAnimation();
   const location = useLocation();
 
+  // Style CSS pour les animations continues
+  const continuousAnimationStyles = `
+  @keyframes floatUp1 {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+  
+  @keyframes floatUp2 {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-50px); }
+  }
+  
+  @keyframes floatUp3 {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-30px); }
+  }
+  
+  .circuit-card-1 {
+    animation: floatUp1 3s ease-in-out infinite;
+  }
+  
+  .circuit-card-2 {
+    animation: floatUp2 4s ease-in-out infinite 0.5s;
+  }
+  
+  .circuit-card-3 {
+    animation: floatUp3 3.5s ease-in-out infinite 1s;
+  }
+`;
+
   useGSAP(
     () => {
       const isFirstLoad = location.pathname === "/";
@@ -369,6 +399,7 @@ const Acceuil = () => {
                     bottom: isMobile ? "4rem" : "8rem",
                   }}
                 >
+                  <style>{continuousAnimationStyles}</style>
                   <Flex
                     style={{ paddingTop: "0px" }}
                     gap={"50px"}
@@ -376,26 +407,34 @@ const Acceuil = () => {
                     align="center"
                     vertical={isMobile}
                   >
-                    <CircuitCard
-                      imageUrl={img4}
-                      title="Circuit Signature"
-                      alt="Circuit Signature"
-                      isMobile={isMobile}
-                    />
-                    <Flex style={{ marginTop: isMobile ? "0px" : "110px" }}>
+                    <div className="circuit-card-1">
                       <CircuitCard
-                        imageUrl={img12}
-                        title="Circuits Thématiques"
-                        alt="Circuit Thématiques"
+                        imageUrl={img4}
+                        title="Circuit Signature"
+                        alt="Circuit Signature"
                         isMobile={isMobile}
                       />
+                    </div>
+
+                    <Flex style={{ marginTop: isMobile ? "0px" : "110px" }}>
+                      <div className="circuit-card-2">
+                        <CircuitCard
+                          imageUrl={img12}
+                          title="Circuits Thématiques"
+                          alt="Circuit Thématiques"
+                          isMobile={isMobile}
+                        />
+                      </div>
                     </Flex>
-                    <CircuitCard
-                      imageUrl={img14}
-                      title="Circuit à la carte"
-                      alt="Circuit à la carte"
-                      isMobile={isMobile}
-                    />
+
+                    <div className="circuit-card-3">
+                      <CircuitCard
+                        imageUrl={img14}
+                        title="Circuit à la carte"
+                        alt="Circuit à la carte"
+                        isMobile={isMobile}
+                      />
+                    </div>
                   </Flex>
                 </Flex>
               </div>
