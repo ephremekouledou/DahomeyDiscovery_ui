@@ -10,6 +10,7 @@ import CircuitsCartes from "./pages/Circuits/CircuitsCartes";
 import CircuitCarteView from "./components/CircuitView/CircuitCarteView";
 import CircuitsSignature from "./pages/Circuits/CircuitsSignature";
 import Hebergements from "./pages/NosOffres/hebergement";
+import Locations from "./pages/NosOffres/locations";
 
 const router = createBrowserRouter([
   {
@@ -54,11 +55,11 @@ const router = createBrowserRouter([
     element: <Hebergements />,
     errorElement: <NotFound />,
   },
-  // {
-  //   path: "/locations",
-  //   element: <AccommodationCard />,
-  //   errorElement: <NotFound />,
-  // },
+  {
+    path: "/locations",
+    element: <Locations />,
+    errorElement: <NotFound />,
+  },
   {
     path: "/a-propos",
     element: <Apropos />,

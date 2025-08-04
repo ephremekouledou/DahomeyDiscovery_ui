@@ -799,6 +799,7 @@ const Hebergements = () => {
         <Flex
           wrap="wrap"
           gap={20}
+          justify="center"
           /* justify="space-between" gap={isMobile ? 20 : 30} */ style={{
             paddingTop: "40px",
           }}
