@@ -95,13 +95,13 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
       subItems: [
         {
           key: "HÉBERGEMENT",
-          label: "Hébergement",
-          path: "/hebergement",
+          label: "Hébergements",
+          path: "/hebergements",
         },
         {
           key: "LOCATION",
           label: "Location de voiture",
-          path: "/location de voiture",
+          path: "/locations",
         },
       ],
     },

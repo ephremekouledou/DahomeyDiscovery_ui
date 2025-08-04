@@ -9,6 +9,7 @@ import { CircuitView } from "./components/CircuitView/CircuitView";
 import CircuitsCartes from "./pages/Circuits/CircuitsCartes";
 import CircuitCarteView from "./components/CircuitView/CircuitCarteView";
 import CircuitsSignature from "./pages/Circuits/CircuitsSignature";
+import Hebergements from "./pages/NosOffres/hebergement";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,16 @@ const router = createBrowserRouter([
     element: <BonneAddress />,
     errorElement: <NotFound />,
   },
+  {
+    path: "/hebergements",
+    element: <Hebergements />,
+    errorElement: <NotFound />,
+  },
+  // {
+  //   path: "/locations",
+  //   element: <AccommodationCard />,
+  //   errorElement: <NotFound />,
+  // },
   {
     path: "/a-propos",
     element: <Apropos />,
