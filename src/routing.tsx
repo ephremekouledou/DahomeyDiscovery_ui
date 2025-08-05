@@ -13,6 +13,7 @@ import Hebergements from "./pages/NosOffres/hebergement";
 import Locations from "./pages/NosOffres/locations";
 import ReservationCircuit from "./pages/Reservations/reservationCircuits";
 import ReservationLocation from "./pages/Reservations/reservationLocations";
+import ViewHebergement from "./pages/NosOffres/viewHebergement";
 
 const router = createBrowserRouter([
   {
@@ -58,8 +59,18 @@ const router = createBrowserRouter([
     errorElement: <NotFound />,
   },
   {
+    path: "/hebergements/:id",
+    element: <ViewHebergement />,
+    errorElement: <NotFound />,
+  },
+  {
     path: "/locations",
     element: <Locations />,
+    errorElement: <NotFound />,
+  },
+  {
+    path: "/locations/:id",
+    element: <ReservationLocation />,
     errorElement: <NotFound />,
   },
   {
