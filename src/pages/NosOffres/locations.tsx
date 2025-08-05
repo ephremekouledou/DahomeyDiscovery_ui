@@ -7,8 +7,6 @@ import {
   Settings,
   Shield,
   Camera,
-  MapPin,
-  Calendar,
   Snowflake,
   Radio,
   Navigation,
@@ -31,7 +29,7 @@ import img8 from "../../assets/images/8.jpg";
 import img10 from "../../assets/images/10.jpg";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
 import Footer from "../../components/footer/footer";
-import { Flex, Modal, Typography } from "antd";
+import { Button, Flex, Typography } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import NavBar from "../../components/navBar/navBar";
 import { useTransaction } from "../../context/transactionContext";
@@ -58,7 +56,7 @@ const images = [
 ];
 
 // Interface pour définir une caractéristique de voiture
-interface CarFeature {
+export interface CarFeature {
   name: string;
   icon: LucideIcon;
   available: boolean;
@@ -81,8 +79,8 @@ interface CarSpecs {
 }
 
 // Interface pour les données de location de voiture
-interface CarRentalData {
-  id: number;
+export interface CarRentalData {
+  id: string;
   name: string;
   brand: string;
   model: string;
@@ -108,7 +106,7 @@ interface CarRentalData {
 }
 
 // Interface pour les props du composant
-interface CarRentalCardProps {
+export interface CarRentalCardProps {
   car: CarRentalData;
   onRent?: () => void;
   onViewDetails?: () => void;
@@ -118,40 +116,18 @@ interface CarRentalCardProps {
 }
 
 // Interface pour les colonnes équilibrées
-interface BalancedFeatures {
+export interface BalancedFeatures {
   leftColumn: [string, CarFeature[]][];
   rightColumn: [string, CarFeature[]][];
 }
 
 const CarRentalCard: React.FC<CarRentalCardProps> = ({
   car,
-  onRent,
-  onViewDetails,
   className = "",
-  startDate,
-  endDate,
 }) => {
-  const [showModal, setShowModal] = useState<boolean>(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
+  const navigate = useNavigate();
+  const [isHovered, setIsHovered] = useState(false);
 
-  const openModal = (): void => {
-    setShowModal(true);
-    if (onViewDetails) {
-      onViewDetails();
-    }
-  };
-
-  const closeModal = (): void => setShowModal(false);
-
-  const nextImage = (): void => {
-    setCurrentImageIndex((prev) => (prev + 1) % car.images.length);
-  };
-
-  const prevImage = (): void => {
-    setCurrentImageIndex(
-      (prev) => (prev - 1 + car.images.length) % car.images.length
-    );
-  };
 
   const renderStars = (rating: number): React.ReactNode[] => {
     return Array.from({ length: 5 }, (_, i) => (
@@ -167,87 +143,6 @@ const CarRentalCard: React.FC<CarRentalCardProps> = ({
     ));
   };
 
-  // Fonction pour équilibrer la distribution des caractéristiques
-  const getBalancedFeatures = (): BalancedFeatures => {
-    const featureEntries = Object.entries(car.features);
-    const totalSections = featureEntries.length;
-    const midPoint = Math.ceil(totalSections / 2);
-
-    return {
-      leftColumn: featureEntries.slice(0, midPoint),
-      rightColumn: featureEntries.slice(midPoint),
-    };
-  };
-
-  const renderFeatureSection = (
-    title: string,
-    features: CarFeature[]
-  ): React.ReactNode | null => {
-    if (!features || features.length === 0) return null;
-
-    return (
-      <div className="mb-6">
-        <h4 className="font-semibold text-gray-800 mb-3 text-base">{title}</h4>
-        <div className="space-y-3">
-          {features.map((feature, index) => {
-            const IconComponent = feature.icon;
-            return (
-              <div
-                key={index}
-                className={`flex items-start space-x-3 ${
-                  !feature.available ? "opacity-60" : ""
-                }`}
-              >
-                <div className="flex-shrink-0 mt-0.5">
-                  <IconComponent
-                    size={18}
-                    className={
-                      feature.available ? "text-green-600" : "text-red-500"
-                    }
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <span
-                    className={`block ${
-                      !feature.available
-                        ? "line-through text-gray-500"
-                        : "text-gray-700"
-                    } text-sm font-medium`}
-                  >
-                    {feature.name}
-                  </span>
-                  {feature.description && (
-                    <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                      {feature.description}
-                    </p>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-
-  // Mapping des clés vers des titres en français
-  const featureTitles: Record<string, string> = {
-    comfort: "Confort",
-    technology: "Technologie",
-    safety: "Sécurité",
-    entertainment: "Divertissement",
-    connectivity: "Connectivité",
-    climate: "Climatisation",
-    extras: "Équipements supplémentaires",
-  };
-
-  const handleRenting = (): void => {
-    if (onRent) {
-      onRent();
-    } else {
-      console.log(`Location initiée pour ${car.brand} ${car.model}`);
-    }
-  };
 
   const getCategoryColor = (category: string): string => {
     const colors: Record<string, string> = {
@@ -272,8 +167,6 @@ const CarRentalCard: React.FC<CarRentalCardProps> = ({
         return Fuel;
     }
   };
-
-  const { leftColumn, rightColumn } = getBalancedFeatures();
 
   return (
     <>
@@ -363,11 +256,11 @@ const CarRentalCard: React.FC<CarRentalCardProps> = ({
             </span>
           </div>
 
-          {/* Localisation */}
+          {/* Localisation
           <div className="flex items-center mb-3 text-sm text-gray-600">
             <MapPin size={16} className="mr-1" />
             <span>{car.location}</span>
-          </div>
+          </div> */}
 
           {/* Prix et bouton */}
           <div className="flex items-center justify-between">
@@ -378,7 +271,7 @@ const CarRentalCard: React.FC<CarRentalCardProps> = ({
               <span className="text-gray-600 text-sm"> / jour</span>
             </div>
 
-            <button
+            {/* <button
               onClick={openModal}
               disabled={!car.availability}
               className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 bg-blue-600 hover:bg-blue-700 text-white ${
@@ -388,222 +281,35 @@ const CarRentalCard: React.FC<CarRentalCardProps> = ({
               }`}
             >
               Détails
-            </button>
+            </button> */}
+
+            <Button
+              type="primary"
+              size="large"
+              style={{
+                backgroundColor: isHovered ? "#ff3100" : "#F59F00",
+                color: isHovered ? "white" : "black",
+                borderRadius: "7px",
+                border: "none",
+                fontFamily: "GeneralSans",
+                transition: "all 0.3s ease",
+                fontSize: "16px",
+                height: "40px",
+                padding: "0 20px",
+                fontWeight: "bold",
+              }}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+              onClick={() => {
+                // we redirect to the payment page
+                navigate("/locations/" + car.id);
+              }}
+            >
+              Détails
+            </Button>
           </div>
         </div>
       </div>
-
-      {/* Modal */}
-      <Modal
-        open={showModal}
-        closeIcon={false}
-        onCancel={closeModal}
-        footer={null}
-      >
-        {/* Contenu scrollable */}
-        <div className="flex-1 overflow-y-auto max-h-[80vh] w-fit">
-          {/* Galerie d'images */}
-          <div className="relative bg-gray-100">
-            <img
-              src={car.images[currentImageIndex]}
-              alt={`${car.brand} ${car.model} - Image ${currentImageIndex + 1}`}
-              className="w-full h-80 object-cover"
-            />
-
-            {car.images.length > 1 && (
-              <>
-                <button
-                  onClick={prevImage}
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white hover:bg-gray-50 rounded-full p-3 shadow-lg transition-all"
-                  aria-label="Image précédente"
-                >
-                  <span className="text-lg font-bold">‹</span>
-                </button>
-                <button
-                  onClick={nextImage}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white hover:bg-gray-50 rounded-full p-3 shadow-lg transition-all"
-                  aria-label="Image suivante"
-                >
-                  <span className="text-lg font-bold">›</span>
-                </button>
-
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-3 py-1 rounded-full text-sm">
-                  {currentImageIndex + 1} / {car.images.length}
-                </div>
-              </>
-            )}
-
-            {/* Miniatures */}
-            <div className="absolute bottom-4 left-4 flex space-x-2">
-              {car.images.slice(0, 5).map((image, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentImageIndex(index)}
-                  className={`w-12 h-8 rounded overflow-hidden border-2 transition-all ${
-                    index === currentImageIndex
-                      ? "border-white"
-                      : "border-transparent opacity-70"
-                  }`}
-                  aria-label={`Aller à l'image ${index + 1}`}
-                >
-                  <img
-                    src={image}
-                    alt={`Miniature ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="p-6">
-            {/* Prix et évaluation */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-1">
-                  {renderStars(car.rating)}
-                  <span className="font-semibold ml-2 text-lg">
-                    {car.rating}
-                  </span>
-                  <span className="text-gray-600">
-                    ({car.reviewCount} avis)
-                  </span>
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <MapPin size={16} className="mr-1" />
-                  <span>{car.location}</span>
-                </div>
-              </div>
-              <div className="text-left md:text-right">
-                <div className="text-3xl font-bold text-blue-600">
-                  {car.pricePerDay}€
-                </div>
-                <div className="text-gray-600">par jour</div>
-              </div>
-            </div>
-
-            {/* Spécifications détaillées */}
-            <div className="mb-8">
-              <h3 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
-                Spécifications du véhicule
-              </h3>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-gray-50 p-4 rounded-lg text-center">
-                  <Users size={24} className="mx-auto mb-2 text-blue-600" />
-                  <div className="font-semibold">{car.specs.passengers}</div>
-                  <div className="text-sm text-gray-600">Passagers</div>
-                </div>
-
-                <div className="bg-gray-50 p-4 rounded-lg text-center">
-                  <Luggage size={24} className="mx-auto mb-2 text-blue-600" />
-                  <div className="font-semibold">{car.specs.luggage}</div>
-                  <div className="text-sm text-gray-600">Bagages</div>
-                </div>
-
-                <div className="bg-gray-50 p-4 rounded-lg text-center">
-                  <Settings size={24} className="mx-auto mb-2 text-blue-600" />
-                  <div className="font-semibold">{car.specs.transmission}</div>
-                  <div className="text-sm text-gray-600">Transmission</div>
-                </div>
-
-                <div className="bg-gray-50 p-4 rounded-lg text-center">
-                  {React.createElement(getFuelIcon(car.specs.fuelType), {
-                    size: 24,
-                    className: "mx-auto mb-2 text-blue-600",
-                  })}
-                  <div className="font-semibold">{car.specs.fuelType}</div>
-                  <div className="text-sm text-gray-600">Carburant</div>
-                </div>
-              </div>
-
-              {car.specs.fuelConsumption && (
-                <div className="mt-4 p-3 bg-green-50 rounded-lg">
-                  <div className="flex items-center text-green-700">
-                    <Fuel size={16} className="mr-2" />
-                    <span className="font-medium">
-                      Consommation: {car.specs.fuelConsumption}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Description */}
-            <div className="mb-8">
-              <h3 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
-                Description du véhicule
-              </h3>
-              <p className="text-gray-700 leading-relaxed text-base">
-                {car.description}
-              </p>
-            </div>
-
-            {/* Équipements avec distribution équilibrée */}
-            <div className="mb-8">
-              <h3 className="text-xl font-semibold mb-6 text-gray-800 border-b pb-2">
-                Équipements et options
-              </h3>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Colonne de gauche */}
-                <div className="space-y-6">
-                  {leftColumn.map(([key, features]) =>
-                    renderFeatureSection(featureTitles[key] || key, features)
-                  )}
-                </div>
-
-                {/* Colonne de droite */}
-                <div className="space-y-6">
-                  {rightColumn.map(([key, features]) =>
-                    renderFeatureSection(featureTitles[key] || key, features)
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Informations de location */}
-            {(startDate || endDate) && (
-              <div className="mb-8 p-4 bg-blue-50 rounded-lg">
-                <h4 className="font-semibold text-blue-800 mb-2">
-                  Période de location
-                </h4>
-                <div className="flex items-center space-x-4 text-blue-700">
-                  {startDate && (
-                    <div className="flex items-center">
-                      <Calendar size={16} className="mr-1" />
-                      <span>Du: {startDate}</span>
-                    </div>
-                  )}
-                  {endDate && (
-                    <div className="flex items-center">
-                      <Calendar size={16} className="mr-1" />
-                      <span>Au: {endDate}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Bouton de location */}
-            <div className="mt-8 pt-6 border-t">
-              <button
-                onClick={handleRenting}
-                disabled={!car.availability}
-                className={`w-full py-3 px-6 rounded-lg font-semibold text-lg transition-colors duration-200 ${
-                  car.availability
-                    ? "bg-blue-600 hover:bg-blue-700 text-white"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
-              >
-                {car.availability
-                  ? "Réserver maintenant"
-                  : "Véhicule non disponible"}
-              </button>
-            </div>
-          </div>
-        </div>
-      </Modal>
     </>
   );
 };
@@ -611,7 +317,7 @@ const CarRentalCard: React.FC<CarRentalCardProps> = ({
 // Exemple d'utilisation avec données typées
 export const createExampleCars = (): CarRentalData[] => [
   {
-    id: 1,
+    id: "de7464d5sewr",
     name: "Citroën C3 Aircross",
     brand: "Citroën",
     model: "C3 Aircross",
@@ -686,7 +392,7 @@ export const createExampleCars = (): CarRentalData[] => [
     },
   },
   {
-    id: 3,
+    id: "f8d7a3b2c1e4",
     name: "Peugeot 3008",
     brand: "Peugeot",
     model: "3008",
@@ -759,7 +465,7 @@ export const createExampleCars = (): CarRentalData[] => [
     },
   },
   {
-    id: 1,
+    id: "a1b2c3d4e5f6",
     name: "Citroën C3 Aircross",
     brand: "Citroën",
     model: "C3 Aircross",
@@ -834,7 +540,7 @@ export const createExampleCars = (): CarRentalData[] => [
     },
   },
   {
-    id: 1,
+    id: "f8d7a3b2c1e4sdesde",
     name: "Citroën C3 Aircross",
     brand: "Citroën",
     model: "C3 Aircross",
@@ -1041,15 +747,19 @@ const Locations = () => {
           }}
         >
           {cars.map((car: any, index: any) => (
-            <CarRentalCard key={index} car={car} onRent={() => {
-              setTransaction({
-              id: car.id,
-              title: car.name,
-              amount: car.pricePerDay,
-            })
-            // we redirect to the payment page
-            navigate("/reservations-locations");
-            }} />
+            <CarRentalCard
+              key={index}
+              car={car}
+              onRent={() => {
+                setTransaction({
+                  id: car.id,
+                  title: car.name,
+                  amount: car.pricePerDay,
+                });
+                // we redirect to the payment page
+                navigate("/reservations-locations");
+              }}
+            />
           ))}
         </Flex>
       </Flex>

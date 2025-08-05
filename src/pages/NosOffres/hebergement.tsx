@@ -191,7 +191,7 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({
                     navigate("/hebergements/" + accommodation.id);
                   }}
                 >
-                  Réserver
+                  Détails
                 </Button>
               </div>
             </Flex>

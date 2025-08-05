@@ -1,38 +1,41 @@
-import { Button, Flex, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  BalancedFeatures,
+  CarFeature,
+  CarRentalCardProps,
+  CarRentalData,
+  createExampleCars,
+} from "./locations";
+import Footer from "../../components/footer/footer";
+import { Button, Flex, Typography } from "antd";
 import NavBar from "../../components/navBar/navBar";
 import {
-  AccommodationData,
-  Amenity,
-  BalancedAmenities,
-  createExampleAccommodation,
-} from "./hebergement";
-import { Star } from "lucide-react";
+  Fuel,
+  LucideIcon,
+  Luggage,
+  MapPin,
+  Settings,
+  Star,
+  Users,
+  Zap,
+} from "lucide-react";
 import { useTransaction } from "../../context/transactionContext";
-import Footer from "../../components/footer/footer";
 
-const ViewHebergementContent: React.FC<AccommodationData> = ({
-  id,
-  name,
-  price,
-  rating,
-  reviewCount,
-  images,
-  description,
-  amenities,
-}) => {
+const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
   const { setTransaction } = useTransaction();
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
 
   const nextImage = (): void => {
-    setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    setCurrentImageIndex((prev) => (prev + 1) % car.images.length);
   };
 
   const prevImage = (): void => {
-    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+    setCurrentImageIndex(
+      (prev) => (prev - 1 + car.images.length) % car.images.length
+    );
   };
 
   const renderStars = (rating: number): React.ReactNode[] => {
@@ -49,70 +52,58 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
     ));
   };
 
-  const getBalancedAmenities = (): BalancedAmenities => {
-    const amenityEntries = Object.entries(amenities);
-    const totalSections = amenityEntries.length;
+  // Fonction pour équilibrer la distribution des caractéristiques
+  const getBalancedFeatures = (): BalancedFeatures => {
+    const featureEntries = Object.entries(car.features);
+    const totalSections = featureEntries.length;
     const midPoint = Math.ceil(totalSections / 2);
 
     return {
-      leftColumn: amenityEntries.slice(0, midPoint),
-      rightColumn: amenityEntries.slice(midPoint),
+      leftColumn: featureEntries.slice(0, midPoint),
+      rightColumn: featureEntries.slice(midPoint),
     };
   };
 
-  // Mapping des clés vers des titres en français
-  const amenityTitles: Record<string, string> = {
-    entertainment: "Divertissement",
-    heating: "Chauffage et climatisation",
-    internet: "Internet et bureau",
-    kitchen: "Cuisine et salle à manger",
-    location: "Caractéristiques de l'emplacement",
-    parking: "Parking et installations",
-    safety: "Sécurité",
-    comfort: "Équipements de base",
-    laundry: "Lave-linge et sèche-linge",
-  };
-
-  const renderAmenitySection = (
+  const renderFeatureSection = (
     title: string,
-    amenities: Amenity[]
+    features: CarFeature[]
   ): React.ReactNode | null => {
-    if (!amenities || amenities.length === 0) return null;
+    if (!features || features.length === 0) return null;
 
     return (
       <div className="mb-6">
         <h4 className="font-semibold text-gray-800 mb-3 text-base">{title}</h4>
         <div className="space-y-3">
-          {amenities.map((amenity, index) => {
-            const IconComponent = amenity.icon;
+          {features.map((feature, index) => {
+            const IconComponent = feature.icon;
             return (
               <div
                 key={index}
                 className={`flex items-start space-x-3 ${
-                  !amenity.available ? "opacity-60" : ""
+                  !feature.available ? "opacity-60" : ""
                 }`}
               >
                 <div className="flex-shrink-0 mt-0.5">
                   <IconComponent
                     size={18}
                     className={
-                      amenity.available ? "text-green-600" : "text-red-500"
+                      feature.available ? "text-green-600" : "text-red-500"
                     }
                   />
                 </div>
                 <div className="flex-1 min-w-0">
                   <span
                     className={`block ${
-                      !amenity.available
+                      !feature.available
                         ? "line-through text-gray-500"
                         : "text-gray-700"
                     } text-sm font-medium`}
                   >
-                    {amenity.name}
+                    {feature.name}
                   </span>
-                  {amenity.description && (
+                  {feature.description && (
                     <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                      {amenity.description}
+                      {feature.description}
                     </p>
                   )}
                 </div>
@@ -124,25 +115,49 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
     );
   };
 
-  const { leftColumn, rightColumn } = getBalancedAmenities();
+  // Mapping des clés vers des titres en français
+  const featureTitles: Record<string, string> = {
+    comfort: "Confort",
+    technology: "Technologie",
+    safety: "Sécurité",
+    entertainment: "Divertissement",
+    connectivity: "Connectivité",
+    climate: "Climatisation",
+    extras: "Équipements supplémentaires",
+  };
+
+  const getFuelIcon = (fuelType: string): LucideIcon => {
+    switch (fuelType) {
+      case "Électrique":
+        return Zap;
+      case "Hybride":
+        return Zap;
+      default:
+        return Fuel;
+    }
+  };
+
+  const { leftColumn, rightColumn } = getBalancedFeatures();
 
   return (
     <div className="flex-1 w-fit">
       <div>
-        {/* En-tête avec le nom de l'hébergement */}
+        {/* En-tête avec le nom du véhicule */}
         <div className="bg-white shadow-md p-6">
-          <h2 className="text-2xl font-bold text-gray-800">{name}</h2>
+          <h2 className="text-2xl font-bold text-gray-800">
+            {car.brand} {car.model}
+          </h2>
         </div>
       </div>
       {/* Galerie d'images */}
       <div className="relative bg-gray-100">
         <img
-          src={images[currentImageIndex]}
-          alt={`${name} - Image ${currentImageIndex + 1}`}
-          className="w-full h-100 object-cover"
+          src={car.images[currentImageIndex]}
+          alt={`${car.brand} ${car.model} - Image ${currentImageIndex + 1}`}
+          className="w-full h-80 object-cover"
         />
 
-        {images.length > 1 && (
+        {car.images.length > 1 && (
           <>
             <button
               onClick={prevImage}
@@ -160,14 +175,14 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
             </button>
 
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-3 py-1 rounded-full text-sm">
-              {currentImageIndex + 1} / {images.length}
+              {currentImageIndex + 1} / {car.images.length}
             </div>
           </>
         )}
 
         {/* Miniatures */}
         <div className="absolute bottom-4 left-4 flex space-x-2">
-          {images.slice(0, 5).map((image, index) => (
+          {car.images.slice(0, 5).map((image, index) => (
             <button
               key={index}
               onClick={() => setCurrentImageIndex(index)}
@@ -191,51 +206,106 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
       <div className="p-6">
         {/* Prix et évaluation */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-          <div className="flex items-center space-x-1">
-            {renderStars(rating)}
-            <span className="font-semibold ml-2 text-lg">{rating}</span>
-            <span className="text-gray-600">({reviewCount} avis)</span>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-1">
+              {renderStars(car.rating)}
+              <span className="font-semibold ml-2 text-lg">{car.rating}</span>
+              <span className="text-gray-600">({car.reviewCount} avis)</span>
+            </div>
+            <div className="flex items-center text-gray-600">
+              <MapPin size={16} className="mr-1" />
+              <span>{car.location}</span>
+            </div>
           </div>
           <div className="text-left md:text-right">
-            <div className="text-3xl font-bold text-blue-600">{price}€</div>
-            <div className="text-gray-600">par nuit</div>
+            <div className="text-3xl font-bold text-blue-600">
+              {car.pricePerDay}€
+            </div>
+            <div className="text-gray-600">par jour</div>
           </div>
+        </div>
+
+        {/* Spécifications détaillées */}
+        <div className="mb-8">
+          <h3 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
+            Spécifications du véhicule
+          </h3>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-gray-50 p-4 rounded-lg text-center">
+              <Users size={24} className="mx-auto mb-2 text-blue-600" />
+              <div className="font-semibold">{car.specs.passengers}</div>
+              <div className="text-sm text-gray-600">Passagers</div>
+            </div>
+
+            <div className="bg-gray-50 p-4 rounded-lg text-center">
+              <Luggage size={24} className="mx-auto mb-2 text-blue-600" />
+              <div className="font-semibold">{car.specs.luggage}</div>
+              <div className="text-sm text-gray-600">Bagages</div>
+            </div>
+
+            <div className="bg-gray-50 p-4 rounded-lg text-center">
+              <Settings size={24} className="mx-auto mb-2 text-blue-600" />
+              <div className="font-semibold">{car.specs.transmission}</div>
+              <div className="text-sm text-gray-600">Transmission</div>
+            </div>
+
+            <div className="bg-gray-50 p-4 rounded-lg text-center">
+              {React.createElement(getFuelIcon(car.specs.fuelType), {
+                size: 24,
+                className: "mx-auto mb-2 text-blue-600",
+              })}
+              <div className="font-semibold">{car.specs.fuelType}</div>
+              <div className="text-sm text-gray-600">Carburant</div>
+            </div>
+          </div>
+
+          {car.specs.fuelConsumption && (
+            <div className="mt-4 p-3 bg-green-50 rounded-lg">
+              <div className="flex items-center text-green-700">
+                <Fuel size={16} className="mr-2" />
+                <span className="font-medium">
+                  Consommation: {car.specs.fuelConsumption}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Description */}
         <div className="mb-8">
           <h3 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
-            À propos de ce logement
+            Description du véhicule
           </h3>
           <p className="text-gray-700 leading-relaxed text-base">
-            {description}
+            {car.description}
           </p>
         </div>
 
         {/* Équipements avec distribution équilibrée */}
         <div className="mb-8">
           <h3 className="text-xl font-semibold mb-6 text-gray-800 border-b pb-2">
-            Ce que propose ce logement
+            Équipements et options
           </h3>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Colonne de gauche */}
             <div className="space-y-6">
-              {leftColumn.map(([key, amenities]) =>
-                renderAmenitySection(amenityTitles[key] || key, amenities)
+              {leftColumn.map(([key, features]) =>
+                renderFeatureSection(featureTitles[key] || key, features)
               )}
             </div>
 
             {/* Colonne de droite */}
             <div className="space-y-6">
-              {rightColumn.map(([key, amenities]) =>
-                renderAmenitySection(amenityTitles[key] || key, amenities)
+              {rightColumn.map(([key, features]) =>
+                renderFeatureSection(featureTitles[key] || key, features)
               )}
             </div>
           </div>
         </div>
 
-        {/* Bouton de réservation */}
+        {/* Bouton de location */}
         <div className="mt-8 pt-6 border-t">
           <Button
             type="primary"
@@ -253,19 +323,22 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
               fontWeight: "bold",
               width: "100%",
             }}
+            disabled={!car.availability}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             onClick={() => {
               setTransaction({
-                id: id,
-                title: name,
-                amount: price,
+                id: car.id,
+                title: car.name,
+                amount: car.pricePerDay,
               });
               // we redirect to the payment page
               navigate("/reservations-locations");
             }}
           >
-            Réserver maintenant
+            {car.availability
+              ? "Réserver maintenant"
+              : "Véhicule non disponible"}
           </Button>
         </div>
       </div>
@@ -273,23 +346,21 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
   );
 };
 
-const ViewHebergement = () => {
+const ViewLocation = () => {
   const { id } = useParams();
   const [isMobile, setIsMobile] = useState(false);
   const { pathname } = useLocation();
 
-  const [accommodation, setAccommodation] = useState<AccommodationData | null>(
-    null
-  );
+  const [car, setCar] = useState<CarRentalData | null>(null);
 
-  // Simulate fetching accommodation data based on the ID
-  const accommodations = createExampleAccommodation();
+  // Simulate fetching car data based on the ID
+  const cars = createExampleCars();
 
   useEffect(() => {
-    const foundAccommodation = accommodations.find((acc) => acc.id === id);
-    if (foundAccommodation) {
-      console.log("Found accommodation:", foundAccommodation);
-      setAccommodation(foundAccommodation);
+    const foundCar = cars.find((car) => car.id === id);
+    if (foundCar) {
+      console.log("Found car:", foundCar);
+      setCar(foundCar);
     }
   }, []);
 
@@ -305,6 +376,7 @@ const ViewHebergement = () => {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
   return (
     <Flex justify="center" vertical>
       {/* Header avec NavBar - Responsive */}
@@ -322,7 +394,7 @@ const ViewHebergement = () => {
         vertical
         className="relative w-full overflow-hidden"
         style={{
-          backgroundImage: `url(${accommodation?.mainImage})`,
+          backgroundImage: `url(${car?.mainImage})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           padding: isMobile ? "4vh 6vw" : "8vh 8vw",
@@ -415,13 +487,10 @@ const ViewHebergement = () => {
             paddingBottom: isMobile ? "1vw" : "2vw",
           }}
         >
-          {accommodations
-            .filter((accommodation) => accommodation.id === id)
-            .map((accommodation) => (
-              <ViewHebergementContent
-                {...accommodation}
-                key={accommodation.id}
-              />
+          {cars
+            .filter((car) => car.id === id)
+            .map((car) => (
+              <ViewLocationContent car={car} {...car} key={car.id} />
             ))}
         </Flex>
       </Flex>
@@ -432,4 +501,4 @@ const ViewHebergement = () => {
   );
 };
 
-export default ViewHebergement;
+export default ViewLocation;

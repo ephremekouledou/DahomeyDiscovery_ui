@@ -14,6 +14,7 @@ import Locations from "./pages/NosOffres/locations";
 import ReservationCircuit from "./pages/Reservations/reservationCircuits";
 import ReservationLocation from "./pages/Reservations/reservationLocations";
 import ViewHebergement from "./pages/NosOffres/viewHebergement";
+import ViewLocation from "./pages/NosOffres/viewLocation";
 
 const router = createBrowserRouter([
   {
@@ -70,7 +71,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/locations/:id",
-    element: <ReservationLocation />,
+    element: <ViewLocation />,
     errorElement: <NotFound />,
   },
   {
