@@ -16,6 +16,12 @@ import {
   Zap,
   LucideIcon,
   Thermometer,
+  MapPin,
+  Smartphone,
+  Mail,
+  User,
+  Coffee,
+  Droplets,
 } from "lucide-react";
 // import img1 from "../../assets/images/1.jpg";
 import img2 from "../../assets/images/2.jpg";
@@ -27,6 +33,8 @@ import img6 from "../../assets/images/6.jpg";
 import img8 from "../../assets/images/8.jpg";
 // import img9 from "../../assets/images/9.jpg";
 import img10 from "../../assets/images/10.jpg";
+import voiture from "../../assets/images/voitures.jpg";
+import voitureFront from "../../assets/images/voitureFront.webp";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
 import Footer from "../../components/footer/footer";
 import { Button, Flex, Typography } from "antd";
@@ -54,6 +62,127 @@ const images = [
   // img13,
   // img14,
 ];
+
+const ServicesSection = () => {
+  const services = [
+    {
+      id: 1,
+      title: "CHAUFFEURS",
+      description: "Chauffeurs expérimentés et professionnels.",
+      icon: User,
+      delay: "0ms",
+    },
+    {
+      id: 2,
+      title: "VÉHICULES",
+      description: "Véhicules hauts de gamme et tout équipés",
+      icon: Car,
+      delay: "100ms",
+    },
+    {
+      id: 3,
+      title: "CHAUFFEURS",
+      description: "Chauffeurs expérimentés et professionnels.",
+      icon: Coffee,
+      delay: "200ms",
+    },
+    {
+      id: 4,
+      title: "RAFRAÎCHISSEMENT",
+      description: "N'hésitez pas à nous demander une bouteille d'eau.",
+      icon: Droplets,
+      delay: "300ms",
+    },
+  ];
+
+  return (
+    <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black relative overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-red-500/20 to-transparent"></div>
+        <div className="absolute bottom-0 right-0 w-full h-full bg-gradient-to-l from-red-500/20 to-transparent"></div>
+      </div>
+
+      {/* Road-like lines for visual effect */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-500/30 to-transparent transform rotate-12"></div>
+        <div className="absolute bottom-1/4 right-0 w-full h-px bg-gradient-to-r from-transparent via-red-500/30 to-transparent transform -rotate-12"></div>
+      </div>
+
+      <div className="relative z-10 container mx-auto px-4 py-16">
+        {/* Title */}
+        <div className="text-center mb-16">
+          <h2
+            className="text-5xl md:text-6xl font-bold text-white mb-4"
+            style={{ fontFamily: "DragonAngled" }}
+          >
+            <span className="text-red-500">NOS</span>{" "}
+            <span className="text-white">SERVICES</span>
+          </h2>
+          <div className="w-24 h-1 bg-red-500 mx-auto"></div>
+        </div>
+
+        {/* Services Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          {services.map((service) => {
+            const IconComponent = service.icon;
+            return (
+              <div
+                key={service.id}
+                className="group relative bg-black/40 backdrop-blur-sm border border-gray-600/30 rounded-2xl p-8 hover:border-red-500/50 transition-all duration-500 hover:transform hover:scale-105"
+                style={{
+                  animationDelay: service.delay,
+                  animation: `fadeInUp 0.8s ease-out forwards ${service.delay}`,
+                }}
+              >
+                {/* Gradient overlay on hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+
+                <div className="relative z-10 flex items-start space-x-6">
+                  {/* Icon */}
+                  <div className="flex-shrink-0">
+                    <div className="w-16 h-16 bg-red-500 rounded-xl flex items-center justify-center group-hover:bg-red-600 transition-colors duration-300">
+                      <IconComponent size={28} className="text-white" />
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1">
+                    <h3
+                      className="text-xl font-bold text-red-500 mb-3 group-hover:text-red-400 transition-colors duration-300"
+                      style={{ fontFamily: "DragonAngled", fontSize: "2rem" }}
+                    >
+                      {service.title}
+                    </h3>
+                    <p className="text-gray-300 leading-relaxed group-hover:text-white transition-colors duration-300">
+                      {service.description}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Decorative corner */}
+                <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-red-500/30 group-hover:border-red-500/60 transition-colors duration-300"></div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
+    </div>
+  );
+};
 
 // Interface pour définir une caractéristique de voiture
 export interface CarFeature {
@@ -128,7 +257,6 @@ const CarRentalCard: React.FC<CarRentalCardProps> = ({
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
 
-
   const renderStars = (rating: number): React.ReactNode[] => {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
@@ -142,7 +270,6 @@ const CarRentalCard: React.FC<CarRentalCardProps> = ({
       />
     ));
   };
-
 
   const getCategoryColor = (category: string): string => {
     const colors: Record<string, string> = {
@@ -641,6 +768,37 @@ const Locations = () => {
   }, []);
   const cars = createExampleCars();
 
+  const steps = [
+    {
+      number: 1,
+      title: "Choisissez",
+      description: "Votre destination\net votre véhicule",
+      icon: MapPin,
+      bgColor: "bg-[#FF3100]",
+    },
+    {
+      number: 2,
+      title: "Réservez",
+      description: "en ligne (paiement CB\nou à bord)",
+      icon: Smartphone,
+      bgColor: "bg-[#FF3100]",
+    },
+    {
+      number: 3,
+      title: "Confirmation",
+      description: "Par mail de votre\nréservation",
+      icon: Mail,
+      bgColor: "bg-[#FF3100]",
+    },
+    {
+      number: 4,
+      title: "Profitez",
+      description: "de votre trajet",
+      icon: Car,
+      bgColor: "bg-[#FF3100]",
+    },
+  ];
+
   return (
     <Flex justify="center" vertical>
       {/* Header avec NavBar */}
@@ -653,7 +811,7 @@ const Locations = () => {
         vertical
         className="relative w-full overflow-hidden"
         style={{
-          backgroundImage: `url(${img2})`,
+          backgroundImage: `url(${voiture})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           padding: isMobile ? "4vh 6vw" : "8vh 8vw",
@@ -662,15 +820,14 @@ const Locations = () => {
       >
         {/* Gradient overlay - de la couleur beige/crème vers transparent */}
         <div
-          className="absolute inset-0"
           style={{
-            background: `linear-gradient(to right, 
-            rgba(250, 235, 215, 0.95) 0%,
-            rgba(250, 235, 215, 0.85) 20%,
-            rgba(250, 235, 215, 0.6) 40%,
-            rgba(250, 235, 215, 0.3) 60%,
-            rgba(250, 235, 215, 0.1) 80%,
-            transparent 100%)`,
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.3)", // Ajuste l'opacité ici
+            zIndex: 1,
           }}
         />
         <Flex
@@ -681,24 +838,11 @@ const Locations = () => {
             zIndex: 1,
           }}
         >
-          <Flex vertical gap={0}>
-            <Typography.Text
-              style={{
-                color: "#000000",
-                fontSize: isMobile ? "12px" : "16px",
-                lineHeight: "1.1",
-                margin: "0",
-                textTransform: "uppercase",
-                fontFamily: "GeneralSans",
-                letterSpacing: "0.3em",
-              }}
-            >
-              Explorez le Bénin à votre rythme
-            </Typography.Text>
+          <Flex vertical gap={0} align="center" style={{ width: "100%" }}>
             <Typography.Title
               level={1}
               style={{
-                color: "#FF3100",
+                color: "white",
                 fontSize: isMobile ? "44px" : "85px",
                 fontWeight: "900",
                 lineHeight: "1",
@@ -707,23 +851,199 @@ const Locations = () => {
                 marginBottom: "15px",
                 fontFamily: "DragonAngled",
                 textTransform: "uppercase",
+                textAlign: "center",
               }}
             >
-              Nos Véhicules
+              SOYEZ VOTRE CHAUFFEUR PRIVÉ
+            </Typography.Title>
+            <Button
+              type="primary"
+              size="large"
+              style={{
+                backgroundColor: "#ff3100",
+                color: "white",
+                borderRadius: "7px",
+                border: "none",
+                fontFamily: "GeneralSans",
+                transition: "all 0.3s ease",
+                fontSize: "20px",
+                height: "40px",
+                padding: "10px 25px",
+                fontWeight: "bold",
+                width: "fit-content",
+              }}
+            >
+              Réserver
+            </Button>
+          </Flex>
+        </Flex>
+      </Flex>
+
+      {/* Section Step */}
+      <Flex
+        style={{
+          width: "100%",
+          position: "relative",
+          bottom: "35px",
+          zIndex: 1,
+        }}
+        justify="center"
+        gap={"10vw"}
+      >
+        {steps.map((step, _) => {
+          const IconComponent = step.icon;
+
+          return (
+            <div key={step.number} className="text-center">
+              {/* Icon Circle */}
+              <div
+                className={`${step.bgColor} rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4`}
+              >
+                <IconComponent className="w-8 h-8 text-white" />
+              </div>
+
+              {/* Step Content */}
+              <div className="space-y-2">
+                <h3 className="text-lg font-bold text-gray-800">
+                  {step.number}. {step.title}
+                </h3>
+                <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+                  {step.description}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+      </Flex>
+
+      {/* Section Presentation - Responsive */}
+      <Flex vertical>
+        <Flex
+          style={{ width: "100%", height: "70px", backgroundColor: "#FF3100" }}
+        >
+          <div></div>
+        </Flex>
+        <Flex justify="flex-end">
+          <div
+            style={{
+              width: "20vw",
+              height: "20vw",
+              minWidth: "265px",
+              minHeight: "265px",
+              backgroundColor: "#FF3100",
+              borderBottomLeftRadius: "300px",
+              position: "relative",
+              top: "180px",
+              left: "100px",
+            }}
+          ></div>
+          <div
+            style={{
+              width: "23vw",
+              height: "21vw",
+              minWidth: "305px",
+              minHeight: "278px",
+              backgroundColor: "#FF3100",
+            }}
+          >
+            <img
+              src={voitureFront}
+              alt="Location de véhicules"
+              style={{
+                minWidth: "281px",
+                minHeight: "281px",
+                width: "22vw",
+                height: "22vw",
+                borderRadius: "50px",
+                zIndex: 1,
+                position: "relative",
+                top: "60px",
+                right: "100px",
+              }}
+            />
+          </div>
+        </Flex>
+        <Flex
+          style={{
+            maxWidth: "1050px",
+            width: "100%",
+            margin: "0 auto",
+            zIndex: 1,
+          }}
+        >
+          <Flex
+            vertical
+            style={{ width: "50%", position: "relative", bottom: "200px" }}
+          >
+            <Typography.Title
+              level={1}
+              style={{
+                color: "#FF3100",
+                fontSize: isMobile ? "44px" : "85px",
+                fontWeight: "bold",
+                lineHeight: "1",
+                letterSpacing: "0.03em",
+                marginTop: "20px",
+                marginBottom: "15px",
+                fontFamily: "DragonAngled",
+                textTransform: "uppercase",
+              }}
+            >
+              SOYEZ VOTRE <br />
+              <span style={{ color: "#3b1b19" }}>CHAUFFEUR PRIVÉ</span>
             </Typography.Title>
             <Typography.Text
               style={{
-                color: "#000000",
-                fontSize: isMobile ? "24px" : "45px",
+                color: "#563800",
+                fontSize: isMobile ? "24px" : "22px",
                 lineHeight: "1",
                 marginTop: "0",
-                fontFamily: "DragonAngled",
+                fontFamily: "GeneralSans",
               }}
             >
-              Confort et sécurité sur toutes vos routes
+              text à revoir "Acteur essentielle dans la mobilité et le transport
+              de personnes en région parisienne. Spécialisé dans les transferts
+              aéroports, gares, courses courtes ou longues distances, nationales
+              ou internationales."
             </Typography.Text>
           </Flex>
         </Flex>
+      </Flex>
+
+      {/* Section Separator */}
+      <div
+        style={{
+          height: "80px",
+          backgroundColor: "#D9D9D938",
+          margin: "40px 0",
+        }}
+      ></div>
+
+      {/* Section Titre */}
+      <Flex
+        style={{
+          maxWidth: "1050px",
+          width: "100%",
+          margin: "0 auto",
+          zIndex: 1,
+        }}
+      >
+        <Typography.Title
+          level={1}
+          style={{
+            color: "#FF3100",
+            fontSize: isMobile ? "44px" : "85px",
+            fontWeight: "bold",
+            lineHeight: "1",
+            letterSpacing: "0.03em",
+            marginTop: "20px",
+            marginBottom: "15px",
+            fontFamily: "DragonAngled",
+            textTransform: "uppercase",
+          }}
+        >
+          NOS VÉHICULES
+        </Typography.Title>
       </Flex>
 
       {/* Liste des véhicules */}
@@ -764,7 +1084,104 @@ const Locations = () => {
         </Flex>
       </Flex>
 
-      <section style={{ height: "45vw" }}>
+      {/* Section Devis sur mesure */}
+      <Flex
+        style={{
+          backgroundColor: "#FF3100",
+          width: "100%",
+          padding: "30px 0",
+        }}
+      >
+        <Flex
+          style={{
+            maxWidth: "1050px",
+            width: "100%",
+            margin: "0 auto",
+          }}
+          justify="space-between"
+          align="center"
+        >
+          <Typography.Title
+            level={1}
+            style={{
+              color: "white",
+              fontSize: isMobile ? "44px" : "65px",
+              fontWeight: "bold",
+              lineHeight: "1",
+              letterSpacing: "0.03em",
+              marginTop: "20px",
+              marginBottom: "15px",
+              fontFamily: "DragonAngled",
+              textTransform: "uppercase",
+            }}
+          >
+            Besoin d'un devis sur mesure ?
+          </Typography.Title>
+          <Button
+            type="primary"
+            size="large"
+            style={{
+              backgroundColor: "#F59F00",
+              color: "black",
+              borderRadius: "7px",
+              border: "none",
+              fontFamily: "GeneralSans",
+              transition: "all 0.3s ease",
+              fontSize: "26px",
+              height: "40px",
+              padding: "35px 20px",
+              fontWeight: "bold",
+              width: "fit-content",
+            }}
+          >
+            Contactez-nous
+          </Button>
+        </Flex>
+      </Flex>
+
+      {/* Section Nos services */}
+      <ServicesSection />
+
+      {/* Section Devis sur mesure */}
+      <Flex
+        style={{
+          backgroundColor: "#FF3100",
+          width: "100%",
+          padding: "30px 0",
+        }}
+      >
+        <Flex
+          style={{
+            maxWidth: "1050px",
+            width: "100%",
+            margin: "0 auto",
+          }}
+          justify="center"
+          align="center"
+        >
+          <Button
+            type="primary"
+            size="large"
+            style={{
+              backgroundColor: "#F59F00",
+              color: "black",
+              borderRadius: "7px",
+              border: "none",
+              fontFamily: "GeneralSans",
+              transition: "all 0.3s ease",
+              fontSize: "26px",
+              height: "40px",
+              padding: "35px 20px",
+              fontWeight: "bold",
+              width: "fit-content",
+            }}
+          >
+            Reservation
+          </Button>
+        </Flex>
+      </Flex>
+
+      <section style={{ height: "25vw", padding: "5px 0" }}>
         <ImageCarousel images={images} />
       </section>
 
