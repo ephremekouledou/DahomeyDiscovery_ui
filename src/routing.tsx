@@ -11,6 +11,7 @@ import CircuitCarteView from "./components/CircuitView/CircuitCarteView";
 import CircuitsSignature from "./pages/Circuits/CircuitsSignature";
 import Hebergements from "./pages/NosOffres/hebergement";
 import Locations from "./pages/NosOffres/locations";
+import ReservationCircuit from "./pages/Reservations/reservationCircuits";
 
 const router = createBrowserRouter([
   {
@@ -68,6 +69,11 @@ const router = createBrowserRouter([
   {
     path: "/actualites",
     element: <Actualites />,
+    errorElement: <NotFound />,
+  },
+  {
+    path: "/reservations-circuits",
+    element: <ReservationCircuit />,
     errorElement: <NotFound />,
   },
 ]);

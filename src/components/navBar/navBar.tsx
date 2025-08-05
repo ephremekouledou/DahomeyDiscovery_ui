@@ -479,7 +479,7 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
                   {navItems.slice(3).map((item) => renderDesktopNavItem(item))}
 
                   <Flex>
-                    <Link to="/reserver">
+                    <Link to="/reservations-circuits">
                       <Button
                         type="primary"
                         size={scrolled ? "middle" : "large"}
