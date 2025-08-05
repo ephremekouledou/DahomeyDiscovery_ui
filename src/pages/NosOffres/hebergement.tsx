@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { Flex, Modal, Typography } from "antd";
 import NavBar from "../../components/navBar/navBar";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 // import img1 from "../../assets/images/1.jpg";
 import img2 from "../../assets/images/2.jpg";
 // import img3 from "../../assets/images/3.jpg";
@@ -32,6 +32,7 @@ import img8 from "../../assets/images/8.jpg";
 import img10 from "../../assets/images/10.jpg";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
 import Footer from "../../components/footer/footer";
+import { useTransaction } from "../../context/transactionContext";
 /* import img11 from "../../assets/images/11.jpg";
 import img12 from "../../assets/images/12.jpg";
 import img13 from "../../assets/images/13.jpg";
@@ -679,6 +680,8 @@ export const createExampleAccommodation = (): AccommodationData[] => [
 const Hebergements = () => {
   const [isMobile, setIsMobile] = useState(false);
   const { pathname } = useLocation();
+  const { setTransaction } = useTransaction();
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -805,7 +808,15 @@ const Hebergements = () => {
           }}
         >
           {accommodation.map((acc: any, index: any) => (
-            <AccommodationCard key={index} accommodation={acc} />
+            <AccommodationCard key={index} accommodation={acc} onBook={() => {
+              setTransaction({
+              id: acc.id,
+              title: acc.name,
+              amount: acc.price,
+            })
+            // we redirect to the payment page
+            navigate("/reservations-locations");
+            }} />
           ))}
         </Flex>
       </Flex>

@@ -12,6 +12,7 @@ import CircuitsSignature from "./pages/Circuits/CircuitsSignature";
 import Hebergements from "./pages/NosOffres/hebergement";
 import Locations from "./pages/NosOffres/locations";
 import ReservationCircuit from "./pages/Reservations/reservationCircuits";
+import ReservationLocation from "./pages/Reservations/reservationLocations";
 
 const router = createBrowserRouter([
   {
@@ -74,6 +75,11 @@ const router = createBrowserRouter([
   {
     path: "/reservations-circuits",
     element: <ReservationCircuit />,
+    errorElement: <NotFound />,
+  },
+  {
+    path: "/reservations-locations",
+    element: <ReservationLocation />,
     errorElement: <NotFound />,
   },
 ]);

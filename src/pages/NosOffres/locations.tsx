@@ -32,8 +32,9 @@ import img10 from "../../assets/images/10.jpg";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
 import Footer from "../../components/footer/footer";
 import { Flex, Modal, Typography } from "antd";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import NavBar from "../../components/navBar/navBar";
+import { useTransaction } from "../../context/transactionContext";
 /* import img11 from "../../assets/images/11.jpg";
 import img12 from "../../assets/images/12.jpg";
 import img13 from "../../assets/images/13.jpg";
@@ -912,6 +913,8 @@ export const createExampleCars = (): CarRentalData[] => [
 const Locations = () => {
   const [isMobile, setIsMobile] = useState(false);
   const { pathname } = useLocation();
+  const { setTransaction } = useTransaction();
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -1038,7 +1041,15 @@ const Locations = () => {
           }}
         >
           {cars.map((car: any, index: any) => (
-            <CarRentalCard key={index} car={car} />
+            <CarRentalCard key={index} car={car} onRent={() => {
+              setTransaction({
+              id: car.id,
+              title: car.name,
+              amount: car.pricePerDay,
+            })
+            // we redirect to the payment page
+            navigate("/reservations-locations");
+            }} />
           ))}
         </Flex>
       </Flex>
