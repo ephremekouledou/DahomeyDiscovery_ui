@@ -28,6 +28,7 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
   const [menuSelected, setMenuSelected] = useState<string>(menu);
   const [menuHover, setMenuHover] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [isTablet, setIsTablet] = useState<boolean>(false);
   const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState(false);
   const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>(
@@ -35,13 +36,15 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
   );
   const [scrolled, setScrolled] = useState<boolean>(false);
 
-  // Handle responsive breakpoint
+  // Enhanced responsive breakpoints
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
+      const width = window.innerWidth;
+      setIsMobile(width <= 768);
+      setIsTablet(width > 768 && width <= 1024);
     };
 
-    handleResize(); // Check initial size
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -59,7 +62,7 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
 
   const handleMenuClick = (menuItem: string) => {
     setMenuSelected(menuItem);
-    setDrawerVisible(false); // Close mobile menu when item is clicked
+    setDrawerVisible(false);
   };
 
   const handleMobileMenuToggle = (menuKey: string) => {
@@ -109,6 +112,50 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
     { key: "ACTUALITES", label: "ACTUALITÉS", path: "/actualites" },
   ];
 
+  // Get responsive font sizes based on device and scroll state
+  const getResponsiveFontSize = (baseSize: number) => {
+    if (isMobile) {
+      return scrolled ? `${baseSize - 2}px` : `${baseSize}px`;
+    }
+    if (isTablet) {
+      return scrolled ? `${baseSize - 1}px` : `${baseSize + 1}px`;
+    }
+    return scrolled ? `${baseSize}px` : `${baseSize + 2}px`;
+  };
+
+  // Get responsive logo height
+  const getLogoHeight = () => {
+    if (isMobile) {
+      return scrolled ? "28px" : "32px";
+    }
+    if (isTablet) {
+      return scrolled ? "35px" : "40px";
+    }
+    return scrolled ? "40px" : "50px";
+  };
+
+  // Get responsive padding
+  const getContainerPadding = () => {
+    if (isMobile) {
+      return scrolled ? "8px 12px" : "12px 16px";
+    }
+    if (isTablet) {
+      return scrolled ? "10px 20px" : "14px 24px";
+    }
+    return scrolled ? "12px 40px" : "16px 40px";
+  };
+
+  // Get responsive container height
+  const getContainerHeight = () => {
+    if (isMobile) {
+      return scrolled ? "50px" : "60px";
+    }
+    if (isTablet) {
+      return scrolled ? "55px" : "65px";
+    }
+    return scrolled ? "60px" : "70px";
+  };
+
   const renderDesktopNavItem = (item: NavItem) => {
     const hasSubItems = item.subItems && item.subItems.length > 0;
 
@@ -122,7 +169,9 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
               textDecoration: "none",
               color: "black",
               fontFamily: "GeneralSans",
-              fontSize: "14px",
+              fontSize: getResponsiveFontSize(13),
+              padding: "8px 4px",
+              display: "block",
             }}
             onClick={() => handleMenuClick(subItem.key)}
           >
@@ -136,7 +185,10 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
           menu={{ items: dropdownItems }}
           trigger={["hover"]}
           placement="bottomCenter"
-          overlayStyle={{ paddingTop: "15px" }}
+          overlayStyle={{
+            paddingTop: "15px",
+            minWidth: isTablet ? "180px" : "200px",
+          }}
         >
           <Flex
             vertical
@@ -144,24 +196,32 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
             style={{
               cursor: "pointer",
               transition: "transform 0.8s ease",
+              padding: isTablet ? "4px 8px" : "4px 12px",
             }}
             onMouseEnter={() => setMenuHover(item.key)}
             onMouseLeave={() => setMenuHover(null)}
           >
-            <Flex align="center" gap="4px">
+            <Flex align="center" gap="4px" justify="center">
               <span
                 style={{
                   textDecoration: "none",
                   color: "black",
-                  fontSize: scrolled ? "13px" : "14px",
+                  fontSize: getResponsiveFontSize(14),
                   fontFamily: "GeneralSans",
                   fontWeight: "500",
                   transition: "font-size 0.3s ease",
+                  whiteSpace: "nowrap",
+                  textAlign: "center",
                 }}
               >
                 {item.label}
               </span>
-              <DownOutlined style={{ fontSize: "10px" }} />
+              <DownOutlined
+                style={{
+                  fontSize: isTablet ? "8px" : "10px",
+                  marginLeft: "2px",
+                }}
+              />
             </Flex>
 
             {(menuSelected === item.key || menuHover === item.key) && (
@@ -169,8 +229,8 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
                 src={menuVector}
                 alt="Menu Vector"
                 style={{
-                  height: "10px",
-                  width: "30px",
+                  height: isTablet ? "8px" : "10px",
+                  width: isTablet ? "25px" : "30px",
                   margin: "0 auto",
                   transition: "transform 0.3s ease",
                   transform: menuHover === item.key ? "scale(1.2)" : "none",
@@ -182,7 +242,6 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
       );
     }
 
-    // Regular menu item with link
     return (
       <Link
         to={item.path!}
@@ -198,16 +257,19 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
           style={{
             cursor: "pointer",
             transition: "transform 0.8s ease",
+            padding: isTablet ? "4px 8px" : "4px 12px",
           }}
           onMouseEnter={() => setMenuHover(item.key)}
           onMouseLeave={() => setMenuHover(null)}
         >
           <span
             style={{
-              fontSize: scrolled ? "13px" : "14px",
+              fontSize: getResponsiveFontSize(14),
               fontFamily: "GeneralSans",
               fontWeight: "500",
               transition: "font-size 0.3s ease",
+              whiteSpace: "nowrap",
+              textAlign: "center",
             }}
           >
             {item.label}
@@ -218,8 +280,8 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
               src={menuVector}
               alt="Menu Vector"
               style={{
-                height: "10px",
-                width: "30px",
+                height: isTablet ? "8px" : "10px",
+                width: isTablet ? "25px" : "30px",
                 margin: "0 auto",
                 transition: "transform 0.3s ease",
                 transform: menuHover === item.key ? "scale(1.2)" : "none",
@@ -245,16 +307,18 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
             onClick={() => handleMobileMenuToggle(item.key)}
             style={{
               cursor: "pointer",
-              padding: "12px 0",
+              padding: "14px 0",
               borderBottom: "1px solid #f0f0f0",
+              minHeight: "48px",
             }}
           >
             <span
               style={{
-                fontSize: "16px",
+                fontSize: isMobile ? "15px" : "16px",
                 fontWeight: "500",
                 fontFamily: "GeneralSans",
                 color: "black",
+                lineHeight: "1.4",
               }}
             >
               {item.label}
@@ -264,6 +328,7 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
                 fontSize: "12px",
                 transition: "transform 0.3s ease",
                 transform: isExpanded ? "rotate(180deg)" : "none",
+                marginLeft: "8px",
               }}
             />
           </Flex>
@@ -282,11 +347,15 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
                   <div
                     onClick={() => handleMenuClick(subItem.key)}
                     style={{
-                      padding: "8px 0",
-                      fontSize: "14px",
+                      padding: "10px 0",
+                      fontSize: isMobile ? "13px" : "14px",
                       fontFamily: "GeneralSans",
                       borderBottom: "1px solid #f8f8f8",
                       cursor: "pointer",
+                      lineHeight: "1.4",
+                      minHeight: "40px",
+                      display: "flex",
+                      alignItems: "center",
                     }}
                   >
                     {subItem.label}
@@ -299,7 +368,6 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
       );
     }
 
-    // Regular menu item with link
     return (
       <Link
         key={item.key}
@@ -313,11 +381,15 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
           onClick={() => handleMenuClick(item.key)}
           style={{
             cursor: "pointer",
-            padding: "12px 0",
+            padding: "14px 0",
             borderBottom: "1px solid #f0f0f0",
-            fontSize: "16px",
+            fontSize: isMobile ? "15px" : "16px",
             fontWeight: "500",
             fontFamily: "GeneralSans",
+            lineHeight: "1.4",
+            minHeight: "48px",
+            display: "flex",
+            alignItems: "center",
           }}
         >
           {item.label}
@@ -332,10 +404,10 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
       placement="right"
       onClose={() => setDrawerVisible(false)}
       open={drawerVisible}
-      width={280}
+      width={isMobile ? Math.min(280, window.innerWidth - 40) : 300}
       closable={false}
       styles={{
-        body: { padding: "20px" },
+        body: { padding: isMobile ? "16px" : "20px" },
         header: { display: "none" },
       }}
     >
@@ -344,12 +416,24 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
         align="center"
         style={{ marginBottom: "30px" }}
       >
-        <img src={logo} alt="Logo" style={{ height: "40px", width: "auto" }} />
+        <img
+          src={logo}
+          alt="Logo"
+          style={{
+            height: isMobile ? "32px" : "40px",
+            width: "auto",
+            maxWidth: "120px",
+          }}
+        />
         <Button
           type="text"
           icon={<CloseOutlined />}
           onClick={() => setDrawerVisible(false)}
-          style={{ fontSize: "18px" }}
+          style={{
+            fontSize: "18px",
+            minWidth: "40px",
+            height: "40px",
+          }}
         />
       </Flex>
 
@@ -368,9 +452,10 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
               color: "black",
               borderRadius: "25px",
               border: "none",
-              height: "45px",
-              fontSize: "16px",
+              height: isMobile ? "48px" : "50px",
+              fontSize: isMobile ? "15px" : "16px",
               fontWeight: "600",
+              fontFamily: "GeneralSans",
             }}
             onClick={() => setDrawerVisible(false)}
           >
@@ -380,6 +465,17 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
       </Flex>
     </Drawer>
   );
+
+  // Get spacer height for fixed navbar
+  const getSpacerHeight = () => {
+    if (isMobile) {
+      return scrolled ? "66px" : "76px";
+    }
+    if (isTablet) {
+      return scrolled ? "71px" : "81px";
+    }
+    return scrolled ? "76px" : "86px";
+  };
 
   return (
     <>
@@ -395,15 +491,16 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
           backdropFilter: scrolled ? "blur(10px)" : "none",
           borderBottom: scrolled ? "1px solid rgba(0, 0, 0, 0.1)" : "none",
           padding: scrolled ? "8px 0" : "16px 0",
+          boxShadow: scrolled ? "0 2px 8px rgba(0, 0, 0, 0.1)" : "none",
         }}
       >
         <Flex
           style={{
             color: "black",
             width: "100%",
-            maxWidth: "1200px",
+            maxWidth: isMobile ? "100%" : isTablet ? "900px" : "1200px",
             margin: "0 auto",
-            padding: "0 20px",
+            padding: isMobile ? "0 12px" : "0 20px",
           }}
           justify="center"
           align="center"
@@ -413,72 +510,74 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
               style={{
                 backgroundColor: "white",
                 width: "100%",
-                padding: scrolled
-                  ? isMobile
-                    ? "8px 16px"
-                    : "12px 40px"
-                  : isMobile
-                  ? "12px 16px"
-                  : "16px 40px",
+                padding: getContainerPadding(),
                 transition: "all 0.3s ease",
-                height: scrolled
-                  ? isMobile
-                    ? "50px"
-                    : "60px"
-                  : isMobile
-                  ? "60px"
-                  : "70px",
+                height: getContainerHeight(),
               }}
               justify="space-between"
               align="center"
-              gap={isMobile ? "16px" : "36px"}
+              gap={isMobile ? "12px" : isTablet ? "20px" : "36px"}
             >
-              {/* Logo - Always visible */}
+              {/* Mobile Logo */}
               {isMobile && (
-                <Flex>
+                <Flex flex="1">
                   <Link to="/">
                     <img
                       src={logo}
                       alt="Logo"
                       style={{
-                        height: scrolled ? "30px" : "35px",
+                        height: getLogoHeight(),
                         width: "auto",
                         transition: "height 0.3s ease",
+                        maxWidth: "100px",
                       }}
                     />
                   </Link>
                 </Flex>
               )}
 
-              {/* Desktop Navigation */}
+              {/* Desktop and Tablet Navigation */}
               {!isMobile && (
                 <>
-                  {navItems
-                    .slice(0, 3)
-                    .map((item) => renderDesktopNavItem(item))}
+                  {/* First part of nav items */}
+                  <Flex
+                    align="center"
+                    gap={isTablet ? "12px" : "24px"}
+                    flex="1"
+                    justify="flex-end"
+                  >
+                    {navItems
+                      .slice(0, 3)
+                      .map((item) => renderDesktopNavItem(item))}
+                  </Flex>
 
-                  {/* {navItems
-                    .slice(2, 3)
-                    .map((item) => renderDesktopNavItem(item))} */}
-
-                  {/* Center Logo for desktop */}
-                  <Flex>
+                  {/* Center Logo */}
+                  <Flex justify="center" style={{ margin: "0 16px" }}>
                     <Link to="/">
                       <img
                         src={logo}
                         alt="Logo"
                         style={{
-                          height: scrolled ? "40px" : "50px",
+                          height: getLogoHeight(),
                           width: "auto",
                           transition: "height 0.3s ease",
+                          maxWidth: isTablet ? "120px" : "150px",
                         }}
                       />
                     </Link>
                   </Flex>
 
-                  {navItems.slice(3).map((item) => renderDesktopNavItem(item))}
+                  {/* Second part of nav items */}
+                  <Flex
+                    align="center"
+                    gap={isTablet ? "12px" : "24px"}
+                    flex="1"
+                    justify="flex-start"
+                  >
+                    {navItems
+                      .slice(3, 5)
+                      .map((item) => renderDesktopNavItem(item))}
 
-                  <Flex>
                     <Link to="/reservations-circuits">
                       <Button
                         type="primary"
@@ -490,9 +589,23 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
                           border: "none",
                           fontFamily: "GeneralSans",
                           transition: "all 0.3s ease",
-                          fontSize: scrolled ? "14px" : "16px",
-                          height: scrolled ? "36px" : "40px",
-                          padding: scrolled ? "0 16px" : "0 20px",
+                          fontSize: isTablet
+                            ? "13px"
+                            : getResponsiveFontSize(14),
+                          height: isTablet
+                            ? scrolled
+                              ? "32px"
+                              : "36px"
+                            : scrolled
+                            ? "36px"
+                            : "40px",
+                          padding: isTablet
+                            ? "0 12px"
+                            : scrolled
+                            ? "0 16px"
+                            : "0 20px",
+                          fontWeight: "600",
+                          whiteSpace: "nowrap",
                         }}
                         onMouseEnter={() => setIsHovered(true)}
                         onMouseLeave={() => setIsHovered(false)}
@@ -511,10 +624,14 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
                   icon={<MenuOutlined />}
                   onClick={() => setDrawerVisible(true)}
                   style={{
-                    fontSize: "20px",
+                    fontSize: "18px",
                     padding: "8px",
-                    height: "auto",
+                    height: "40px",
+                    width: "40px",
                     color: "black",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                 />
               )}
@@ -526,13 +643,13 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
       {/* Spacer to prevent content from being hidden behind fixed navbar */}
       <div
         style={{
-          height: scrolled ? "76px" : "102px",
+          height: getSpacerHeight(),
           transition: "height 0.3s ease",
         }}
       />
 
       {/* Mobile Drawer Menu */}
-      {isMobile && renderMobileMenu()}
+      {(isMobile || isTablet) && renderMobileMenu()}
     </>
   );
 };
