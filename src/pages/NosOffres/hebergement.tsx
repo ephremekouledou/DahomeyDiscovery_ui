@@ -33,10 +33,7 @@ import img10 from "../../assets/images/10.jpg";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
 import Footer from "../../components/footer/footer";
 import { useTransaction } from "../../context/transactionContext";
-/* import img11 from "../../assets/images/11.jpg";
-import img12 from "../../assets/images/12.jpg";
-import img13 from "../../assets/images/13.jpg";
-import img14 from "../../assets/images/14.png"; */
+import bonneAdressImg from "../../assets/images/bonnesAddresse.webp";
 
 const images = [
   // img1,
@@ -54,6 +51,45 @@ const images = [
   // img13,
   // img14,
 ];
+
+const BonneAdresse = () => {
+  return (
+    <div
+      className="relative w-full max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-2xl"
+      style={{
+        backgroundImage: `url(${bonneAdressImg})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      {/* Overlay dégradé pour lisibilité */}
+      <div className="absolute inset-0">
+        <div className="w-full h-full bg-gradient-to-r from-slate-800 via-slate-600 to-slate-500 opacity-60"></div>
+      </div>
+
+      {/* Contenu principal */}
+      <div className="relative z-10 flex items-center min-h-[400px] p-8">
+        <div className="flex-1 max-w-md">
+          {/* Carte blanche avec le contenu */}
+          <div className="bg-white rounded-2xl p-8 shadow-xl">
+            <h1 className="text-2xl font-bold text-gray-900 mb-6 leading-tight">
+              Decouvrez toutes les bonnes adresses du Bénin
+            </h1>
+
+            <p className="text-gray-600 mb-8 text-sm leading-relaxed">
+              Nous vous proposons un guide pdf pour bien choisir vos
+              destinations.
+            </p>
+
+            <button className="w-full bg-orange-400 hover:bg-orange-500 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 transition-transform">
+              Achetez
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Interface pour définir une commodité
 export interface Amenity {
@@ -79,6 +115,7 @@ export interface AccommodationData {
   images: string[];
   description: string;
   amenities: AmenitiesGroup;
+  owner: boolean; // Indique si l'hébergement est géré par l'utilisateur
 }
 
 // Interface pour les props du composant
@@ -278,6 +315,7 @@ export const createExampleAccommodation = (): AccommodationData[] => [
         { name: "Eau chaude", icon: Droplets, available: true },
       ],
     },
+    owner: true,
   },
   {
     id: "es7f8s7f8s7f8s7f8s7f8s7f8s7f8s7f8",
@@ -331,6 +369,7 @@ export const createExampleAccommodation = (): AccommodationData[] => [
         { name: "Eau chaude", icon: Droplets, available: true },
       ],
     },
+    owner: false,
   },
   {
     id: "deef8s7f8s7f8s7f8s7f8s7f8s7f8s7f8",
@@ -406,6 +445,7 @@ export const createExampleAccommodation = (): AccommodationData[] => [
         { name: "Eau chaude", icon: Droplets, available: true },
       ],
     },
+    owner: false,
   },
   {
     id: "deef8s7f8s7f8s7f8s7f8s7f8s7f8s7f9",
@@ -459,6 +499,7 @@ export const createExampleAccommodation = (): AccommodationData[] => [
         { name: "Eau chaude", icon: Droplets, available: true },
       ],
     },
+    owner: true,
   },
 ];
 
@@ -584,32 +625,136 @@ const Hebergements = () => {
         vertical
         gap={isMobile ? 30 : 50}
       >
+        {/* Nos hébergements */}
         <Flex
           wrap="wrap"
+          vertical
           gap={20}
           justify="center"
           /* justify="space-between" gap={isMobile ? 20 : 30} */ style={{
             paddingTop: "40px",
           }}
         >
-          {accommodation.map((acc: any, index: any) => (
-            <AccommodationCard
-              key={index}
-              accommodation={acc}
-              onBook={() => {
-                setTransaction({
-                  id: acc.id,
-                  title: acc.name,
-                  amount: acc.price,
-                });
-                // we redirect to the payment page
-                navigate("/reservations-locations");
-              }}
-            />
-          ))}
+          <Typography.Title
+            level={2}
+            style={{
+              color: "#3B1B19",
+              fontSize: isMobile ? "1.2rem" : "2.5rem",
+              fontWeight: "200",
+              // textAlign: "center",
+              margin: "0",
+              fontFamily: "DragonAngled",
+            }}
+          >
+            Nos meilleures offres d'hébergements selectionnées pour vous
+          </Typography.Title>
+          <Flex
+            wrap="wrap"
+            gap={20}
+            justify={isMobile ? "center" : "flex-start"}
+          >
+            {accommodation
+              .filter((acc: AccommodationData) => acc.owner === true)
+              .map((acc: any, index: any) => (
+                <AccommodationCard
+                  key={index}
+                  accommodation={acc}
+                  onBook={() => {
+                    setTransaction({
+                      id: acc.id,
+                      title: acc.name,
+                      amount: acc.price,
+                    });
+                    // we redirect to the payment page
+                    navigate("/reservations-locations");
+                  }}
+                />
+              ))}
+          </Flex>
+        </Flex>
+
+        {/* Nos partenaires */}
+        <Flex
+          wrap="wrap"
+          vertical
+          gap={20}
+          justify="center"
+          /* justify="space-between" gap={isMobile ? 20 : 30} */ style={{
+            paddingTop: "40px",
+          }}
+        >
+          <Typography.Title
+            level={2}
+            style={{
+              color: "#3B1B19",
+              fontSize: isMobile ? "1.2rem" : "2.5rem",
+              fontWeight: "200",
+              // textAlign: "center",
+              margin: "0",
+              fontFamily: "DragonAngled",
+            }}
+          >
+            Nos partenaires
+          </Typography.Title>
+          <Flex wrap="wrap" gap={20} justify={isMobile ? "center" : "flex-start"}>
+            {accommodation
+              .filter((acc: AccommodationData) => acc.owner === false)
+              .map((acc: any, index: any) => (
+                <AccommodationCard
+                  key={index}
+                  accommodation={acc}
+                  onBook={() => {
+                    setTransaction({
+                      id: acc.id,
+                      title: acc.name,
+                      amount: acc.price,
+                    });
+                    // we redirect to the payment page
+                    navigate("/reservations-locations");
+                  }}
+                />
+              ))}
+          </Flex>
         </Flex>
       </Flex>
 
+      {/* Section Separator */}
+      <div
+        style={{
+          height: "80px",
+          backgroundColor: "#D9D9D938",
+          margin: "40px 0",
+        }}
+      ></div>
+
+      {/* Proposition de la fiche des bonnes adresses */}
+      <Flex>
+        <Flex
+          style={{
+            width: "100%",
+            // padding: "3vh 0",
+            paddingBottom: "50px",
+            maxWidth: "1200px",
+            margin: "0 auto",
+          }}
+          vertical
+          gap={isMobile ? 30 : 50}
+        >
+          <Typography.Title
+            level={2}
+            style={{
+              color: "#3B1B19",
+              fontSize: isMobile ? "1.2rem" : "2.5rem",
+              fontWeight: "200",
+              margin: "0",
+              fontFamily: "DragonAngled",
+            }}
+          >
+            Decouvrez toutes les bonnes adresses du Bénin
+          </Typography.Title>
+          <BonneAdresse />
+        </Flex>
+      </Flex>
       <section style={{ height: "45vw" }}>
         <ImageCarousel images={images} />
       </section>
