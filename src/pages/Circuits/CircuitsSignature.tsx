@@ -7,7 +7,7 @@ import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
 import debut from "../../assets/images/Circuit signature/Début.webp";
 import img1 from "../../assets/images/Circuit signature/1_5.webp";
 import img2 from "../../assets/images/Circuit signature/2_5.webp";
-import img3 from "../../assets/images/Circuit signature/3_5.webp";
+import img3 from "../../assets/images/Circuit signature/3_5.jpeg";
 import img4 from "../../assets/images/Circuit signature/4_5.webp";
 import img5 from "../../assets/images/Circuit signature/5_5.webp";
 

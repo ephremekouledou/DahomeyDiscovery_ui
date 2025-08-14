@@ -1,6 +1,6 @@
 import { Button, Flex, Typography } from "antd";
 import { useEffect, useState } from "react";
-import bgVideo from "../../assets/videos/background.mp4";
+import bgVideo from "../../assets/videos/bannieCoupe.mp4"
 import vector from "../../assets/icons/homeVector.png";
 import NavBar from "../navBar/navBar";
 import "../../assets/Fonts/font.css";
@@ -218,7 +218,7 @@ const VideoBackground = () => {
           left: 0,
           width: "100%",
           height: "100%",
-          backgroundColor: "rgba(0, 0, 0, 0.4)",
+          backgroundColor: "rgba(0, 0, 0, 0.0)",
           zIndex: 2,
         }}
       />
