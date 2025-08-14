@@ -285,30 +285,6 @@ const Circuits = () => {
     []
   );
 
-  // Styles responsifs pour la section héros
-  const heroStyles = useMemo(
-    () => ({
-      padding: isMobile ? "3vh 4vw" : isTablet ? "6vh 6vw" : "8vh 8vw",
-      paddingBottom: isMobile ? "8vh" : isTablet ? "15vh" : "20vh",
-    }),
-    [isMobile, isTablet]
-  );
-
-  // Styles pour le texte du héros
-  const heroTextStyles = useMemo(
-    () => ({
-      subtitle: {
-        fontSize: isMobile ? "10px" : isTablet ? "14px" : "16px",
-        letterSpacing: isMobile ? "0.2em" : "0.3em",
-      },
-      title: {
-        fontSize: isMobile ? "32px" : isTablet ? "55px" : "85px",
-        lineHeight: isMobile ? "1.1" : "1.1",
-      },
-    }),
-    [isMobile, isTablet]
-  );
-
   useEffect(() => {
     document.title = "Circuits Thématiques";
   }, []);
