@@ -677,7 +677,7 @@ const Acceuil = () => {
           <section style={{ 
             height: isMobile ? "60vw" : isTablet ? "50vw" : "45vw",
             minHeight: "300px",
-            maxHeight: "600px"
+            // maxHeight: "600px"
           }}>
             <ImageCarousel images={IMAGES} />
           </section>

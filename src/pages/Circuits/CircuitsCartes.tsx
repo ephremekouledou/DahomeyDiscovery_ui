@@ -4,7 +4,16 @@ import Footer from "../../components/footer/footer";
 import { useEffect, useRef, useState } from "react";
 import circuitImage from "../../assets/images/circuitImage.png";
 import { useLocation, useNavigate } from "react-router-dom";
-import villes from "../../assets/images/villes.svg";
+import cotonou from "../../assets/images/Circuit à la carte/Cotonou.webp";
+import abomey from "../../assets/images/Circuit à la carte/abomey.webp";
+import dassa from "../../assets/images/Circuit à la carte/dassa.webp";
+import ganvie from "../../assets/images/Circuit à la carte/Ganvié.webp";
+import gogotinkpon from "../../assets/images/Circuit à la carte/Gogotinkpon.webp";
+import popo from "../../assets/images/Circuit à la carte/Grand-Popo.webp";
+import ouidah from "../../assets/images/Circuit à la carte/Ouidah.webp";
+import porto from "../../assets/images/Circuit à la carte/Porto.webp";
+import possotome from "../../assets/images/Circuit à la carte/Possotomè.webp";
+
 
 // Types
 interface Circuit {
@@ -307,62 +316,58 @@ const CircuitsCartes = () => {
       ville: "Cotonou",
       description:
         "Art urbain,\nmarchés, street\nfood, fresques &\nvie moderne",
-      image: villes,
+      image:
+        cotonou,
     },
     {
-      ville: "Cotonou",
-      description:
-        "Art urbain,\nmarchés, street\nfood, fresques &\nvie moderne",
-      image: villes,
+      ville: "Abomey",
+      description: "Monuments,\nmusées, cuisine\nraffrinée & mode",
+      image:
+        abomey,
     },
     {
-      ville: "Cotonou",
-      description:
-        "Art urbain,\nmarchés, street\nfood, fresques &\nvie moderne",
-      image: villes,
+      ville: "Dassa",
+      description: "Tradition,\ntechnologie,\nculture pop &\narchitecture",
+      image:
+        dassa,
     },
     {
-      ville: "Cotonou",
-      description:
-        "Art urbain,\nmarchés, street\nfood, fresques &\nvie moderne",
-      image: villes,
+      ville: "Ganvie",
+      description: "Gratte-ciels,\nBroadway, diversité\n& énergie urbaine",
+      image:
+        ganvie,
     },
     {
-      ville: "Cotonou",
-      description:
-        "Art urbain,\nmarchés, street\nfood, fresques &\nvie moderne",
-      image: villes,
+      ville: "Gogotinkpon",
+      description: "Histoire,\nthéâtres, pubs\n& architecture\nvictorienne",
+      image:
+        gogotinkpon,
     },
     {
-      ville: "Cotonou",
-      description:
-        "Art urbain,\nmarchés, street\nfood, fresques &\nvie moderne",
-      image: villes,
+      ville: "Grand-Popo",
+      description: "Gaudí,\narchitecture,\ntapas & vie\nnocturne",
+      image:
+        popo,
     },
     {
-      ville: "Cotonou",
-      description:
-        "Art urbain,\nmarchés, street\nfood, fresques &\nvie moderne",
-      image: villes,
+      ville: "Ouidah",
+      description: "Culture,\ntraditions, art\ncontemporain &\nscène musicale",
+      image:
+        ouidah,
     },
     {
-      ville: "Cotonou",
-      description:
-        "Art urbain,\nmarchés, street\nfood, fresques &\nvie moderne",
-      image: villes,
+      ville: "Porto-Novo",
+      description: "Plages,\nculture, gastronomie\n& vie nocturne",
+      image:
+        porto,
     },
     {
-      ville: "Cotonou",
-      description:
-        "Art urbain,\nmarchés, street\nfood, fresques &\nvie moderne",
-      image: villes,
+      ville: "Possotomè",
+      description: "Nature,\nculture, artisanat\n& traditions",
+      image:
+        possotome,
     },
-    {
-      ville: "Cotonou",
-      description:
-        "Art urbain,\nmarchés, street\nfood, fresques &\nvie moderne",
-      image: villes,
-    },
+
   ];
 
   // État local pour le circuit sélectionné
