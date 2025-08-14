@@ -1,7 +1,7 @@
 import { Button, Flex, Typography } from "antd";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
 import debut from "../../assets/images/Circuit signature/Début.webp";
@@ -11,14 +11,128 @@ import img3 from "../../assets/images/Circuit signature/3_5.webp";
 import img4 from "../../assets/images/Circuit signature/4_5.webp";
 import img5 from "../../assets/images/Circuit signature/5_5.webp";
 
-const images = [
-  img1,
-  img2,
-  img3,
-  img4,
-  img5,
+// Optimisation: Déplacer les images en constante pour éviter les re-rendus
+const images = [img1, img2, img3, img4, img5];
+
+// Optimisation: Données de la timeline en constante
+const timelineData = [
+  {
+    title: "Bienvenue au Bénin !",
+    subtitle: "Arrivée à l'aéroport de Cotonou",
+    times: [
+      "Accueil personnalisé + transfert vers hôtel de charme",
+      "Dîner d'accueil dans un restaurant local",
+    ],
+    position: "left",
+  },
+  {
+    title: "Cotonou entre modernité et culture urbaine",
+    subtitle: "08h00 - Petit déjeuner à l'hôtel",
+    times: [
+      "09h00 - Départ pour le marché Dantokpa",
+      "11h00 - Découverte du Musée de Ouidah",
+      "13h00 - Déjeuner avec spécialités béninoises",
+      "14h30 - Visite de la Place de l'Amazone",
+      "16h00 - Temps libre ou visite de Fidjrossè",
+      "20h00 - Dîner dans un restaurant local / Nuit à Cotonou",
+    ],
+    position: "right",
+  },
+  {
+    title: "Ganvié, la Venise du Bénin",
+    subtitle: "07h30 - Petit déjeuner",
+    times: [
+      "08h30 - Départ pour Abomey-Calavi",
+      "09h00 - Embarquement en pirogue vers Ganvié",
+      "09h30-12h30 - Visite guidée du village lacustre",
+      "13h00 - Déjeuner sur l'eau",
+      "15h00 - Retour à Cotonou",
+      "19h30 - Dîner & soirée libre / Nuit à Cotonou",
+    ],
+    position: "left",
+  },
+  {
+    title: "Ouidah & Bégotinkpon, mémoire et immersion rurale",
+    subtitle: "07h00 - Petit déjeuner",
+    times: [
+      "08h00 - Départ pour Ouidah",
+      "09h15 - Visite du Musée d'Histoire",
+      "11h30 - Route des Esclaves",
+      "13h00 - Déjeuner local",
+      "14h30 - Départ vers Bégotinkpon",
+      "16h00 - Immersion rurale",
+      "18h00 - Dîner local + nuit en écologie",
+    ],
+    position: "right",
+  },
+  {
+    title: "Abomey, mémoire royale et artisanat",
+    subtitle: "07h30 - Petit déjeuner",
+    times: [
+      "08h30 - Route vers Abomey",
+      "11h00 - Visite du Palais royal + musée",
+      "13h00 - Déjeuner béninois",
+      "15h00 - Atelier artisanal",
+      "17h00 - Visite Place Goho",
+      "19h30 - Dîner & nuit à Abomey",
+    ],
+    position: "left",
+  },
+  {
+    title: "Dassa-Zoumé, spiritualité et nature sacrée",
+    subtitle: "07h00 - Petit déjeuner",
+    times: [
+      "08h00 - Départ vers Dassa",
+      "10h00 - Visite des collines sacrées",
+      "12h00 - Déjeuner + visite Okuta",
+      "16h00 - Retour vers Paradomé",
+      "20h00 - Dîner + nuit au bord du lac Ahémé",
+    ],
+    position: "right",
+  },
+  {
+    title: "Possotomé, nature et détente",
+    subtitle: "08h00 - Petit déjeuner",
+    times: [
+      "09h00 - Balade au bord du lac",
+      "11h00 - Activités nautiques",
+      "13h00 - Déjeuner poisson frais",
+      "Après-midi libre : détente, baignade",
+      "19h00 - Dîner au coucher du soleil",
+    ],
+    position: "left",
+  },
 ];
 
+// Optimisation: Hook personnalisé pour la détection de la taille d'écran
+const useScreenSize = () => {
+  const [screenSize, setScreenSize] = useState({
+    isMobile: false,
+    isTablet: false,
+    isDesktop: false,
+    width: 0,
+  });
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const width = window.innerWidth;
+      setScreenSize({
+        isMobile: width < 768,
+        isTablet: width >= 768 && width < 1024,
+        isDesktop: width >= 1024,
+        width,
+      });
+    };
+
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
+  return screenSize;
+};
+
+// Optimisation: Types TypeScript
 type TimelineItemProps = {
   title: string;
   subtitle: string;
@@ -27,188 +141,221 @@ type TimelineItemProps = {
   position: "left" | "right" | string;
   index: number;
   isActive: boolean;
+  screenSize: ReturnType<typeof useScreenSize>;
 };
 
-const DetailedTimeline = () => {
+// Composant Timeline optimisé
+const DetailedTimeline = ({ screenSize }: { screenSize: ReturnType<typeof useScreenSize> }) => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const timelineRef = useRef<HTMLDivElement | null>(null);
 
-  const timelineData = [
-    {
-      title: "Bienvenue au Bénin !",
-      subtitle: "Arrivée à l'aéroport de Cotonou",
-      times: [
-        "Accueil personnalisé + transfert vers hôtel de charme",
-        "Dîner d'accueil dans un restaurant local",
-      ],
-      position: "left",
-    },
-    {
-      title: "Cotonou entre modernité et culture urbaine",
-      subtitle: "08h00 - Petit déjeuner à l'hôtel",
-      times: [
-        "09h00 - Départ pour le marché Dantokpa",
-        "11h00 - Découverte du Musée de Ouidah",
-        "13h00 - Déjeuner avec spécialités béninoises",
-        "14h30 - Visite de la Place de l'Amazone",
-        "16h00 - Temps libre ou visite de Fidjrossè",
-        "20h00 - Dîner dans un restaurant local / Nuit à Cotonou",
-      ],
-      position: "right",
-    },
-    {
-      title: "Ganvié, la Venise du Bénin",
-      subtitle: "07h30 - Petit déjeuner",
-      times: [
-        "08h30 - Départ pour Abomey-Calavi",
-        "09h00 - Embarquement en pirogue vers Ganvié",
-        "09h30-12h30 - Visite guidée du village lacustre",
-        "13h00 - Déjeuner sur l'eau",
-        "15h00 - Retour à Cotonou",
-        "19h30 - Dîner & soirée libre / Nuit à Cotonou",
-      ],
-      position: "left",
-    },
-    {
-      title: "Ouidah & Bégotinkpon, mémoire et immersion rurale",
-      subtitle: "07h00 - Petit déjeuner",
-      times: [
-        "08h00 - Départ pour Ouidah",
-        "09h15 - Visite du Musée d'Histoire",
-        "11h30 - Route des Esclaves",
-        "13h00 - Déjeuner local",
-        "14h30 - Départ vers Bégotinkpon",
-        "16h00 - Immersion rurale",
-        "18h00 - Dîner local + nuit en écologie",
-      ],
-      position: "right",
-    },
-    {
-      title: "Abomey, mémoire royale et artisanat",
-      subtitle: "07h30 - Petit déjeuner",
-      times: [
-        "08h30 - Route vers Abomey",
-        "11h00 - Visite du Palais royal + musée",
-        "13h00 - Déjeuner béninois",
-        "15h00 - Atelier artisanal",
-        "17h00 - Visite Place Goho",
-        "19h30 - Dîner & nuit à Abomey",
-      ],
-      position: "left",
-    },
-    {
-      title: "Dassa-Zoumé, spiritualité et nature sacrée",
-      subtitle: "07h00 - Petit déjeuner",
-      times: [
-        "08h00 - Départ vers Dassa",
-        "10h00 - Visite des collines sacrées",
-        "12h00 - Déjeuner + visite Okuta",
-        "16h00 - Retour vers Paradomé",
-        "20h00 - Dîner + nuit au bord du lac Ahémé",
-      ],
-      position: "right",
-    },
-    {
-      title: "Possotomé, nature et détente",
-      subtitle: "08h00 - Petit déjeuner",
-      times: [
-        "09h00 - Balade au bord du lac",
-        "11h00 - Activités nautiques",
-        "13h00 - Déjeuner poisson frais",
-        "Après-midi libre : détente, baignade",
-        "19h00 - Dîner au coucher du soleil",
-      ],
-      position: "left",
-    },
-  ];
+  // Optimisation: useCallback pour éviter les re-rendus
+  const handleScroll = useCallback(() => {
+    if (timelineRef.current) {
+      const element = timelineRef.current;
+      const rect = element.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (timelineRef.current) {
-        const element = timelineRef.current;
-        const rect = element.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
+      const elementTop = rect.top;
+      const elementHeight = rect.height;
+      const startOffset = windowHeight;
+      const endOffset = -elementHeight;
+      const totalDistance = startOffset - endOffset;
+      const currentDistance = startOffset - elementTop;
+      const progress = Math.max(0, Math.min(1, currentDistance / totalDistance));
 
-        // Calculer la progression du scroll pour cet élément
-        const elementTop = rect.top;
-        const elementHeight = rect.height;
-
-        // Commencer l'animation dès que l'élément commence à entrer dans la vue
-        const startOffset = windowHeight; // Commencer dès que le haut de l'élément touche le bas de l'écran
-        const endOffset = -elementHeight; // Finir quand l'élément sort complètement de la vue
-
-        // Calculer la progression de 0 à 1
-        const totalDistance = startOffset - endOffset;
-        const currentDistance = startOffset - elementTop;
-        const progress = Math.max(
-          0,
-          Math.min(1, currentDistance / totalDistance)
-        );
-
-        setScrollProgress(progress);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    handleScroll(); // Appeler une fois au montage
-
-    return () => window.removeEventListener("scroll", handleScroll);
+      setScrollProgress(progress);
+    }
   }, []);
 
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
+
+  // Responsive: Ajustement du layout pour mobile
+  const timelineLayout = screenSize.isMobile ? "vertical" : "horizontal";
+
   return (
-    <div className="min-h-screen py-12 w-full" ref={timelineRef}>
-      <div className="px-4">
-        <div className="relative">
-          {/* Ligne verticale de base (grise) */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 w-0.5 h-full bg-gray-300"></div>
+    <div 
+      className={`min-h-screen w-full ${
+        screenSize.isMobile ? 'py-6 px-4' : 'py-12 px-4'
+      }`} 
+      ref={timelineRef}
+    >
+      <div className="relative">
+        {/* Timeline pour desktop/tablet */}
+        {timelineLayout === "horizontal" && (
+          <>
+            {/* Ligne verticale de base */}
+            <div className="absolute left-1/2 transform -translate-x-1/2 w-0.5 h-full bg-gray-300"></div>
+            {/* Ligne verticale animée */}
+            <div
+              className="absolute left-1/2 transform -translate-x-1/2 w-0.5 bg-[#F59F00] transition-all duration-300 ease-out"
+              style={{
+                height: `${scrollProgress * 100}%`,
+                top: 0,
+              }}
+            ></div>
+          </>
+        )}
 
-          {/* Ligne verticale animée (orange) */}
-          <div
-            className="absolute left-1/2 transform -translate-x-1/2 w-0.5 bg-[#F59F00] transition-all duration-300 ease-out"
-            style={{
-              height: `${scrollProgress * 100}%`,
-              top: 0,
-            }}
-          ></div>
+        {/* Timeline pour mobile */}
+        {timelineLayout === "vertical" && (
+          <>
+            {/* Ligne verticale à gauche pour mobile */}
+            <div className="absolute left-6 w-0.5 h-full bg-gray-300"></div>
+            <div
+              className="absolute left-6 w-0.5 bg-[#F59F00] transition-all duration-300 ease-out"
+              style={{
+                height: `${scrollProgress * 100}%`,
+                top: 0,
+              }}
+            ></div>
+          </>
+        )}
 
-          {/* Items de la timeline */}
-          {timelineData.map((item, index) => {
-            // Calculer si cet item spécifique est actif basé sur sa position dans la timeline
-            const itemProgress = (index + 1) / (timelineData.length + 1);
-            const isActive = scrollProgress >= itemProgress * 0.7; // Activation plus précoce
+        {/* Items de la timeline */}
+        {timelineData.map((item, index) => {
+          const itemProgress = (index + 1) / (timelineData.length + 1);
+          const isActive = scrollProgress >= itemProgress * 0.7;
 
-            return (
-              <TimelineItem
-                key={index}
-                {...item}
-                index={index + 1}
-                isActive={isActive}
-              />
-            );
-          })}
+          return (
+            <TimelineItem
+              key={index}
+              {...item}
+              index={index + 1}
+              isActive={isActive}
+              screenSize={screenSize}
+            />
+          );
+        })}
 
-          {/* Élément final centré */}
-          <FinalElement isActive={scrollProgress >= 0.6} />
-        </div>
+        {/* Élément final */}
+        <FinalElement isActive={scrollProgress >= 0.6} screenSize={screenSize} />
       </div>
     </div>
   );
 };
 
-// Mise à jour du composant TimelineItem pour inclure l'animation
+// Composant TimelineItem responsive
 const TimelineItem = ({
   title,
   subtitle,
   times,
-  details,
+  // details,
   position,
   index,
   isActive,
+  screenSize,
 }: TimelineItemProps) => {
   const isLeft = position === "left";
 
+  // Responsive: Styles adaptatifs
+  const getResponsiveStyles = useMemo(() => {
+    if (screenSize.isMobile) {
+      return {
+        titleFontSize: "24px",
+        subtitleFontSize: "14px",
+        textFontSize: "14px",
+        padding: "16px",
+        marginBottom: "24px",
+      };
+    } else if (screenSize.isTablet) {
+      return {
+        titleFontSize: "32px",
+        subtitleFontSize: "15px",
+        textFontSize: "15px",
+        padding: "20px",
+        marginBottom: "32px",
+      };
+    } else {
+      return {
+        titleFontSize: "38px",
+        subtitleFontSize: "15px",
+        textFontSize: "15px",
+        padding: "24px",
+        marginBottom: "48px",
+      };
+    }
+  }, [screenSize]);
+
+  // Layout mobile: tout en colonne
+  if (screenSize.isMobile) {
+    return (
+      <div className="relative flex items-start mb-8 pl-16">
+        {/* Numéro à gauche pour mobile */}
+        <div className="absolute left-0 top-4">
+          <div
+            className={`w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-md transition-all duration-500 ${
+              isActive ? "bg-[#F59F00] scale-110" : "bg-gray-400 scale-100"
+            }`}
+          >
+            {index.toString().padStart(2, "0")}
+          </div>
+        </div>
+
+        {/* Contenu */}
+        <div
+          className={`w-full transition-all duration-500 ${
+            isActive ? "opacity-100 translate-y-0" : "opacity-70 translate-y-2"
+          }`}
+        >
+          <div
+            className={`rounded-lg shadow-sm border transition-all duration-500 ${
+              isActive
+                ? "bg-[#F59F00] border-[#F59F00]"
+                : "bg-white border-gray-100"
+            }`}
+            style={{ padding: getResponsiveStyles.padding }}
+          >
+            <h3
+              className={`font-semibold mb-2 transition-colors duration-500 ${
+                isActive ? "text-white" : "text-[#F59F00]"
+              }`}
+              style={{ 
+                fontFamily: "DragonAngled", 
+                fontSize: getResponsiveStyles.titleFontSize,
+                lineHeight: "1.2"
+              }}
+            >
+              {title}
+            </h3>
+            <p
+              className={`mb-3 transition-colors duration-500 ${
+                isActive ? "text-white/90" : "text-gray-500"
+              }`}
+              style={{ 
+                fontFamily: "GeneralSans", 
+                fontSize: getResponsiveStyles.subtitleFontSize 
+              }}
+            >
+              {subtitle}
+            </p>
+            {times?.map((time, i) => (
+              <p
+                key={i}
+                className={`mb-1 transition-colors duration-500 ${
+                  isActive ? "text-white/85" : "text-gray-600"
+                }`}
+                style={{ 
+                  fontFamily: "GeneralSans", 
+                  fontSize: getResponsiveStyles.textFontSize 
+                }}
+              >
+                {time}
+              </p>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Layout desktop/tablet: alternance gauche-droite
   return (
-    <div className="relative flex items-center mb-12">
+    <div className="relative flex items-center" style={{ marginBottom: getResponsiveStyles.marginBottom }}>
       {/* Contenu à gauche */}
       <div
         className={`w-5/12 transition-all duration-500 ${
@@ -217,17 +364,22 @@ const TimelineItem = ({
       >
         {isLeft && (
           <div
-            className={`rounded-lg shadow-sm p-6 border transition-all duration-500 ${
+            className={`rounded-lg shadow-sm border transition-all duration-500 ${
               isActive
                 ? "bg-[#F59F00] border-[#F59F00]"
                 : "bg-white border-gray-100"
             }`}
+            style={{ padding: getResponsiveStyles.padding }}
           >
             <h3
               className={`font-semibold mb-2 transition-colors duration-500 ${
                 isActive ? "text-white" : "text-[#F59F00]"
               }`}
-              style={{ fontFamily: "DragonAngled", fontSize: "38px" }}
+              style={{ 
+                fontFamily: "DragonAngled", 
+                fontSize: getResponsiveStyles.titleFontSize,
+                lineHeight: "1.2"
+              }}
             >
               {title}
             </h3>
@@ -235,34 +387,27 @@ const TimelineItem = ({
               className={`mb-3 transition-colors duration-500 ${
                 isActive ? "text-white/90" : "text-gray-500"
               }`}
-              style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+              style={{ 
+                fontFamily: "GeneralSans", 
+                fontSize: getResponsiveStyles.subtitleFontSize 
+              }}
             >
               {subtitle}
             </p>
-            {times &&
-              times.map((time, i) => (
-                <p
-                  key={i}
-                  className={`mb-1 transition-colors duration-500 ${
-                    isActive ? "text-white/85" : "text-gray-600"
-                  }`}
-                  style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
-                >
-                  {time}
-                </p>
-              ))}
-            {details &&
-              details.map((detail, i) => (
-                <p
-                  key={i}
-                  className={`text-sm mt-2 transition-colors duration-500 ${
-                    isActive ? "text-white/85" : "text-gray-700"
-                  }`}
-                  style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
-                >
-                  {detail}
-                </p>
-              ))}
+            {times?.map((time, i) => (
+              <p
+                key={i}
+                className={`mb-1 transition-colors duration-500 ${
+                  isActive ? "text-white/85" : "text-gray-600"
+                }`}
+                style={{ 
+                  fontFamily: "GeneralSans", 
+                  fontSize: getResponsiveStyles.textFontSize 
+                }}
+              >
+                {time}
+              </p>
+            ))}
           </div>
         )}
       </div>
@@ -289,17 +434,22 @@ const TimelineItem = ({
       >
         {!isLeft && (
           <div
-            className={`rounded-lg shadow-sm p-6 border transition-all duration-500 ${
+            className={`rounded-lg shadow-sm border transition-all duration-500 ${
               isActive
                 ? "bg-[#F59F00] border-[#F59F00]"
                 : "bg-white border-gray-100"
             }`}
+            style={{ padding: getResponsiveStyles.padding }}
           >
             <h3
-              className={`text-xl font-semibold mb-2 transition-colors duration-500 ${
+              className={`font-semibold mb-2 transition-colors duration-500 ${
                 isActive ? "text-white" : "text-[#F59F00]"
               }`}
-              style={{ fontFamily: "DragonAngled", fontSize: "38px" }}
+              style={{ 
+                fontFamily: "DragonAngled", 
+                fontSize: getResponsiveStyles.titleFontSize,
+                lineHeight: "1.2"
+              }}
             >
               {title}
             </h3>
@@ -307,34 +457,27 @@ const TimelineItem = ({
               className={`mb-3 transition-colors duration-500 ${
                 isActive ? "text-white/90" : "text-gray-500"
               }`}
-              style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+              style={{ 
+                fontFamily: "GeneralSans", 
+                fontSize: getResponsiveStyles.subtitleFontSize 
+              }}
             >
               {subtitle}
             </p>
-            {times &&
-              times.map((time, i) => (
-                <p
-                  key={i}
-                  className={`mb-1 transition-colors duration-500 ${
-                    isActive ? "text-white/85" : "text-gray-600"
-                  }`}
-                  style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
-                >
-                  {time}
-                </p>
-              ))}
-            {details &&
-              details.map((detail, i) => (
-                <p
-                  key={i}
-                  className={`mt-2 transition-colors duration-500 ${
-                    isActive ? "text-white/85" : "text-gray-700"
-                  }`}
-                  style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
-                >
-                  {detail}
-                </p>
-              ))}
+            {times?.map((time, i) => (
+              <p
+                key={i}
+                className={`mb-1 transition-colors duration-500 ${
+                  isActive ? "text-white/85" : "text-gray-600"
+                }`}
+                style={{ 
+                  fontFamily: "GeneralSans", 
+                  fontSize: getResponsiveStyles.textFontSize 
+                }}
+              >
+                {time}
+              </p>
+            ))}
           </div>
         )}
       </div>
@@ -342,30 +485,139 @@ const TimelineItem = ({
   );
 };
 
-// Mise à jour du composant FinalElement
-const FinalElement = ({ isActive }: { isActive: boolean }) => {
+// Composant FinalElement responsive
+const FinalElement = ({ 
+  isActive, 
+  screenSize 
+}: { 
+  isActive: boolean; 
+  screenSize: ReturnType<typeof useScreenSize>; 
+}) => {
+  const getResponsiveStyles = useMemo(() => {
+    if (screenSize.isMobile) {
+      return {
+        titleFontSize: "28px",
+        textFontSize: "14px",
+        padding: "24px",
+        circleSize: "w-12 h-12",
+        iconSize: "text-lg",
+        maxWidth: "max-w-sm",
+      };
+    } else if (screenSize.isTablet) {
+      return {
+        titleFontSize: "32px",
+        textFontSize: "15px",
+        padding: "32px",
+        circleSize: "w-14 h-14",
+        iconSize: "text-xl",
+        maxWidth: "max-w-lg",
+      };
+    } else {
+      return {
+        titleFontSize: "38px",
+        textFontSize: "15px",
+        padding: "32px",
+        circleSize: "w-16 h-16",
+        iconSize: "text-2xl",
+        maxWidth: "max-w-2xl",
+      };
+    }
+  }, [screenSize]);
+
+  if (screenSize.isMobile) {
+    return (
+      <div className="relative flex justify-center items-center pt-8 pb-12 pl-16">
+        <div
+          className={`relative z-10 rounded-lg shadow-lg border text-center transition-all duration-500 ${
+            isActive
+              ? "bg-[#F59F00] border-[#F59F00] opacity-100 translate-y-0"
+              : "bg-white border-gray-100 opacity-70 translate-y-4"
+          } ${getResponsiveStyles.maxWidth}`}
+          style={{ padding: getResponsiveStyles.padding }}
+        >
+          <div
+            className={`${getResponsiveStyles.circleSize} rounded-full flex items-center justify-center text-white font-bold shadow-md mx-auto -mt-12 mb-4 transition-all duration-500 ${
+              isActive ? "bg-[#F59F00] scale-110" : "bg-gray-400 scale-100"
+            }`}
+          >
+            <span className={getResponsiveStyles.iconSize}>✓</span>
+          </div>
+          <h3
+            className={`font-bold mb-4 transition-colors duration-500 ${
+              isActive ? "text-white" : "text-gray-900"
+            }`}
+            style={{ 
+              fontFamily: "DragonAngled", 
+              fontSize: getResponsiveStyles.titleFontSize,
+              lineHeight: "1.2"
+            }}
+          >
+            Fin du voyage
+          </h3>
+          <p
+            className={`mb-2 transition-colors duration-500 ${
+              isActive ? "text-white/90" : "text-gray-600"
+            }`}
+            style={{ 
+              fontFamily: "GeneralSans", 
+              fontSize: getResponsiveStyles.textFontSize 
+            }}
+          >
+            Retour à l'aéroport de Cotonou
+          </p>
+          <p
+            className={`transition-colors duration-500 ${
+              isActive ? "text-white/85" : "text-gray-500"
+            }`}
+            style={{ 
+              fontFamily: "GeneralSans", 
+              fontSize: getResponsiveStyles.textFontSize 
+            }}
+          >
+            Transfert organisé • Assistance jusqu'au départ
+          </p>
+          <p
+            className={`mt-4 transition-colors duration-500 ${
+              isActive ? "text-white/85" : "text-gray-500"
+            }`}
+            style={{ 
+              fontFamily: "GeneralSans", 
+              fontSize: getResponsiveStyles.textFontSize 
+            }}
+          >
+            Merci pour ce magnifique voyage au Bénin !
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative flex justify-center items-center pt-8 pb-12">
       <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 h-16 bg-transparent"></div>
       <div
-        className={`relative z-10 rounded-lg shadow-lg p-8 border max-w-2xl text-center mt-16 transition-all duration-500 ${
+        className={`relative z-10 rounded-lg shadow-lg border text-center mt-16 transition-all duration-500 ${
           isActive
             ? "bg-[#F59F00] border-[#F59F00] opacity-100 translate-y-0"
             : "bg-white border-gray-100 opacity-70 translate-y-4"
-        }`}
+        } ${getResponsiveStyles.maxWidth}`}
+        style={{ padding: getResponsiveStyles.padding }}
       >
         <div
-          className={`w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-2xl shadow-md mx-auto -mt-16 mb-6 transition-all duration-500 ${
+          className={`${getResponsiveStyles.circleSize} rounded-full flex items-center justify-center text-white font-bold shadow-md mx-auto -mt-16 mb-6 transition-all duration-500 ${
             isActive ? "bg-[#F59F00] scale-110" : "bg-gray-400 scale-100"
           }`}
         >
-          ✓
+          <span className={getResponsiveStyles.iconSize}>✓</span>
         </div>
         <h3
           className={`font-bold mb-4 transition-colors duration-500 ${
             isActive ? "text-white" : "text-gray-900"
           }`}
-          style={{ fontFamily: "DragonAngled", fontSize: "38px" }}
+          style={{ 
+            fontFamily: "DragonAngled", 
+            fontSize: getResponsiveStyles.titleFontSize 
+          }}
         >
           Fin du voyage
         </h3>
@@ -373,7 +625,10 @@ const FinalElement = ({ isActive }: { isActive: boolean }) => {
           className={`mb-2 transition-colors duration-500 ${
             isActive ? "text-white/90" : "text-gray-600"
           }`}
-          style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+          style={{ 
+            fontFamily: "GeneralSans", 
+            fontSize: getResponsiveStyles.textFontSize 
+          }}
         >
           Retour à l'aéroport de Cotonou
         </p>
@@ -381,7 +636,10 @@ const FinalElement = ({ isActive }: { isActive: boolean }) => {
           className={`transition-colors duration-500 ${
             isActive ? "text-white/85" : "text-gray-500"
           }`}
-          style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+          style={{ 
+            fontFamily: "GeneralSans", 
+            fontSize: getResponsiveStyles.textFontSize 
+          }}
         >
           Transfert organisé • Assistance jusqu'au départ
         </p>
@@ -389,7 +647,10 @@ const FinalElement = ({ isActive }: { isActive: boolean }) => {
           className={`mt-4 transition-colors duration-500 ${
             isActive ? "text-white/85" : "text-gray-500"
           }`}
-          style={{ fontFamily: "GeneralSans", fontSize: "15px" }}
+          style={{ 
+            fontFamily: "GeneralSans", 
+            fontSize: getResponsiveStyles.textFontSize 
+          }}
         >
           Merci pour ce magnifique voyage au Bénin !
         </p>
@@ -398,7 +659,8 @@ const FinalElement = ({ isActive }: { isActive: boolean }) => {
   );
 };
 
-const InclusNonInclusComponent = () => {
+// Composant InclusNonInclusComponent responsive
+const InclusNonInclusComponent = ({ screenSize }: { screenSize: ReturnType<typeof useScreenSize> }) => {
   const inclus = [
     "Hébergement 9 nuits (hôtel, maison d'hôte ou écolodge)",
     "Chauffeur privé + véhicule climatisé",
@@ -409,46 +671,75 @@ const InclusNonInclusComponent = () => {
   ];
 
   const nonInclus = [
-    "Hébergement 9 nuits (hôtel, maison d'hôte ou écolodge)",
-    "Chauffeur privé + véhicule climatisé",
-    "Guide certifié sur chaque site",
-    "Prise en charge à l'aéroport",
-    "Accompagnement personnalisé",
-    "Connexion internet + kit de bienvenue",
+    "Billets d'avion international",
+    "Visa d'entrée au Bénin",
+    "Assurance voyage",
+    "Frais personnels et pourboires",
+    "Boissons alcoolisées",
+    "Activités optionnelles non mentionnées",
   ];
+
+  const getResponsiveStyles = useMemo(() => {
+    if (screenSize.isMobile) {
+      return {
+        titleFontSize: "32px",
+        textFontSize: "14px",
+        padding: "20px",
+        gap: "16px",
+      };
+    } else if (screenSize.isTablet) {
+      return {
+        titleFontSize: "40px",
+        textFontSize: "15px",
+        padding: "25px",
+        gap: "20px",
+      };
+    } else {
+      return {
+        titleFontSize: "49px",
+        textFontSize: "16px",
+        padding: "30px",
+        gap: "20px",
+      };
+    }
+  }, [screenSize]);
 
   return (
     <div className="w-full px-4 py-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div className={`grid ${screenSize.isMobile ? 'grid-cols-1' : 'grid-cols-2'}`} style={{ gap: getResponsiveStyles.gap }}>
         {/* Section INCLUS */}
         <div
           style={{
             backgroundColor: "#EAFFEF",
-            padding: "25px 30px",
+            padding: getResponsiveStyles.padding,
             height: "fit-content",
+            borderRadius: "8px",
           }}
         >
           <Typography.Title
             level={2}
             style={{
               color: "#36A330",
-              fontSize: "49px",
+              fontSize: getResponsiveStyles.titleFontSize,
               fontFamily: "DragonAngled",
               fontWeight: "bold",
               textTransform: "uppercase",
               letterSpacing: "0.05em",
+              marginBottom: "16px",
+              lineHeight: "1.2",
             }}
           >
             INCLUS
           </Typography.Title>
-          <ul className="space-y-1">
+          <ul className="space-y-2">
             {inclus.map((item, index) => (
               <li key={index} className="flex items-start">
-                <span style={{ paddingRight: "10px" }}>•</span>
+                <span style={{ paddingRight: "10px", color: "#36A330", fontWeight: "bold" }}>•</span>
                 <Typography.Text
                   style={{
-                    fontSize: "16px",
+                    fontSize: getResponsiveStyles.textFontSize,
                     fontFamily: "GeneralSans",
+                    lineHeight: "1.4",
                   }}
                 >
                   {item}
@@ -462,31 +753,36 @@ const InclusNonInclusComponent = () => {
         <div
           style={{
             backgroundColor: "#FFE6E6",
-            padding: "25px 30px",
+            padding: getResponsiveStyles.padding,
             height: "fit-content",
+            borderRadius: "8px",
+            marginTop: screenSize.isMobile ? "16px" : "0",
           }}
         >
           <Typography.Title
             level={2}
             style={{
               color: "#991D00",
-              fontSize: "49px",
+              fontSize: getResponsiveStyles.titleFontSize,
               fontFamily: "DragonAngled",
               fontWeight: "bold",
               textTransform: "uppercase",
               letterSpacing: "0.05em",
+              marginBottom: "16px",
+              lineHeight: "1.2",
             }}
           >
             NON INCLUS
           </Typography.Title>
-          <ul className="space-y-1">
+          <ul className="space-y-2">
             {nonInclus.map((item, index) => (
               <li key={index} className="flex items-start">
-                <span style={{ paddingRight: "10px" }}>•</span>
+                <span style={{ paddingRight: "10px", color: "#991D00", fontWeight: "bold" }}>•</span>
                 <Typography.Text
                   style={{
-                    fontSize: "16px",
+                    fontSize: getResponsiveStyles.textFontSize,
                     fontFamily: "GeneralSans",
+                    lineHeight: "1.4",
                   }}
                 >
                   {item}
@@ -500,32 +796,89 @@ const InclusNonInclusComponent = () => {
   );
 };
 
+// Composant principal optimisé
 const CircuitsSignature = () => {
-  const [isMobile, setIsMobile] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const { pathname } = useLocation();
+  const screenSize = useScreenSize();
 
-  useEffect(() => {
-    document.title = "Circuits";
-  }, []);
+  // Optimisation: Mémorisation des styles responsifs
+  const heroStyles = useMemo(() => {
+    if (screenSize.isMobile) {
+      return {
+        padding: "4vh 4vw",
+        paddingBottom: "8vw",
+        categoryFontSize: "10px",
+        titleFontSize: "36px",
+        subtitleFontSize: "18px",
+        letterSpacing: "0.2em",
+      };
+    } else if (screenSize.isTablet) {
+      return {
+        padding: "6vh 6vw",
+        paddingBottom: "6vw",
+        categoryFontSize: "14px",
+        titleFontSize: "65px",
+        subtitleFontSize: "32px",
+        letterSpacing: "0.25em",
+      };
+    } else {
+      return {
+        padding: "8vh 8vw",
+        paddingBottom: "8vw",
+        categoryFontSize: "16px",
+        titleFontSize: "85px",
+        subtitleFontSize: "45px",
+        letterSpacing: "0.3em",
+      };
+    }
+  }, [screenSize]);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+  const circuitCardStyles = useMemo(() => {
+    if (screenSize.isMobile) {
+      return {
+        badgeMargin: "1vh 0 0 0",
+        badgePadding: "8px 16px",
+        badgeFontSize: "12px",
+        height: "auto",
+        padding: "16px",
+        titleFontSize: "22px",
+        subtitleFontSize: "14px",
+        titlePadding: "0",
+        subtitlePadding: "0",
+      };
+    } else if (screenSize.isTablet) {
+      return {
+        badgeMargin: "1.5vh 0 0 2vw",
+        badgePadding: "10px 20px",
+        badgeFontSize: "14px",
+        height: "120px",
+        padding: "20px",
+        titleFontSize: "40px",
+        subtitleFontSize: "16px",
+        titlePadding: "16px",
+        subtitlePadding: "17px",
+      };
+    } else {
+      return {
+        badgeMargin: "2vh 0 0 3vw",
+        badgePadding: "12px 24px",
+        badgeFontSize: "16px",
+        height: "150px",
+        padding: "24px",
+        titleFontSize: "58px",
+        subtitleFontSize: "18px",
+        titlePadding: "24px",
+        subtitlePadding: "25px",
+      };
+    }
+  }, [screenSize]);
 
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
-
-  // Effet pour définir le titre de la page
+  // Optimisation: Effects regroupés
   useEffect(() => {
     document.title = "Circuits Signature";
-  }, []);
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   return (
     <Flex justify="center" vertical>
@@ -542,26 +895,26 @@ const CircuitsSignature = () => {
           backgroundImage: `url(${debut})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          padding: isMobile ? "4vh 6vw" : "8vh 8vw",
-          paddingBottom: isMobile ? "10vw" : "8vw",
+          padding: heroStyles.padding,
+          paddingBottom: heroStyles.paddingBottom,
         }}
       >
-        {/* Gradient overlay - de la couleur beige/crème vers transparent */}
+        {/* Gradient overlay optimisé */}
         <div
           className="absolute inset-0"
           style={{
             background: `linear-gradient(to right, 
-            rgba(250, 235, 215, 0.95) 0%,
-            rgba(250, 235, 215, 0.85) 20%,
-            rgba(250, 235, 215, 0.6) 40%,
-            rgba(250, 235, 215, 0.3) 60%,
-            rgba(250, 235, 215, 0.1) 80%,
-            transparent 100%)`,
+              rgba(250, 235, 215, 0.95) 0%,
+              rgba(250, 235, 215, 0.85) 20%,
+              rgba(250, 235, 215, 0.6) 40%,
+              rgba(250, 235, 215, 0.3) 60%,
+              rgba(250, 235, 215, 0.1) 80%,
+              transparent 100%)`,
           }}
         />
         <Flex
           style={{
-            maxWidth: "1050px",
+            maxWidth: screenSize.isMobile ? "100%" : "1050px",
             width: "100%",
             margin: "0 auto",
             zIndex: 1,
@@ -571,12 +924,12 @@ const CircuitsSignature = () => {
             <Typography.Text
               style={{
                 color: "#000000",
-                fontSize: isMobile ? "12px" : "16px",
+                fontSize: heroStyles.categoryFontSize,
                 lineHeight: "1.1",
                 margin: "0",
                 textTransform: "uppercase",
                 fontFamily: "GeneralSans",
-                letterSpacing: "0.3em",
+                letterSpacing: heroStyles.letterSpacing,
               }}
             >
               CIRCUIT SIGNATURE
@@ -585,12 +938,12 @@ const CircuitsSignature = () => {
               level={1}
               style={{
                 color: "#FF3100",
-                fontSize: isMobile ? "44px" : "85px",
+                fontSize: heroStyles.titleFontSize,
                 fontWeight: "900",
-                lineHeight: "1",
+                lineHeight: screenSize.isMobile ? "1.1" : "1",
                 letterSpacing: "0.03em",
-                marginTop: "20px",
-                marginBottom: "15px",
+                marginTop: screenSize.isMobile ? "12px" : "20px",
+                marginBottom: screenSize.isMobile ? "8px" : "15px",
                 fontFamily: "DragonAngled",
                 textTransform: "uppercase",
               }}
@@ -600,14 +953,13 @@ const CircuitsSignature = () => {
             <Typography.Text
               style={{
                 color: "#000000",
-                fontSize: isMobile ? "24px" : "45px",
-                lineHeight: "1",
+                fontSize: heroStyles.subtitleFontSize,
+                lineHeight: screenSize.isMobile ? "1.3" : "1",
                 marginTop: "0",
                 fontFamily: "DragonAngled",
               }}
             >
-              Sites incontournables, entre mémoire, spiritualité, artisanat et
-              détente
+              Sites incontournables, entre mémoire, spiritualité, artisanat et détente
             </Typography.Text>
           </Flex>
         </Flex>
@@ -617,25 +969,24 @@ const CircuitsSignature = () => {
       <Flex
         style={{
           width: "100%",
-          // padding: "3vh 0",
           paddingBottom: "0vh",
-          maxWidth: "1100px",
+          maxWidth: screenSize.isMobile ? "100%" : "1100px",
           margin: "0 auto",
+          padding: screenSize.isMobile ? "0 16px" : "0",
         }}
         vertical
-        gap={isMobile ? 30 : 50}
+        gap={screenSize.isMobile ? 20 : screenSize.isTablet ? 35 : 50}
       >
         {/* Section des circuits - Responsive */}
         <Flex
-          className="bg-white rounded-lg shadow-md border border-gray-200 p-6"
+          className="bg-white rounded-lg shadow-md border border-gray-200"
           vertical
           gap="20px"
           style={{
-            // padding: isMobile ? "0 4vw" : "0 7vw",
             width: "100%",
-            // paddingBottom: isMobile ? "4vw" : "15vw",
             position: "relative",
-            bottom: isMobile ? "1vw" : "3vw",
+            bottom: screenSize.isMobile ? "2vw" : "3vw",
+            margin: screenSize.isMobile ? "16px 0" : "0",
           }}
         >
           <Flex
@@ -643,12 +994,12 @@ const CircuitsSignature = () => {
             style={{ backgroundColor: "white" }}
             className="bg-white rounded-lg shadow-md border border-gray-200 p-6"
           >
-            {/* Badge de durée - affiché uniquement pour le circuit sélectionné */}
+            {/* Badge de durée */}
             <Flex
               style={{
                 backgroundColor: "#FFE0D9",
-                margin: isMobile ? "1vh 0 0 4vw" : "2vh 0 0 3vw",
-                padding: isMobile ? "0.8vw" : "0.6vw",
+                margin: circuitCardStyles.badgeMargin,
+                padding: circuitCardStyles.badgePadding,
                 border: "1px solid #999791",
                 borderRadius: "46px",
                 width: "fit-content",
@@ -657,7 +1008,7 @@ const CircuitsSignature = () => {
             >
               <Typography
                 style={{
-                  fontSize: isMobile ? "12px" : "16px",
+                  fontSize: circuitCardStyles.badgeFontSize,
                   fontFamily: "GeneralSans",
                 }}
               >
@@ -669,39 +1020,45 @@ const CircuitsSignature = () => {
             <Flex
               justify="space-between"
               align="center"
+              vertical={screenSize.isMobile}
               style={{
                 width: "100%",
-                height: isMobile ? "80px" : "150px",
+                height: screenSize.isMobile ? "auto" : circuitCardStyles.height,
                 backgroundColor: "white",
-                padding: isMobile ? "12px" : "24px",
+                padding: circuitCardStyles.padding,
                 borderRadius: "0.3rem",
                 cursor: "pointer",
               }}
             >
-              <Flex vertical>
+              <Flex vertical style={{ width: screenSize.isMobile ? "100%" : "auto" }}>
                 <Typography.Title
                   level={2}
                   style={{
                     color: "#BF2500",
-                    fontSize: isMobile ? "26px" : "58px",
+                    fontSize: circuitCardStyles.titleFontSize,
                     fontFamily: "DragonAngled",
                     fontWeight: "300",
-                    paddingLeft: isMobile ? "8px" : "24px",
+                    paddingLeft: circuitCardStyles.titlePadding,
                     margin: "0",
-                    lineHeight: isMobile ? "1.2" : "1.4",
+                    lineHeight: screenSize.isMobile ? "1.2" : "1.4",
                     transition: "all 0.5s ease",
                   }}
                 >
                   <span style={{ color: "black" }}>L'Essentiel du Bénin</span>{" "}
-                  (Best-seller)
+                  {screenSize.isMobile ? <br /> : ""}
+                  <span style={{ fontSize: screenSize.isMobile ? "18px" : "inherit" }}>
+                    (Best-seller)
+                  </span>
                 </Typography.Title>
                 <Typography
                   style={{
                     color: "#311715",
-                    fontSize: isMobile ? "26px" : "18px",
-                    paddingLeft: isMobile ? "8px" : "25px",
+                    fontSize: circuitCardStyles.subtitleFontSize,
+                    paddingLeft: circuitCardStyles.subtitlePadding,
                     fontFamily: "GeneralSans",
                     fontWeight: "300",
+                    marginTop: screenSize.isMobile ? "8px" : "0",
+                    lineHeight: "1.4",
                   }}
                 >
                   Voyageurs curieux, familles, groupes DOM-TOM, premiers séjours
@@ -711,11 +1068,13 @@ const CircuitsSignature = () => {
           </Flex>
         </Flex>
 
+        {/* Timeline */}
         <Flex style={{ width: "100%" }}>
-          <DetailedTimeline />
+          <DetailedTimeline screenSize={screenSize} />
         </Flex>
 
-        <Flex justify="center">
+        {/* Bouton de réservation */}
+        <Flex justify="center" style={{ padding: screenSize.isMobile ? "20px 0" : "0" }}>
           <Link to="/reserver">
             <Button
               type="primary"
@@ -727,8 +1086,10 @@ const CircuitsSignature = () => {
                 border: "none",
                 fontFamily: "GeneralSans",
                 transition: "all 0.3s ease",
-                fontSize: "17px",
+                fontSize: screenSize.isMobile ? "16px" : "17px",
                 fontWeight: "200",
+                padding: screenSize.isMobile ? "8px 24px" : "12px 32px",
+                height: "auto",
               }}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
@@ -738,12 +1099,19 @@ const CircuitsSignature = () => {
           </Link>
         </Flex>
 
+        {/* Section Inclus/Non Inclus */}
         <Flex style={{ width: "100%", paddingBottom: "60px" }}>
-          <InclusNonInclusComponent />
+          <InclusNonInclusComponent screenSize={screenSize} />
         </Flex>
       </Flex>
 
-      <section style={{ height: "45vw" }}>
+      {/* Galerie d'images - Responsive */}
+      <section 
+        style={{ 
+          height: screenSize.isMobile ? "60vw" : screenSize.isTablet ? "50vw" : "45vw",
+          width: "100%"
+        }}
+      >
         <ImageCarousel images={images} />
       </section>
 
