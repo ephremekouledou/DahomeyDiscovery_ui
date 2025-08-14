@@ -14,7 +14,7 @@ import img5 from "../../assets/images/Circuit signature/5_5.webp";
 // Optimisation: Déplacer les images en constante pour éviter les re-rendus
 const images = [img1, img2, img3, img4, img5];
 
-// Optimisation: Données de la timeline en constante
+// Optimisation: Données de la timeline en constante avec images
 const timelineData = [
   {
     title: "Bienvenue au Bénin !",
@@ -24,6 +24,7 @@ const timelineData = [
       "Dîner d'accueil dans un restaurant local",
     ],
     position: "left",
+    image: img1,
   },
   {
     title: "Cotonou entre modernité et culture urbaine",
@@ -37,6 +38,7 @@ const timelineData = [
       "20h00 - Dîner dans un restaurant local / Nuit à Cotonou",
     ],
     position: "right",
+    image: img2,
   },
   {
     title: "Ganvié, la Venise du Bénin",
@@ -50,6 +52,7 @@ const timelineData = [
       "19h30 - Dîner & soirée libre / Nuit à Cotonou",
     ],
     position: "left",
+    image: img3,
   },
   {
     title: "Ouidah & Bégotinkpon, mémoire et immersion rurale",
@@ -64,6 +67,7 @@ const timelineData = [
       "18h00 - Dîner local + nuit en écologie",
     ],
     position: "right",
+    image: img4,
   },
   {
     title: "Abomey, mémoire royale et artisanat",
@@ -77,6 +81,7 @@ const timelineData = [
       "19h30 - Dîner & nuit à Abomey",
     ],
     position: "left",
+    image: img5,
   },
   {
     title: "Dassa-Zoumé, spiritualité et nature sacrée",
@@ -89,6 +94,7 @@ const timelineData = [
       "20h00 - Dîner + nuit au bord du lac Ahémé",
     ],
     position: "right",
+    image: img1,
   },
   {
     title: "Possotomé, nature et détente",
@@ -101,6 +107,7 @@ const timelineData = [
       "19h00 - Dîner au coucher du soleil",
     ],
     position: "left",
+    image: img2,
   },
 ];
 
@@ -142,6 +149,7 @@ type TimelineItemProps = {
   index: number;
   isActive: boolean;
   screenSize: ReturnType<typeof useScreenSize>;
+  image?: string;
 };
 
 // Composant Timeline optimisé
@@ -239,7 +247,7 @@ const DetailedTimeline = ({ screenSize }: { screenSize: ReturnType<typeof useScr
   );
 };
 
-// Composant TimelineItem responsive
+// Composant TimelineItem responsive avec images
 const TimelineItem = ({
   title,
   subtitle,
@@ -249,6 +257,7 @@ const TimelineItem = ({
   index,
   isActive,
   screenSize,
+  image,
 }: TimelineItemProps) => {
   const isLeft = position === "left";
 
@@ -261,6 +270,7 @@ const TimelineItem = ({
         textFontSize: "14px",
         padding: "16px",
         marginBottom: "24px",
+        imageSize: { width: 0, height: 0 }, // Pas d'images sur mobile
       };
     } else if (screenSize.isTablet) {
       return {
@@ -269,6 +279,7 @@ const TimelineItem = ({
         textFontSize: "15px",
         padding: "20px",
         marginBottom: "32px",
+        imageSize: { width: 220, height: 220 },
       };
     } else {
       return {
@@ -276,7 +287,8 @@ const TimelineItem = ({
         subtitleFontSize: "15px",
         textFontSize: "15px",
         padding: "24px",
-        marginBottom: "48px",
+        marginBottom: "88px",
+        imageSize: { width: 300, height: 300 },
       };
     }
   }, [screenSize]);
@@ -353,61 +365,86 @@ const TimelineItem = ({
     );
   }
 
-  // Layout desktop/tablet: alternance gauche-droite
+  // Layout desktop/tablet: alternance gauche-droite avec images
   return (
     <div className="relative flex items-center" style={{ marginBottom: getResponsiveStyles.marginBottom }}>
+      {/* Image à l'extrême gauche (seulement si content à droite) */}
+      {!isLeft && !screenSize.isMobile && image && (
+        <div className="absolute left-0 z-10">
+          <div
+            className={`rounded-lg overflow-hidden shadow-lg transition-all duration-500 ${
+              isActive ? "opacity-100 scale-105" : "opacity-70 scale-100"
+            }`}
+            style={getResponsiveStyles.imageSize}
+          >
+            <img
+              src={image}
+              alt={`Timeline ${index}`}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+      )}
+
       {/* Contenu à gauche */}
       <div
         className={`w-5/12 transition-all duration-500 ${
           isActive ? "opacity-100 translate-y-0" : "opacity-70 translate-y-2"
         }`}
+        style={{ 
+          marginLeft: !isLeft && !screenSize.isMobile
+        ? screenSize.isTablet
+          ? `${getResponsiveStyles.imageSize.width - 220}px`
+          : `${getResponsiveStyles.imageSize.width - 300}px`
+        : '0'
+        }}
       >
         {isLeft && (
           <div
-            className={`rounded-lg shadow-sm border transition-all duration-500 ${
-              isActive
-                ? "bg-[#F59F00] border-[#F59F00]"
-                : "bg-white border-gray-100"
-            }`}
-            style={{ padding: getResponsiveStyles.padding }}
+        className={`rounded-lg shadow-sm border transition-all duration-500 ${
+          isActive
+            ? "bg-[#F59F00] border-[#F59F00]"
+            : "bg-white border-gray-100"
+        }`}
+        style={{ padding: getResponsiveStyles.padding }}
           >
-            <h3
-              className={`font-semibold mb-2 transition-colors duration-500 ${
-                isActive ? "text-white" : "text-[#F59F00]"
-              }`}
-              style={{ 
-                fontFamily: "DragonAngled", 
-                fontSize: getResponsiveStyles.titleFontSize,
-                lineHeight: "1.2"
-              }}
-            >
-              {title}
-            </h3>
-            <p
-              className={`mb-3 transition-colors duration-500 ${
-                isActive ? "text-white/90" : "text-gray-500"
-              }`}
-              style={{ 
-                fontFamily: "GeneralSans", 
-                fontSize: getResponsiveStyles.subtitleFontSize 
-              }}
-            >
-              {subtitle}
-            </p>
-            {times?.map((time, i) => (
-              <p
-                key={i}
-                className={`mb-1 transition-colors duration-500 ${
-                  isActive ? "text-white/85" : "text-gray-600"
-                }`}
-                style={{ 
-                  fontFamily: "GeneralSans", 
-                  fontSize: getResponsiveStyles.textFontSize 
-                }}
-              >
-                {time}
-              </p>
-            ))}
+        <h3
+          className={`font-semibold mb-2 transition-colors duration-500 ${
+            isActive ? "text-white" : "text-[#F59F00]"
+          }`}
+          style={{ 
+            fontFamily: "DragonAngled", 
+            fontSize: getResponsiveStyles.titleFontSize,
+            lineHeight: "1.2"
+          }}
+        >
+          {title}
+        </h3>
+        <p
+          className={`mb-3 transition-colors duration-500 ${
+            isActive ? "text-white/90" : "text-gray-500"
+          }`}
+          style={{ 
+            fontFamily: "GeneralSans", 
+            fontSize: getResponsiveStyles.subtitleFontSize 
+          }}
+        >
+          {subtitle}
+        </p>
+        {times?.map((time, i) => (
+          <p
+            key={i}
+            className={`mb-1 transition-colors duration-500 ${
+          isActive ? "text-white/85" : "text-gray-600"
+            }`}
+            style={{ 
+          fontFamily: "GeneralSans", 
+          fontSize: getResponsiveStyles.textFontSize 
+            }}
+          >
+            {time}
+          </p>
+        ))}
           </div>
         )}
       </div>
@@ -431,6 +468,13 @@ const TimelineItem = ({
         className={`w-5/12 transition-all duration-500 ${
           isActive ? "opacity-100 translate-y-0" : "opacity-70 translate-y-2"
         }`}
+        style={{ 
+          marginLeft: !isLeft && !screenSize.isMobile
+        ? screenSize.isTablet
+          ? `${getResponsiveStyles.imageSize.width - 220}px`
+          : `${getResponsiveStyles.imageSize.width - 300}px`
+        : '0'
+        }}
       >
         {!isLeft && (
           <div
@@ -481,6 +525,24 @@ const TimelineItem = ({
           </div>
         )}
       </div>
+
+      {/* Image à l'extrême droite (seulement si content à gauche) */}
+      {isLeft && !screenSize.isMobile && image && (
+        <div className="absolute right-0 z-10">
+          <div
+            className={`rounded-lg overflow-hidden shadow-lg transition-all duration-500 ${
+              isActive ? "opacity-100 scale-105" : "opacity-70 scale-100"
+            }`}
+            style={getResponsiveStyles.imageSize}
+          >
+            <img
+              src={image}
+              alt={`Timeline ${index}`}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
