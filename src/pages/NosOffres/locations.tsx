@@ -23,8 +23,11 @@ import {
   Coffee,
   Droplets,
 } from "lucide-react";
+import { Element, scroller } from "react-scroll";
 // import img1 from "../../assets/images/1.jpg";
 import img2 from "../../assets/images/2.jpg";
+import locationBg from "../../assets/images/Location/locationBgR.jpg";
+// import locationBg from "../../assets/images/Location/locationBg.webp";
 // import img3 from "../../assets/images/3.jpg";
 import img4 from "../../assets/images/4.jpg";
 // import img5 from "../../assets/images/5.jpg";
@@ -33,7 +36,6 @@ import img6 from "../../assets/images/6.jpg";
 import img8 from "../../assets/images/8.jpg";
 // import img9 from "../../assets/images/9.jpg";
 import img10 from "../../assets/images/10.jpg";
-import voiture from "../../assets/images/voitures.jpg";
 import voitureFront from "../../assets/images/voitureFront.webp";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
 import Footer from "../../components/footer/footer";
@@ -743,6 +745,82 @@ export const createExampleCars = (): CarRentalData[] => [
   },
 ];
 
+const VehicleCategoryCard = ({ imageUrl, title, description, link }: any) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  const cardStyle = {
+    position: "relative",
+    width: "350px",
+    maxWidth: "500px",
+    height: "300px",
+    borderRadius: "12px",
+    overflow: "hidden",
+    boxShadow: isHovered
+      ? "0 8px 20px rgba(0,0,0,0.3)"
+      : "0 4px 12px rgba(0,0,0,0.2)",
+    transform: isHovered ? "scale(1.02)" : "scale(1)",
+    transition: "transform 0.4s ease, box-shadow 0.4s ease",
+    fontFamily: "DragonAngled, sans-serif",
+    cursor: "pointer",
+  };
+
+  const imageStyle = {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    transform: isHovered ? "scale(1.05)" : "scale(1)",
+    transition: "transform 0.4s ease",
+  };
+
+  const overlayStyle = {
+    position: "absolute",
+    bottom: "0",
+    width: "100%",
+    padding: "16px",
+    background: "linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0))",
+    color: "#fff",
+  };
+
+  const titleStyle = {
+    fontSize: "3rem",
+    fontWeight: "bold",
+    marginBottom: "4px",
+  };
+
+  const descriptionStyle = {
+    fontSize: "2rem",
+    opacity: 0.9,
+  };
+
+  const scrollToSection = () => {
+    scroller.scrollTo(link, {
+      duration: 500,
+      delay: 0,
+      smooth: 'easeInOutQuart',
+    });
+  };
+
+  return (
+    <div
+      style={cardStyle as React.CSSProperties}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onClick={scrollToSection}
+    >
+      <img
+        src={imageUrl}
+        alt={title}
+        style={imageStyle as React.CSSProperties}
+      />
+      <div style={overlayStyle as React.CSSProperties}>
+        <h2 style={titleStyle}>{title}</h2>
+        <p style={descriptionStyle}>{description}</p>
+      </div>
+    </div>
+  );
+
+};
+
 const Locations = () => {
   const [isMobile, setIsMobile] = useState(false);
   const { pathname } = useLocation();
@@ -772,28 +850,28 @@ const Locations = () => {
     {
       number: 1,
       title: "Choisissez",
-      description: "Votre destination\net votre véhicule",
+      description: "votre véhicule avec chauffeur",
       icon: MapPin,
       bgColor: "bg-[#FF3100]",
     },
     {
       number: 2,
       title: "Réservez",
-      description: "en ligne (paiement CB\nou à bord)",
+      description: "en ligne",
       icon: Smartphone,
       bgColor: "bg-[#FF3100]",
     },
     {
       number: 3,
       title: "Confirmation",
-      description: "Par mail de votre\nréservation",
+      description: "par mail",
       icon: Mail,
       bgColor: "bg-[#FF3100]",
     },
     {
       number: 4,
       title: "Profitez",
-      description: "de votre trajet",
+      description: "de votre location",
       icon: Car,
       bgColor: "bg-[#FF3100]",
     },
@@ -811,11 +889,12 @@ const Locations = () => {
         vertical
         className="relative w-full overflow-hidden"
         style={{
-          backgroundImage: `url(${voiture})`,
+          backgroundImage: `url(${locationBg})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           padding: isMobile ? "4vh 6vw" : "8vh 8vw",
           paddingBottom: isMobile ? "10vw" : "8vw",
+          minHeight: isMobile ? "60vh" : "500px",
         }}
       >
         {/* Gradient overlay - de la couleur beige/crème vers transparent */}
@@ -830,7 +909,7 @@ const Locations = () => {
             zIndex: 1,
           }}
         />
-        <Flex
+        {/* <Flex
           style={{
             maxWidth: "1050px",
             width: "100%",
@@ -876,7 +955,7 @@ const Locations = () => {
               Réserver
             </Button>
           </Flex>
-        </Flex>
+        </Flex> */}
       </Flex>
 
       {/* Section Step */}
@@ -989,8 +1068,9 @@ const Locations = () => {
                 textTransform: "uppercase",
               }}
             >
-              SOYEZ VOTRE <br />
-              <span style={{ color: "#3b1b19" }}>CHAUFFEUR PRIVÉ</span>
+              Une flotte pensée
+              <br />
+              <span style={{ color: "#3b1b19" }}>pour tous vos trajets</span>
             </Typography.Title>
             <Typography.Text
               style={{
@@ -1001,10 +1081,10 @@ const Locations = () => {
                 fontFamily: "GeneralSans",
               }}
             >
-              text à revoir "Acteur essentielle dans la mobilité et le transport
-              de personnes en région parisienne. Spécialisé dans les transferts
-              aéroports, gares, courses courtes ou longues distances, nationales
-              ou internationales."
+              Que vous partiez en solo, en famille ou en groupe. Ici chaque
+              route a son véhicule. Notre flotte variée est conçue pour répondre
+              à tous vos besoins de transport, que ce soit pour une escapade
+              citadine, un voyage d'affaires ou une aventure en pleine nature.
             </Typography.Text>
           </Flex>
         </Flex>
@@ -1022,10 +1102,11 @@ const Locations = () => {
       {/* Section Titre */}
       <Flex
         style={{
-          maxWidth: "1050px",
+          maxWidth: "1200px",
           width: "100%",
           margin: "0 auto",
           zIndex: 1,
+          justifyContent: "center",
         }}
       >
         <Typography.Title
@@ -1042,9 +1123,80 @@ const Locations = () => {
             textTransform: "uppercase",
           }}
         >
-          NOS VÉHICULES
+          Notre flotte de véhicules
         </Typography.Title>
       </Flex>
+
+      {/* Section categories */}
+      <Flex
+        style={{
+          width: "100%",
+          // padding: "3vh 0",
+          paddingBottom: "50px",
+          maxWidth: "1200px",
+          margin: "0 auto",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            // alignItems: "center",
+            gap: "20px",
+            flexWrap: "wrap",
+            // marginTop: "40px",
+          }}
+        >
+          <VehicleCategoryCard
+            imageUrl={img4}
+            title="Véhicules de tourisme"
+            description="Confort et praticité au quotidiens"
+            link="tourisme"
+          />
+          <VehicleCategoryCard
+            imageUrl={img10}
+            title="SUV & 4x4"
+            description="Pour explorer les pistes sans compromis"
+            link="suv"
+          />
+          <VehicleCategoryCard
+            imageUrl={img10}
+            title="Mini Bus & Vans"
+            description="Pour partager l'aventure à plusieurs"
+            link="minibus"
+          />
+        </div>
+      </Flex>
+
+      {/* Section Titre de tourisme*/}
+      <Element name="tourisme">
+        <Flex
+          style={{
+            maxWidth: "1200px",
+            width: "100%",
+            margin: "0 auto",
+            zIndex: 1,
+            justifyContent: "center",
+          }}
+        >
+          <Typography.Title
+            level={1}
+            style={{
+              color: "#FF3100",
+              fontSize: isMobile ? "44px" : "85px",
+              fontWeight: "bold",
+              lineHeight: "1",
+              letterSpacing: "0.03em",
+              marginTop: "20px",
+              marginBottom: "15px",
+              fontFamily: "DragonAngled",
+              textTransform: "uppercase",
+            }}
+          >
+            NOS VÉHICULES De Tourisme
+          </Typography.Title>
+        </Flex>
+      </Element>
 
       {/* Liste des véhicules */}
       <Flex
@@ -1058,13 +1210,14 @@ const Locations = () => {
         vertical
         gap={isMobile ? 30 : 50}
       >
-        <Flex
-          wrap="wrap"
-          gap={20}
-          justify="center"
-          /* justify="space-between" gap={isMobile ? 20 : 30} */ style={{
-            paddingTop: "40px",
-          }}
+        <div
+          className="grid grid-cols-1 
+                         xs:grid-cols-1 
+                         sm:grid-cols-2 
+                         lg:grid-cols-3 
+                         xl:grid-cols-3 
+                         gap-4 sm:gap-6 lg:gap-8
+                         justify-items-center"
         >
           {cars.map((car: any, index: any) => (
             <CarRentalCard
@@ -1081,7 +1234,145 @@ const Locations = () => {
               }}
             />
           ))}
+        </div>
+      </Flex>
+
+      {/* Section Titre de SUV & 4x4*/}
+      <Element name="suv">
+        <Flex
+          style={{
+            maxWidth: "1200px",
+            width: "100%",
+            margin: "0 auto",
+            zIndex: 1,
+            justifyContent: "center",
+          }}
+        >
+          <Typography.Title
+            level={1}
+            style={{
+              color: "#FF3100",
+              fontSize: isMobile ? "44px" : "85px",
+              fontWeight: "bold",
+              lineHeight: "1",
+              letterSpacing: "0.03em",
+              marginTop: "20px",
+              marginBottom: "15px",
+              fontFamily: "DragonAngled",
+              textTransform: "uppercase",
+            }}
+          >
+            NOS suv & 4x4
+          </Typography.Title>
         </Flex>
+      </Element>
+
+      {/* Liste des véhicules */}
+      <Flex
+        style={{
+          width: "100%",
+          // padding: "3vh 0",
+          paddingBottom: "50px",
+          maxWidth: "1200px",
+          margin: "0 auto",
+        }}
+        vertical
+        gap={isMobile ? 30 : 50}
+      >
+        <div
+          className="grid grid-cols-1 
+                         xs:grid-cols-1 
+                         sm:grid-cols-2 
+                         lg:grid-cols-3 
+                         xl:grid-cols-3 
+                         gap-4 sm:gap-6 lg:gap-8
+                         justify-items-center"
+        >
+          {cars.map((car: any, index: any) => (
+            <CarRentalCard
+              key={index}
+              car={car}
+              onRent={() => {
+                setTransaction({
+                  id: car.id,
+                  title: car.name,
+                  amount: car.pricePerDay,
+                });
+                // we redirect to the payment page
+                navigate("/reservations-locations");
+              }}
+            />
+          ))}
+        </div>
+      </Flex>
+
+      {/* Section Titre de Mini Bus & Vans */}
+      <Element name="minibus">
+        <Flex
+          style={{
+            maxWidth: "1200px",
+            width: "100%",
+            margin: "0 auto",
+            zIndex: 1,
+            justifyContent: "center",
+          }}
+        >
+          <Typography.Title
+            level={1}
+            style={{
+              color: "#FF3100",
+              fontSize: isMobile ? "44px" : "85px",
+              fontWeight: "bold",
+              lineHeight: "1",
+              letterSpacing: "0.03em",
+              marginTop: "20px",
+              marginBottom: "15px",
+              fontFamily: "DragonAngled",
+              textTransform: "uppercase",
+            }}
+          >
+            NOS mini Bus & Vans
+          </Typography.Title>
+        </Flex>
+      </Element>
+
+      {/* Liste des véhicules */}
+      <Flex
+        style={{
+          width: "100%",
+          // padding: "3vh 0",
+          paddingBottom: "50px",
+          maxWidth: "1200px",
+          margin: "0 auto",
+        }}
+        vertical
+        gap={isMobile ? 30 : 50}
+      >
+        <div
+          className="grid grid-cols-1 
+                         xs:grid-cols-1 
+                         sm:grid-cols-2 
+                         lg:grid-cols-3 
+                         xl:grid-cols-3 
+                         gap-4 sm:gap-6 lg:gap-8
+                         justify-items-center"
+        >
+          {cars.map((car: any, index: any) => (
+            <CarRentalCard
+              key={index}
+              car={car}
+              onRent={() => {
+                setTransaction({
+                  id: car.id,
+                  title: car.name,
+                  amount: car.pricePerDay,
+                });
+                // we redirect to the payment page
+                navigate("/reservations-locations");
+              }}
+            />
+          ))}
+        </div>
       </Flex>
 
       {/* Section Devis sur mesure */}
