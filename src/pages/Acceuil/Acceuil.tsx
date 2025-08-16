@@ -1,4 +1,10 @@
-import React, { useEffect, useState, useRef, useMemo, useCallback } from "react";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import "./Acceuil.css";
 import backChevron from "../../assets/icons/backChevron.png";
 import vector from "../../assets/icons/homeVector.png";
@@ -6,11 +12,11 @@ import VideoBackground from "../../components/videoBackground/videoBackground";
 import { Flex, Typography } from "antd";
 import Footer from "../../components/footer/footer";
 import "../../assets/Fonts/font.css";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import logo from "../../assets/images/Logo/logo-belge.png";
-import { gsap } from "gsap";
-import { useGSAP } from "@gsap/react";
-import { useAnimation } from "../../context/animationContext";
+// import { gsap } from "gsap";
+// import { useGSAP } from "@gsap/react";
+// import { useAnimation } from "../../context/animationContext";
 import { CardBody, CardContainer, CardItem } from "../../components/ui/3d-card";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
 import signature from "../../assets/images/Accueil/Signature du circuit.webp";
@@ -43,7 +49,7 @@ const TESTIMONIALS = [
   {
     id: 2,
     name: "Dianne Russell",
-    service: "EV service", 
+    service: "EV service",
     text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     avatar: "👩‍🦱",
   },
@@ -82,26 +88,32 @@ const CIRCUIT_CARDS = [
     imageUrl: signature,
     title: "Circuit Signature",
     alt: "Circuit Signature",
+    link: "/circuits-signature",
   },
   {
     imageUrl: thematic,
     title: "Circuits Thématiques",
     alt: "Circuit Thématiques",
+    link: "/circuits-thematiques",
   },
   {
     imageUrl: alacarte,
-    title: "Circuit à la carte", 
+    title: "Circuit à la carte",
     alt: "Circuit à la carte",
+    link: "/circuits-a-la-carte",
   },
 ] as const;
 
 // Custom hook for screen size detection with debouncing
 const useScreenSize = () => {
   const [screenSize, setScreenSize] = useState(() => {
-    if (typeof window === 'undefined') return 'desktop';
+    if (typeof window === "undefined") return "desktop";
     const width = window.innerWidth;
-    return width < BREAKPOINTS.MOBILE ? 'mobile' : 
-           width < BREAKPOINTS.TABLET ? 'tablet' : 'desktop';
+    return width < BREAKPOINTS.MOBILE
+      ? "mobile"
+      : width < BREAKPOINTS.TABLET
+      ? "tablet"
+      : "desktop";
   });
 
   const debouncedResize = useCallback(() => {
@@ -110,9 +122,13 @@ const useScreenSize = () => {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
         const width = window.innerWidth;
-        const newSize = width < BREAKPOINTS.MOBILE ? 'mobile' : 
-                       width < BREAKPOINTS.TABLET ? 'tablet' : 'desktop';
-        setScreenSize(prev => prev !== newSize ? newSize : prev);
+        const newSize =
+          width < BREAKPOINTS.MOBILE
+            ? "mobile"
+            : width < BREAKPOINTS.TABLET
+            ? "tablet"
+            : "desktop";
+        setScreenSize((prev) => (prev !== newSize ? newSize : prev));
       }, 100);
     };
   }, []);
@@ -123,254 +139,281 @@ const useScreenSize = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, [debouncedResize]);
 
-  return useMemo(() => ({
-    screenSize,
-    isMobile: screenSize === 'mobile',
-    isTablet: screenSize === 'tablet',
-    isDesktop: screenSize === 'desktop',
-  }), [screenSize]);
+  return useMemo(
+    () => ({
+      screenSize,
+      isMobile: screenSize === "mobile",
+      isTablet: screenSize === "tablet",
+      isDesktop: screenSize === "desktop",
+    }),
+    [screenSize]
+  );
 };
 
 // Memoized circuit card component
-const CircuitCard = React.memo(({ 
-  imageUrl, 
-  title, 
-  alt, 
-  screenSize 
-}: {
-  imageUrl: string;
-  title: string;
-  alt: string;
-  screenSize: string;
-}) => {
-  const dimensions = useMemo(() => {
-    switch (screenSize) {
-      case 'mobile': return { height: "280px", width: "200px" };
-      case 'tablet': return { height: "300px", width: "220px" };
-      default: return { height: "320px", width: "240px" };
-    }
-  }, [screenSize]);
-
-  const fontSize = useMemo(() => {
-    switch (screenSize) {
-      case 'mobile': return "1rem";
-      case 'tablet': return "1.4rem";
-      default: return "2rem";
-    }
-  }, [screenSize]);
-
-  return (
-    <CardContainer>
-      <CardBody className="bg-white w-full rounded-2xl shadow-lg overflow-hidden cursor-pointer">
-        <CardItem
-          className="relative overflow-hidden w-full"
-          style={{
-            // aspectRatio: "5/7",
-            height: dimensions.height,
-            width: dimensions.width,
-            maxWidth: "100%"
-          }}
-        >
-          <img
-            src={imageUrl}
-            alt={alt}
-            className="w-full h-full object-cover rounded-t-2xl group-hover/card:shadow-xl"
-            loading="lazy"
-            decoding="async"
-            style={{ objectFit: "cover", height: "100%", width: "100%" }}
-          />
-        </CardItem>
-        <div className="flex justify-center">
-          <CardItem className="p-3">
-            <Typography.Title
-              level={2}
-              style={{
-                color: "#3B1B19",
-                fontSize,
-                fontWeight: "200",
-                textAlign: "center",
-                margin: "0",
-                fontFamily: "DragonAngled",
-                lineHeight: 1.2,
-                maxWidth: dimensions.width,
-                wordWrap: "break-word"
-              }}
-            >
-              {title}
-            </Typography.Title>
-          </CardItem>
-        </div>
-      </CardBody>
-    </CardContainer>
-  );
-});
-CircuitCard.displayName = 'CircuitCard';
-
-// Optimized testimonial carousel with virtual scrolling concept
-const TestimonialCarousel = React.memo(({ 
-  screenSize 
-}: { 
-  screenSize: string 
-}) => {
-  const [translateX, setTranslateX] = useState(0);
-  const animationRef = useRef<number | null>(null);
-
-  const config = useMemo(() => {
-    const isMobile = screenSize === 'mobile';
-    const isTablet = screenSize === 'tablet';
-    
-    return {
-      cardWidth: isMobile ? 90 : isTablet ? 50 : 33.333,
-      scrollSpeed: 0.05 /* isMobile ? 0.05 : isTablet ? 0.08 : 0.1 */,
-      cardStyle: {
-        minWidth: isMobile ? "320px" : isTablet ? "350px" : "400px",
-        width: isMobile ? "85vw" : isTablet ? "45vw" : "30vw",
-        maxWidth: isMobile ? "400px" : isTablet ? "450px" : "500px",
-        height: isMobile ? "280px" : "300px"
-      },
-      fontSize: isMobile ? "14px" : isTablet ? "15px" : "17px"
-    };
-  }, [screenSize]);
-
-  const duplicatedTestimonials = useMemo(() => [
-    ...TESTIMONIALS,
-    ...TESTIMONIALS,
-    ...TESTIMONIALS,
-  ], []);
-
-  const progressPercentage = useMemo(() => 
-    ((Math.abs(translateX) % (config.cardWidth * TESTIMONIALS.length)) /
-      (config.cardWidth * TESTIMONIALS.length)) * 100
-  , [translateX, config.cardWidth]);
-
-  useEffect(() => {
-    const animate = () => {
-      setTranslateX(prev => {
-        const newTranslateX = prev - config.scrollSpeed;
-        if (Math.abs(newTranslateX) >= config.cardWidth * TESTIMONIALS.length) {
-          return 0;
-        }
-        return newTranslateX;
-      });
-      animationRef.current = requestAnimationFrame(animate);
-    };
-
-    animationRef.current = requestAnimationFrame(animate);
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
+const CircuitCard = React.memo(
+  ({
+    imageUrl,
+    title,
+    alt,
+    screenSize,
+  }: {
+    imageUrl: string;
+    title: string;
+    alt: string;
+    screenSize: string;
+  }) => {
+    const dimensions = useMemo(() => {
+      switch (screenSize) {
+        case "mobile":
+          return { height: "280px", width: "200px" };
+        case "tablet":
+          return { height: "300px", width: "220px" };
+        default:
+          return { height: "320px", width: "240px" };
       }
-    };
-  }, [config.scrollSpeed, config.cardWidth]);
+    }, [screenSize]);
 
-  return (
-    <div className="w-full" style={{ 
-      // maxWidth: screenSize === 'mobile' ? "100%" : "1200px", 
-      margin: "0 auto" 
-    }}>
-      <div className="overflow-hidden w-full">
-        <div
-          className="flex will-change-transform"
-          style={{
-            transform: `translate3d(${translateX}%, 0, 0)`,
-          }}
-        >
-          {duplicatedTestimonials.map((testimonial, index) => (
-            <div
-              key={`${testimonial.id}-${Math.floor(index / TESTIMONIALS.length)}`}
-              className="flex-shrink-0 px-3"
-              style={{
-                width: `${config.cardWidth}%`,
-                minWidth: config.cardStyle.minWidth
-              }}
-            >
-              <div 
-                className="bg-amber-50 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-shadow duration-300 flex flex-col justify-between"
+    const fontSize = useMemo(() => {
+      switch (screenSize) {
+        case "mobile":
+          return "1rem";
+        case "tablet":
+          return "1.4rem";
+        default:
+          return "2rem";
+      }
+    }, [screenSize]);
+
+    return (
+      <CardContainer>
+        <CardBody className="bg-white w-full rounded-2xl shadow-lg overflow-hidden cursor-pointer">
+          <CardItem
+            className="relative overflow-hidden w-full"
+            style={{
+              // aspectRatio: "5/7",
+              height: dimensions.height,
+              width: dimensions.width,
+              maxWidth: "100%",
+            }}
+          >
+            <img
+              src={imageUrl}
+              alt={alt}
+              className="w-full h-full object-cover rounded-t-2xl group-hover/card:shadow-xl"
+              loading="lazy"
+              decoding="async"
+              style={{ objectFit: "cover", height: "100%", width: "100%" }}
+            />
+          </CardItem>
+          <div className="flex justify-center">
+            <CardItem className="p-3">
+              <Typography.Title
+                level={2}
                 style={{
-                  height: config.cardStyle.height,
-                  margin: "0 auto",
-                  maxWidth: config.cardStyle.maxWidth
+                  color: "#3B1B19",
+                  fontSize,
+                  fontWeight: "200",
+                  textAlign: "center",
+                  margin: "0",
+                  fontFamily: "DragonAngled",
+                  lineHeight: 1.2,
+                  maxWidth: dimensions.width,
+                  wordWrap: "break-word",
                 }}
               >
-                <div className={screenSize === 'mobile' ? "mb-4" : "mb-8"}>
-                  <p
-                    className="text-gray-700 leading-relaxed font-medium"
-                    style={{ 
-                      fontFamily: "GeneralSans", 
-                      fontSize: config.fontSize,
-                      lineHeight: 1.5
-                    }}
-                  >
-                    {testimonial.text}
-                  </p>
-                </div>
+                {title}
+              </Typography.Title>
+            </CardItem>
+          </div>
+        </CardBody>
+      </CardContainer>
+    );
+  }
+);
+CircuitCard.displayName = "CircuitCard";
 
-                <div className="flex items-center gap-3">
-                  <div 
-                    className="rounded-full bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center shadow-md"
-                    style={{
-                      width: screenSize === 'mobile' ? "40px" : "48px",
-                      height: screenSize === 'mobile' ? "40px" : "48px",
-                      fontSize: screenSize === 'mobile' ? "16px" : "20px"
-                    }}
-                  >
-                    {testimonial.avatar}
-                  </div>
-                  <div>
-                    <h3 
-                      className="font-bold text-gray-900"
-                      style={{ fontSize: screenSize === 'mobile' ? "12px" : "14px" }}
+// Optimized testimonial carousel with virtual scrolling concept
+const TestimonialCarousel = React.memo(
+  ({ screenSize }: { screenSize: string }) => {
+    const [translateX, setTranslateX] = useState(0);
+    const animationRef = useRef<number | null>(null);
+
+    const config = useMemo(() => {
+      const isMobile = screenSize === "mobile";
+      const isTablet = screenSize === "tablet";
+
+      return {
+        cardWidth: isMobile ? 90 : isTablet ? 50 : 33.333,
+        scrollSpeed: 0.05 /* isMobile ? 0.05 : isTablet ? 0.08 : 0.1 */,
+        cardStyle: {
+          minWidth: isMobile ? "320px" : isTablet ? "350px" : "400px",
+          width: isMobile ? "85vw" : isTablet ? "45vw" : "30vw",
+          maxWidth: isMobile ? "400px" : isTablet ? "450px" : "500px",
+          height: isMobile ? "280px" : "300px",
+        },
+        fontSize: isMobile ? "14px" : isTablet ? "15px" : "17px",
+      };
+    }, [screenSize]);
+
+    const duplicatedTestimonials = useMemo(
+      () => [...TESTIMONIALS, ...TESTIMONIALS, ...TESTIMONIALS],
+      []
+    );
+
+    const progressPercentage = useMemo(
+      () =>
+        ((Math.abs(translateX) % (config.cardWidth * TESTIMONIALS.length)) /
+          (config.cardWidth * TESTIMONIALS.length)) *
+        100,
+      [translateX, config.cardWidth]
+    );
+
+    useEffect(() => {
+      const animate = () => {
+        setTranslateX((prev) => {
+          const newTranslateX = prev - config.scrollSpeed;
+          if (
+            Math.abs(newTranslateX) >=
+            config.cardWidth * TESTIMONIALS.length
+          ) {
+            return 0;
+          }
+          return newTranslateX;
+        });
+        animationRef.current = requestAnimationFrame(animate);
+      };
+
+      animationRef.current = requestAnimationFrame(animate);
+      return () => {
+        if (animationRef.current) {
+          cancelAnimationFrame(animationRef.current);
+        }
+      };
+    }, [config.scrollSpeed, config.cardWidth]);
+
+    return (
+      <div
+        className="w-full"
+        style={{
+          // maxWidth: screenSize === 'mobile' ? "100%" : "1200px",
+          margin: "0 auto",
+        }}
+      >
+        <div className="overflow-hidden w-full">
+          <div
+            className="flex will-change-transform"
+            style={{
+              transform: `translate3d(${translateX}%, 0, 0)`,
+            }}
+          >
+            {duplicatedTestimonials.map((testimonial, index) => (
+              <div
+                key={`${testimonial.id}-${Math.floor(
+                  index / TESTIMONIALS.length
+                )}`}
+                className="flex-shrink-0 px-3"
+                style={{
+                  width: `${config.cardWidth}%`,
+                  minWidth: config.cardStyle.minWidth,
+                }}
+              >
+                <div
+                  className="bg-amber-50 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-shadow duration-300 flex flex-col justify-between"
+                  style={{
+                    height: config.cardStyle.height,
+                    margin: "0 auto",
+                    maxWidth: config.cardStyle.maxWidth,
+                  }}
+                >
+                  <div className={screenSize === "mobile" ? "mb-4" : "mb-8"}>
+                    <p
+                      className="text-gray-700 leading-relaxed font-medium"
+                      style={{
+                        fontFamily: "GeneralSans",
+                        fontSize: config.fontSize,
+                        lineHeight: 1.5,
+                      }}
                     >
-                      {testimonial.name}
-                    </h3>
-                    <p 
-                      className="text-gray-600 font-medium"
-                      style={{ fontSize: screenSize === 'mobile' ? "10px" : "12px" }}
-                    >
-                      {testimonial.service}
+                      {testimonial.text}
                     </p>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="rounded-full bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center shadow-md"
+                      style={{
+                        width: screenSize === "mobile" ? "40px" : "48px",
+                        height: screenSize === "mobile" ? "40px" : "48px",
+                        fontSize: screenSize === "mobile" ? "16px" : "20px",
+                      }}
+                    >
+                      {testimonial.avatar}
+                    </div>
+                    <div>
+                      <h3
+                        className="font-bold text-gray-900"
+                        style={{
+                          fontSize: screenSize === "mobile" ? "12px" : "14px",
+                        }}
+                      >
+                        {testimonial.name}
+                      </h3>
+                      <p
+                        className="text-gray-600 font-medium"
+                        style={{
+                          fontSize: screenSize === "mobile" ? "10px" : "12px",
+                        }}
+                      >
+                        {testimonial.service}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
 
-      <div className={`flex justify-center ${screenSize === 'mobile' ? 'mt-8' : 'mt-15'}`}>
-        <div 
-          className="h-1 bg-[#FFFEFB] bg-opacity-50 rounded-full overflow-hidden"
-          style={{ width: screenSize === 'mobile' ? "80%" : "100%" }}
+        <div
+          className={`flex justify-center ${
+            screenSize === "mobile" ? "mt-8" : "mt-15"
+          }`}
         >
           <div
-            className="h-full bg-[#FF3100] rounded-full will-change-transform"
-            style={{
-              transform: `scaleX(${progressPercentage / 100})`,
-              transformOrigin: 'left',
-            }}
-          />
+            className="h-1 bg-[#FFFEFB] bg-opacity-50 rounded-full overflow-hidden"
+            style={{ width: screenSize === "mobile" ? "80%" : "100%" }}
+          >
+            <div
+              className="h-full bg-[#FF3100] rounded-full will-change-transform"
+              style={{
+                transform: `scaleX(${progressPercentage / 100})`,
+                transformOrigin: "left",
+              }}
+            />
+          </div>
         </div>
       </div>
-    </div>
-  );
-});
-TestimonialCarousel.displayName = 'TestimonialCarousel';
+    );
+  }
+);
+TestimonialCarousel.displayName = "TestimonialCarousel";
 
 const Acceuil = () => {
   const { screenSize, isMobile, isTablet } = useScreenSize();
   const { pathname } = useLocation();
   const container = useRef<HTMLDivElement>(null);
-  const { hasRun, setHasRun } = useAnimation();
-  const location = useLocation();
+  // const { hasRun, setHasRun } = useAnimation();
+  // const location = useLocation();
 
   // Memoized style calculations
   const styles = useMemo(() => {
     const logoPosition = isMobile ? "15vh" : isTablet ? "18vh" : "20vh";
     const logoDimensions = {
       width: isMobile ? "60px" : isTablet ? "70px" : "80px",
-      height: "auto" as const
+      height: "auto" as const,
     };
-    
+
     const percentageStyles = {
       position: "absolute" as const,
       color: "#411E1C",
@@ -389,25 +432,32 @@ const Acceuil = () => {
       percentageRight: {
         ...percentageStyles,
         right: isMobile ? "10vw" : isTablet ? "25vw" : "34vw",
-      }
+      },
     };
   }, [isMobile, isTablet]);
 
   // Memoized animation styles
-  const animationStyles = useMemo(() => `
+  const animationStyles = useMemo(
+    () => `
     @keyframes floatUp1 {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(${isMobile ? '-10px' : isTablet ? '-15px' : '-20px'}); }
+      50% { transform: translateY(${
+        isMobile ? "-10px" : isTablet ? "-15px" : "-20px"
+      }); }
     }
     
     @keyframes floatUp2 {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(${isMobile ? '-25px' : isTablet ? '-35px' : '-50px'}); }
+      50% { transform: translateY(${
+        isMobile ? "-25px" : isTablet ? "-35px" : "-50px"
+      }); }
     }
     
     @keyframes floatUp3 {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(${isMobile ? '-15px' : isTablet ? '-20px' : '-30px'}); }
+      50% { transform: translateY(${
+        isMobile ? "-15px" : isTablet ? "-20px" : "-30px"
+      }); }
     }
     
     .circuit-card-1 {
@@ -430,7 +480,9 @@ const Acceuil = () => {
         animation: none;
       }
     }
-  `, [isMobile, isTablet]);
+  `,
+    [isMobile, isTablet]
+  );
 
   // Effects
   useEffect(() => {
@@ -442,50 +494,50 @@ const Acceuil = () => {
   }, [pathname]);
 
   // GSAP Animation
-  useGSAP(
-    () => {
-      const isFirstLoad = location.pathname === "/";
-      if (!hasRun && isFirstLoad && container.current) {
-        const timeline = gsap.timeline();
-        
-        gsap.set("#mask-wrapper", {
-          position: "absolute",
-          zIndex: 0,
-          overflow: "hidden",
-          clipPath: "polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%)",
-        });
-        
-        gsap.set(["#navBar", "#videoContent"], { opacity: 0 });
+  // useGSAP(
+  //   () => {
+  //     const isFirstLoad = location.pathname === "/";
+  //     if (!hasRun && isFirstLoad && container.current) {
+  //       const timeline = gsap.timeline();
 
-        timeline
-          .to("#mask-wrapper", {
-            clipPath: "polygon(40% 45%, 60% 45%, 60% 55%, 40% 55%)",
-            duration: 2,
-            ease: "sine.inOut",
-          })
-          .to("#mask-wrapper", {
-            clipPath: "polygon(0% -60%, 100% -60%, 100% 160%, 0% 160%)",
-            duration: 1,
-            delay: 0.4,
-            ease: "sine.inOut",
-          })
-          .set("#mask-wrapper", { height: "fit-content" })
-          .to("#navBar", {
-            opacity: 1,
-            duration: 1.5,
-            ease: "sine.inOut",
-          }, "<+=0.2")
-          .to("#videoContent", {
-            opacity: 1,
-            duration: 1.5,
-            ease: "sine.inOut",
-          }, "<+=0.7");
-        
-        setHasRun(true);
-      }
-    },
-    { dependencies: [hasRun, location], scope: container }
-  );
+  //       gsap.set("#mask-wrapper", {
+  //         position: "absolute",
+  //         zIndex: 0,
+  //         overflow: "hidden",
+  //         clipPath: "polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%)",
+  //       });
+
+  //       gsap.set(["#navBar", "#videoContent"], { opacity: 0 });
+
+  //       timeline
+  //         .to("#mask-wrapper", {
+  //           clipPath: "polygon(40% 45%, 60% 45%, 60% 55%, 40% 55%)",
+  //           duration: 2,
+  //           ease: "sine.inOut",
+  //         })
+  //         .to("#mask-wrapper", {
+  //           clipPath: "polygon(0% -60%, 100% -60%, 100% 160%, 0% 160%)",
+  //           duration: 1,
+  //           delay: 0.4,
+  //           ease: "sine.inOut",
+  //         })
+  //         .set("#mask-wrapper", { height: "fit-content" })
+  //         .to("#navBar", {
+  //           opacity: 1,
+  //           duration: 1.5,
+  //           ease: "sine.inOut",
+  //         }, "<+=0.2")
+  //         .to("#videoContent", {
+  //           opacity: 1,
+  //           duration: 1.5,
+  //           ease: "sine.inOut",
+  //         }, "<+=0.7");
+
+  //       setHasRun(true);
+  //     }
+  //   },
+  //   { dependencies: [hasRun, location], scope: container }
+  // );
 
   return (
     <div ref={container} className="h-screen relative bg-white">
@@ -498,10 +550,10 @@ const Acceuil = () => {
             top: styles.logoPosition,
           }}
         >
-          <img 
-            src={logo} 
-            style={styles.logoDimensions} 
-            alt="Logo" 
+          <img
+            src={logo}
+            style={styles.logoDimensions}
+            alt="Logo"
             loading="eager"
             decoding="async"
           />
@@ -552,7 +604,7 @@ const Acceuil = () => {
                   style={{
                     width: isMobile ? "8rem" : isTablet ? "10rem" : "12vw",
                     height: "auto",
-                    maxWidth: "200px"
+                    maxWidth: "200px",
                   }}
                 />
               </Flex>
@@ -571,7 +623,11 @@ const Acceuil = () => {
                   level={1}
                   style={{
                     color: "#3B1B19",
-                    fontSize: isMobile ? "2.2rem" : isTablet ? "3.5rem" : "5rem",
+                    fontSize: isMobile
+                      ? "2.2rem"
+                      : isTablet
+                      ? "3.5rem"
+                      : "5rem",
                     fontWeight: "800",
                     textAlign: "center",
                     lineHeight: "1.1",
@@ -618,22 +674,27 @@ const Acceuil = () => {
                   wrap={isTablet}
                 >
                   {CIRCUIT_CARDS.map((card, index) => (
-                    <Flex 
+                    <Flex
                       key={card.alt}
-                      style={{ 
-                        marginTop: index === 1 && !isMobile 
-                          ? (isTablet ? "60px" : "110px") 
-                          : "0px" 
+                      style={{
+                        marginTop:
+                          index === 1 && !isMobile
+                            ? isTablet
+                              ? "60px"
+                              : "110px"
+                            : "0px",
                       }}
                     >
-                      <div className={`circuit-card-${index + 1}`}>
-                        <CircuitCard
-                          imageUrl={card.imageUrl}
-                          title={card.title}
-                          alt={card.alt}
-                          screenSize={screenSize}
-                        />
-                      </div>
+                      <Link to={card.link}>
+                        <div className={`circuit-card-${index + 1}`}>
+                          <CircuitCard
+                            imageUrl={card.imageUrl}
+                            title={card.title}
+                            alt={card.alt}
+                            screenSize={screenSize}
+                          />
+                        </div>
+                      </Link>
                     </Flex>
                   ))}
                 </Flex>
@@ -641,10 +702,14 @@ const Acceuil = () => {
             </div>
           </section>
 
-          <section 
-            className="three" 
-            style={{ 
-              padding: isMobile ? "2rem 1rem" : isTablet ? "3rem 2rem" : "4rem 5vw" 
+          <section
+            className="three"
+            style={{
+              padding: isMobile
+                ? "2rem 1rem"
+                : isTablet
+                ? "3rem 2rem"
+                : "4rem 5vw",
             }}
           >
             <Flex
@@ -669,16 +734,18 @@ const Acceuil = () => {
               >
                 Nos clients en parlent !
               </Typography.Title>
-              
+
               <TestimonialCarousel screenSize={screenSize} />
             </Flex>
           </section>
 
-          <section style={{ 
-            height: isMobile ? "60vw" : isTablet ? "50vw" : "45vw",
-            minHeight: "300px",
-            // maxHeight: "600px"
-          }}>
+          <section
+            style={{
+              height: isMobile ? "60vw" : isTablet ? "50vw" : "45vw",
+              minHeight: "300px",
+              // maxHeight: "600px"
+            }}
+          >
             <ImageCarousel images={IMAGES} />
           </section>
 
