@@ -87,18 +87,21 @@ const CIRCUIT_CARDS = [
   {
     imageUrl: signature,
     title: "Circuit Signature",
+    description: "Découvrez notre circuit signature, une expérience unique.",
     alt: "Circuit Signature",
     link: "/circuits-signature",
   },
   {
     imageUrl: thematic,
     title: "Circuits Thématiques",
+    description: "Découvrez nos circuits thématiques, une immersion dans la culture locale.",
     alt: "Circuit Thématiques",
     link: "/circuits-thematiques",
   },
   {
     imageUrl: alacarte,
     title: "Circuit à la carte",
+    description: "Découvrez notre circuit à la carte, une expérience personnalisée.",
     alt: "Circuit à la carte",
     link: "/circuits-a-la-carte",
   },
@@ -232,6 +235,49 @@ const CircuitCard = React.memo(
   }
 );
 CircuitCard.displayName = "CircuitCard";
+
+const ThematicCircuitCard = ({
+  imageUrl,
+  title,
+  description,
+  alt,
+}: {
+  imageUrl: string;
+  title: string;
+  description: string;
+  alt: string;
+  screenSize: string;
+}) => {
+  return (
+    <>
+      <div className="relative z-10 bg-white rounded-3xl p-0 shadow-2xl max-w-[400px] w-full overflow-hidden transform hover:scale-105 transition-transform duration-500">
+        {/* Card image container */}
+        <div className="w-full h-74 p-4 rounded-3xl">
+          <img
+            src={imageUrl}
+            alt={alt}
+            className="w-full h-full object-cover rounded-3xl"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+
+        {/* Text content */}
+        <div className="p-8 bg-white pt-0">
+            <h1
+            className="text-3xl font-bold text-gray-900 mb-2 tracking-wider"
+            style={{ fontFamily: "DragonAngled", letterSpacing: "0.05em" }}
+            >
+            {title}
+            </h1>
+          <div className="text-sm text-gray-700 font-medium tracking-wide" style={{ fontFamily: "GeneralSans" }}>
+            {description}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
 
 // Optimized testimonial carousel with virtual scrolling concept
 const TestimonialCarousel = React.memo(
@@ -687,11 +733,18 @@ const Acceuil = () => {
                     >
                       <Link to={card.link}>
                         <div className={`circuit-card-${index + 1}`}>
-                          <CircuitCard
+                          {/* <CircuitCard
                             imageUrl={card.imageUrl}
                             title={card.title}
                             alt={card.alt}
                             screenSize={screenSize}
+                          /> */}
+                          <ThematicCircuitCard
+                          imageUrl={card.imageUrl}
+                          title={card.title}
+                          description={card.description}
+                          alt={card.alt}
+                          screenSize={screenSize}
                           />
                         </div>
                       </Link>

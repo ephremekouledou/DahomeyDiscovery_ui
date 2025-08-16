@@ -909,53 +909,6 @@ const Locations = () => {
             zIndex: 1,
           }}
         />
-        {/* <Flex
-          style={{
-            maxWidth: "1050px",
-            width: "100%",
-            margin: "0 auto",
-            zIndex: 1,
-          }}
-        >
-          <Flex vertical gap={0} align="center" style={{ width: "100%" }}>
-            <Typography.Title
-              level={1}
-              style={{
-                color: "white",
-                fontSize: isMobile ? "44px" : "85px",
-                fontWeight: "900",
-                lineHeight: "1",
-                letterSpacing: "0.03em",
-                marginTop: "20px",
-                marginBottom: "15px",
-                fontFamily: "DragonAngled",
-                textTransform: "uppercase",
-                textAlign: "center",
-              }}
-            >
-              SOYEZ VOTRE CHAUFFEUR PRIVÉ
-            </Typography.Title>
-            <Button
-              type="primary"
-              size="large"
-              style={{
-                backgroundColor: "#ff3100",
-                color: "white",
-                borderRadius: "7px",
-                border: "none",
-                fontFamily: "GeneralSans",
-                transition: "all 0.3s ease",
-                fontSize: "20px",
-                height: "40px",
-                padding: "10px 25px",
-                fontWeight: "bold",
-                width: "fit-content",
-              }}
-            >
-              Réserver
-            </Button>
-          </Flex>
-        </Flex> */}
       </Flex>
 
       {/* Section Step */}
@@ -1016,16 +969,17 @@ const Locations = () => {
               left: "100px",
             }}
           ></div>
-          <div
-            style={{
+            <div
+              style={{
               width: "23vw",
               height: "21vw",
               minWidth: "305px",
               minHeight: "278px",
               backgroundColor: "#FF3100",
-            }}
-          >
-            <img
+              overflow: "visible",
+              }}
+            >
+              <img
               src={voitureFront}
               alt="Location de véhicules"
               style={{
@@ -1038,9 +992,23 @@ const Locations = () => {
                 position: "relative",
                 top: "60px",
                 right: "100px",
+                transition:
+                "transform 1.8s cubic-bezier(0.22, 0.61, 0.36, 1), width 1.8s cubic-bezier(0.22, 0.61, 0.36, 1), height 1.8s cubic-bezier(0.22, 0.61, 0.36, 1)",
               }}
-            />
-          </div>
+              className="hover:scale-[1.15] hover:w-[24vw] hover:h-[24vw]"
+              />
+            </div>
+            <style>
+              {`
+              @media (hover: hover) {
+              div[style*="background-color: #FF3100"] img:hover {
+                width: 24vw !important;
+                height: 24vw !important;
+                transform: scale(1.15);
+              }
+              }
+              `}
+            </style>
         </Flex>
         <Flex
           style={{

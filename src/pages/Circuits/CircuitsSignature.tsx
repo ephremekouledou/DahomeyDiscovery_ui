@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
 import debut from "../../assets/images/Circuit signature/Début.webp";
+import video from "../../assets/videos/usagevid1.mp4";
 import img1 from "../../assets/images/Circuit signature/1_5.webp";
 import img2 from "../../assets/images/Circuit signature/2_5.webp";
 import img3 from "../../assets/images/Circuit signature/3_5.jpeg";
@@ -18,93 +19,95 @@ const images = [img1, img2, img3, img4, img5];
 const timelineData = [
   {
     title: "Bienvenue au Bénin !",
-    subtitle: "Arrivée à l'aéroport de Cotonou",
+    subtitle: "Arrivée à l’aéroport de Cotonou",
     times: [
-      "Accueil personnalisé + transfert vers hôtel de charme",
-      "Dîner d'accueil dans un restaurant local",
+      "Accueil personnalisé",
+      "Dîner",
+      "Transfert vers l’hébergement choisi",
     ],
     position: "left",
     image: img1,
   },
   {
-    title: "Cotonou entre modernité et culture urbaine",
-    subtitle: "08h00 - Petit déjeuner à l'hôtel",
+    title: "Cité lacustre de Ganvié - Cotonou, nature & modernité",
+    subtitle: "07h30 - Petit déjeuner",
     times: [
-      "09h00 - Départ pour le marché Dantokpa",
-      "11h00 - Découverte du Musée de Ouidah",
-      "13h00 - Déjeuner avec spécialités béninoises",
-      "14h30 - Visite de la Place de l'Amazone",
-      "16h00 - Temps libre ou visite de Fidjrossè",
-      "20h00 - Dîner dans un restaurant local / Nuit à Cotonou",
+      "08h00 - Départ pour Abomey-Calavi",
+      "09h00 - Embarquement en pirogue pour Ganvié",
+      "09h15-12h30 - Visite du village lacustre (centre artisanal, marché flottant…)",
+      "13h00 - Déjeuner sur place ou retour vers Cotonou + repos",
+      "16h00 - Balade à Cotonou : Jardin de Matthieu, Mur du Patrimoine, Place de l’Amazone…",
+      "20h00 - Dîner",
     ],
     position: "right",
     image: img2,
   },
   {
-    title: "Ganvié, la Venise du Bénin",
-    subtitle: "07h30 - Petit déjeuner",
+    title: "Ouidah & Gogotinkpon, mémoire et bien-être",
+    subtitle: "07h00 - Petit déjeuner",
     times: [
-      "08h30 - Départ pour Abomey-Calavi",
-      "09h00 - Embarquement en pirogue vers Ganvié",
-      "09h30-12h30 - Visite guidée du village lacustre",
-      "13h00 - Déjeuner sur l'eau",
-      "15h00 - Retour à Cotonou",
-      "19h30 - Dîner & soirée libre / Nuit à Cotonou",
+      "08h00 - Départ pour Ouidah",
+      "09h00 - Visite : Temple des pythons, Forêt Kpassè, Place aux enchères, Route des Esclaves, Porte du Non-Retour…",
+      "12h00 - Départ pour Gogotinkpon",
+      "13h00 - Déjeuner face au lac Ahémé",
+      "15h00 - Soirée détente dans l’espace de l’ile au bio bonheur (bain d’argile, massage, baignade…)",
+      "18h00 - Retour à Cotonou",
+      "20h00 - Dîner",
     ],
     position: "left",
     image: img3,
   },
   {
-    title: "Ouidah & Bégotinkpon, mémoire et immersion rurale",
+    title: "Porto-Novo, la ville aux trois noms",
     subtitle: "07h00 - Petit déjeuner",
     times: [
-      "08h00 - Départ pour Ouidah",
-      "09h15 - Visite du Musée d'Histoire",
-      "11h30 - Route des Esclaves",
-      "13h00 - Déjeuner local",
-      "14h30 - Départ vers Bégotinkpon",
-      "16h00 - Immersion rurale",
-      "18h00 - Dîner local + nuit en écologie",
+      "08h00 - Départ pour Adjarra",
+      "09h00 - Découverte : Rivière noire, vin & sodabi de raphia à Avrankou",
+      "13h00 - Déjeuner dans un Restaurant local",
+      "14h00 - Visite des sites emblématiques de la ville : Musée Honmè (ancien palais royal), Place Toffa 1er, Ancienne Mosquée afro-brésilienne, Place Abessan, Place Adjina…",
+      "17h00 - Retour à Cotonou / temps libre",
+      "20h00 - Dîner",
     ],
     position: "right",
     image: img4,
   },
   {
-    title: "Abomey, mémoire royale et artisanat",
-    subtitle: "07h30 - Petit déjeuner",
+    title: "Abomey, royauté et spiritualité",
+    subtitle: "07h00 - Petit déjeuner express et départ pour Abomey",
     times: [
-      "08h30 - Route vers Abomey",
-      "11h00 - Visite du Palais royal + musée",
-      "13h00 - Déjeuner béninois",
-      "15h00 - Atelier artisanal",
-      "17h00 - Visite Place Goho",
-      "19h30 - Dîner & nuit à Abomey",
+      "10h30 - Visite du Palais privé du Roi Agonglo",
+      "12h30 - Visite de la Fossé de fortification (Abgodo)",
+      "13h00 - Brunch ou déjeuner en ville",
+      "13h30 - Atelier de tissage & calebasses",
+      "14h30 - Visite du lieu Unik d’Abomey",
+      "17h00 - Place Goho (statue de Béhanzin) + photo shooting en accoutrements royaux & dégustation de jus de coco",
+      "19h00 - Dîner & nuit sur place",
     ],
     position: "left",
     image: img5,
   },
   {
-    title: "Dassa-Zoumé, spiritualité et nature sacrée",
-    subtitle: "07h00 - Petit déjeuner",
+    title: "Dassa-Zoumè, Igbo Idaasha",
+    subtitle: "07h00 - Petit déjeuner express",
     times: [
-      "08h00 - Départ vers Dassa",
-      "10h00 - Visite des collines sacrées",
-      "12h00 - Déjeuner + visite Okuta",
-      "16h00 - Retour vers Paradomé",
-      "20h00 - Dîner + nuit au bord du lac Ahémé",
+      "10h30 - Arrivée à Dassa + balade en ville",
+      "Découverte : Oké-Are (ancienne prison des sorciers), Colline du poisson",
+      "12h30 - Déjeuner local",
+      "13h00 - Visite de la grotte mariale et du site du Okuta",
+      "16h00 - Retour à Cotonou",
+      "20h00 - Dîner",
     ],
     position: "right",
     image: img1,
   },
   {
-    title: "Possotomé, nature et détente",
-    subtitle: "08h00 - Petit déjeuner",
+    title: "Clôture & souvenirs",
+    subtitle: "Matinée libre",
     times: [
-      "09h00 - Balade au bord du lac",
-      "11h00 - Activités nautiques",
-      "13h00 - Déjeuner poisson frais",
-      "Après-midi libre : détente, baignade",
-      "19h00 - Dîner au coucher du soleil",
+      "Achats, détente, interviews vidéo (optionnel)",
+      "Journée solidaire (visite de structures soutenues par Dahomey Discovery)",
+      "Dîner de clôture (surprise Dahomey Discovery)",
+      "19h00 - Transfert à l’aéroport + accompagnement embarquement",
     ],
     position: "left",
     image: img2,
@@ -153,7 +156,11 @@ type TimelineItemProps = {
 };
 
 // Composant Timeline optimisé
-const DetailedTimeline = ({ screenSize }: { screenSize: ReturnType<typeof useScreenSize> }) => {
+const DetailedTimeline = ({
+  screenSize,
+}: {
+  screenSize: ReturnType<typeof useScreenSize>;
+}) => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const timelineRef = useRef<HTMLDivElement | null>(null);
 
@@ -170,7 +177,10 @@ const DetailedTimeline = ({ screenSize }: { screenSize: ReturnType<typeof useScr
       const endOffset = -elementHeight;
       const totalDistance = startOffset - endOffset;
       const currentDistance = startOffset - elementTop;
-      const progress = Math.max(0, Math.min(1, currentDistance / totalDistance));
+      const progress = Math.max(
+        0,
+        Math.min(1, currentDistance / totalDistance)
+      );
 
       setScrollProgress(progress);
     }
@@ -186,10 +196,10 @@ const DetailedTimeline = ({ screenSize }: { screenSize: ReturnType<typeof useScr
   const timelineLayout = screenSize.isMobile ? "vertical" : "horizontal";
 
   return (
-    <div 
+    <div
       className={`min-h-screen w-full ${
-        screenSize.isMobile ? 'py-6 px-4' : 'py-12 px-4'
-      }`} 
+        screenSize.isMobile ? "py-6 px-4" : "py-12 px-4"
+      }`}
       ref={timelineRef}
     >
       <div className="relative">
@@ -241,7 +251,10 @@ const DetailedTimeline = ({ screenSize }: { screenSize: ReturnType<typeof useScr
         })}
 
         {/* Élément final */}
-        <FinalElement isActive={scrollProgress >= 0.6} screenSize={screenSize} />
+        <FinalElement
+          isActive={scrollProgress >= 0.6}
+          screenSize={screenSize}
+        />
       </div>
     </div>
   );
@@ -326,10 +339,10 @@ const TimelineItem = ({
               className={`font-semibold mb-2 transition-colors duration-500 ${
                 isActive ? "text-white" : "text-[#F59F00]"
               }`}
-              style={{ 
-                fontFamily: "DragonAngled", 
+              style={{
+                fontFamily: "DragonAngled",
                 fontSize: getResponsiveStyles.titleFontSize,
-                lineHeight: "1.2"
+                lineHeight: "1.2",
               }}
             >
               {title}
@@ -338,9 +351,9 @@ const TimelineItem = ({
               className={`mb-3 transition-colors duration-500 ${
                 isActive ? "text-white/90" : "text-gray-500"
               }`}
-              style={{ 
-                fontFamily: "GeneralSans", 
-                fontSize: getResponsiveStyles.subtitleFontSize 
+              style={{
+                fontFamily: "GeneralSans",
+                fontSize: getResponsiveStyles.subtitleFontSize,
               }}
             >
               {subtitle}
@@ -351,9 +364,9 @@ const TimelineItem = ({
                 className={`mb-1 transition-colors duration-500 ${
                   isActive ? "text-white/85" : "text-gray-600"
                 }`}
-                style={{ 
-                  fontFamily: "GeneralSans", 
-                  fontSize: getResponsiveStyles.textFontSize 
+                style={{
+                  fontFamily: "GeneralSans",
+                  fontSize: getResponsiveStyles.textFontSize,
                 }}
               >
                 {time}
@@ -367,7 +380,10 @@ const TimelineItem = ({
 
   // Layout desktop/tablet: alternance gauche-droite avec images
   return (
-    <div className="relative flex items-center" style={{ marginBottom: getResponsiveStyles.marginBottom }}>
+    <div
+      className="relative flex items-center"
+      style={{ marginBottom: getResponsiveStyles.marginBottom }}
+    >
       {/* Image à l'extrême gauche (seulement si content à droite) */}
       {!isLeft && !screenSize.isMobile && image && (
         <div className="absolute left-0 z-10">
@@ -391,60 +407,61 @@ const TimelineItem = ({
         className={`w-5/12 transition-all duration-500 ${
           isActive ? "opacity-100 translate-y-0" : "opacity-70 translate-y-2"
         }`}
-        style={{ 
-          marginLeft: !isLeft && !screenSize.isMobile
-        ? screenSize.isTablet
-          ? `${getResponsiveStyles.imageSize.width - 220}px`
-          : `${getResponsiveStyles.imageSize.width - 300}px`
-        : '0'
+        style={{
+          marginLeft:
+            !isLeft && !screenSize.isMobile
+              ? screenSize.isTablet
+                ? `${getResponsiveStyles.imageSize.width - 220}px`
+                : `${getResponsiveStyles.imageSize.width - 300}px`
+              : "0",
         }}
       >
         {isLeft && (
           <div
-        className={`rounded-lg shadow-sm border transition-all duration-500 ${
-          isActive
-            ? "bg-[#F59F00] border-[#F59F00]"
-            : "bg-white border-gray-100"
-        }`}
-        style={{ padding: getResponsiveStyles.padding }}
-          >
-        <h3
-          className={`font-semibold mb-2 transition-colors duration-500 ${
-            isActive ? "text-white" : "text-[#F59F00]"
-          }`}
-          style={{ 
-            fontFamily: "DragonAngled", 
-            fontSize: getResponsiveStyles.titleFontSize,
-            lineHeight: "1.2"
-          }}
-        >
-          {title}
-        </h3>
-        <p
-          className={`mb-3 transition-colors duration-500 ${
-            isActive ? "text-white/90" : "text-gray-500"
-          }`}
-          style={{ 
-            fontFamily: "GeneralSans", 
-            fontSize: getResponsiveStyles.subtitleFontSize 
-          }}
-        >
-          {subtitle}
-        </p>
-        {times?.map((time, i) => (
-          <p
-            key={i}
-            className={`mb-1 transition-colors duration-500 ${
-          isActive ? "text-white/85" : "text-gray-600"
+            className={`rounded-lg shadow-sm border transition-all duration-500 ${
+              isActive
+                ? "bg-[#F59F00] border-[#F59F00]"
+                : "bg-white border-gray-100"
             }`}
-            style={{ 
-          fontFamily: "GeneralSans", 
-          fontSize: getResponsiveStyles.textFontSize 
-            }}
+            style={{ padding: getResponsiveStyles.padding }}
           >
-            {time}
-          </p>
-        ))}
+            <h3
+              className={`font-semibold mb-2 transition-colors duration-500 ${
+                isActive ? "text-white" : "text-[#F59F00]"
+              }`}
+              style={{
+                fontFamily: "DragonAngled",
+                fontSize: getResponsiveStyles.titleFontSize,
+                lineHeight: "1.2",
+              }}
+            >
+              {title}
+            </h3>
+            <p
+              className={`mb-3 transition-colors duration-500 ${
+                isActive ? "text-white/90" : "text-gray-500"
+              }`}
+              style={{
+                fontFamily: "GeneralSans",
+                fontSize: getResponsiveStyles.subtitleFontSize,
+              }}
+            >
+              {subtitle}
+            </p>
+            {times?.map((time, i) => (
+              <p
+                key={i}
+                className={`mb-1 transition-colors duration-500 ${
+                  isActive ? "text-white/85" : "text-gray-600"
+                }`}
+                style={{
+                  fontFamily: "GeneralSans",
+                  fontSize: getResponsiveStyles.textFontSize,
+                }}
+              >
+                {time}
+              </p>
+            ))}
           </div>
         )}
       </div>
@@ -468,12 +485,13 @@ const TimelineItem = ({
         className={`w-5/12 transition-all duration-500 ${
           isActive ? "opacity-100 translate-y-0" : "opacity-70 translate-y-2"
         }`}
-        style={{ 
-          marginLeft: !isLeft && !screenSize.isMobile
-        ? screenSize.isTablet
-          ? `${getResponsiveStyles.imageSize.width - 220}px`
-          : `${getResponsiveStyles.imageSize.width - 300}px`
-        : '0'
+        style={{
+          marginLeft:
+            !isLeft && !screenSize.isMobile
+              ? screenSize.isTablet
+                ? `${getResponsiveStyles.imageSize.width - 220}px`
+                : `${getResponsiveStyles.imageSize.width - 300}px`
+              : "0",
         }}
       >
         {!isLeft && (
@@ -489,10 +507,10 @@ const TimelineItem = ({
               className={`font-semibold mb-2 transition-colors duration-500 ${
                 isActive ? "text-white" : "text-[#F59F00]"
               }`}
-              style={{ 
-                fontFamily: "DragonAngled", 
+              style={{
+                fontFamily: "DragonAngled",
                 fontSize: getResponsiveStyles.titleFontSize,
-                lineHeight: "1.2"
+                lineHeight: "1.2",
               }}
             >
               {title}
@@ -501,9 +519,9 @@ const TimelineItem = ({
               className={`mb-3 transition-colors duration-500 ${
                 isActive ? "text-white/90" : "text-gray-500"
               }`}
-              style={{ 
-                fontFamily: "GeneralSans", 
-                fontSize: getResponsiveStyles.subtitleFontSize 
+              style={{
+                fontFamily: "GeneralSans",
+                fontSize: getResponsiveStyles.subtitleFontSize,
               }}
             >
               {subtitle}
@@ -514,9 +532,9 @@ const TimelineItem = ({
                 className={`mb-1 transition-colors duration-500 ${
                   isActive ? "text-white/85" : "text-gray-600"
                 }`}
-                style={{ 
-                  fontFamily: "GeneralSans", 
-                  fontSize: getResponsiveStyles.textFontSize 
+                style={{
+                  fontFamily: "GeneralSans",
+                  fontSize: getResponsiveStyles.textFontSize,
                 }}
               >
                 {time}
@@ -548,12 +566,12 @@ const TimelineItem = ({
 };
 
 // Composant FinalElement responsive
-const FinalElement = ({ 
-  isActive, 
-  screenSize 
-}: { 
-  isActive: boolean; 
-  screenSize: ReturnType<typeof useScreenSize>; 
+const FinalElement = ({
+  isActive,
+  screenSize,
+}: {
+  isActive: boolean;
+  screenSize: ReturnType<typeof useScreenSize>;
 }) => {
   const getResponsiveStyles = useMemo(() => {
     if (screenSize.isMobile) {
@@ -598,7 +616,9 @@ const FinalElement = ({
           style={{ padding: getResponsiveStyles.padding }}
         >
           <div
-            className={`${getResponsiveStyles.circleSize} rounded-full flex items-center justify-center text-white font-bold shadow-md mx-auto -mt-12 mb-4 transition-all duration-500 ${
+            className={`${
+              getResponsiveStyles.circleSize
+            } rounded-full flex items-center justify-center text-white font-bold shadow-md mx-auto -mt-12 mb-4 transition-all duration-500 ${
               isActive ? "bg-[#F59F00] scale-110" : "bg-gray-400 scale-100"
             }`}
           >
@@ -608,10 +628,10 @@ const FinalElement = ({
             className={`font-bold mb-4 transition-colors duration-500 ${
               isActive ? "text-white" : "text-gray-900"
             }`}
-            style={{ 
-              fontFamily: "DragonAngled", 
+            style={{
+              fontFamily: "DragonAngled",
               fontSize: getResponsiveStyles.titleFontSize,
-              lineHeight: "1.2"
+              lineHeight: "1.2",
             }}
           >
             Fin du voyage
@@ -620,9 +640,9 @@ const FinalElement = ({
             className={`mb-2 transition-colors duration-500 ${
               isActive ? "text-white/90" : "text-gray-600"
             }`}
-            style={{ 
-              fontFamily: "GeneralSans", 
-              fontSize: getResponsiveStyles.textFontSize 
+            style={{
+              fontFamily: "GeneralSans",
+              fontSize: getResponsiveStyles.textFontSize,
             }}
           >
             Retour à l'aéroport de Cotonou
@@ -631,9 +651,9 @@ const FinalElement = ({
             className={`transition-colors duration-500 ${
               isActive ? "text-white/85" : "text-gray-500"
             }`}
-            style={{ 
-              fontFamily: "GeneralSans", 
-              fontSize: getResponsiveStyles.textFontSize 
+            style={{
+              fontFamily: "GeneralSans",
+              fontSize: getResponsiveStyles.textFontSize,
             }}
           >
             Transfert organisé • Assistance jusqu'au départ
@@ -642,9 +662,9 @@ const FinalElement = ({
             className={`mt-4 transition-colors duration-500 ${
               isActive ? "text-white/85" : "text-gray-500"
             }`}
-            style={{ 
-              fontFamily: "GeneralSans", 
-              fontSize: getResponsiveStyles.textFontSize 
+            style={{
+              fontFamily: "GeneralSans",
+              fontSize: getResponsiveStyles.textFontSize,
             }}
           >
             Merci pour ce magnifique voyage au Bénin !
@@ -666,7 +686,9 @@ const FinalElement = ({
         style={{ padding: getResponsiveStyles.padding }}
       >
         <div
-          className={`${getResponsiveStyles.circleSize} rounded-full flex items-center justify-center text-white font-bold shadow-md mx-auto -mt-16 mb-6 transition-all duration-500 ${
+          className={`${
+            getResponsiveStyles.circleSize
+          } rounded-full flex items-center justify-center text-white font-bold shadow-md mx-auto -mt-16 mb-6 transition-all duration-500 ${
             isActive ? "bg-[#F59F00] scale-110" : "bg-gray-400 scale-100"
           }`}
         >
@@ -676,9 +698,9 @@ const FinalElement = ({
           className={`font-bold mb-4 transition-colors duration-500 ${
             isActive ? "text-white" : "text-gray-900"
           }`}
-          style={{ 
-            fontFamily: "DragonAngled", 
-            fontSize: getResponsiveStyles.titleFontSize 
+          style={{
+            fontFamily: "DragonAngled",
+            fontSize: getResponsiveStyles.titleFontSize,
           }}
         >
           Fin du voyage
@@ -687,9 +709,9 @@ const FinalElement = ({
           className={`mb-2 transition-colors duration-500 ${
             isActive ? "text-white/90" : "text-gray-600"
           }`}
-          style={{ 
-            fontFamily: "GeneralSans", 
-            fontSize: getResponsiveStyles.textFontSize 
+          style={{
+            fontFamily: "GeneralSans",
+            fontSize: getResponsiveStyles.textFontSize,
           }}
         >
           Retour à l'aéroport de Cotonou
@@ -698,9 +720,9 @@ const FinalElement = ({
           className={`transition-colors duration-500 ${
             isActive ? "text-white/85" : "text-gray-500"
           }`}
-          style={{ 
-            fontFamily: "GeneralSans", 
-            fontSize: getResponsiveStyles.textFontSize 
+          style={{
+            fontFamily: "GeneralSans",
+            fontSize: getResponsiveStyles.textFontSize,
           }}
         >
           Transfert organisé • Assistance jusqu'au départ
@@ -709,9 +731,9 @@ const FinalElement = ({
           className={`mt-4 transition-colors duration-500 ${
             isActive ? "text-white/85" : "text-gray-500"
           }`}
-          style={{ 
-            fontFamily: "GeneralSans", 
-            fontSize: getResponsiveStyles.textFontSize 
+          style={{
+            fontFamily: "GeneralSans",
+            fontSize: getResponsiveStyles.textFontSize,
           }}
         >
           Merci pour ce magnifique voyage au Bénin !
@@ -722,22 +744,27 @@ const FinalElement = ({
 };
 
 // Composant InclusNonInclusComponent responsive
-const InclusNonInclusComponent = ({ screenSize }: { screenSize: ReturnType<typeof useScreenSize> }) => {
+const InclusNonInclusComponent = ({
+  screenSize,
+}: {
+  screenSize: ReturnType<typeof useScreenSize>;
+}) => {
   const inclus = [
-    "Hébergement 9 nuits (hôtel, maison d'hôte ou écolodge)",
-    "Chauffeur privé + véhicule climatisé",
+    "Hébergement 6 nuits (hôtel ou maison d’hôte)",
+    "Transport tout au long du séjour",
     "Guide certifié sur chaque site",
-    "Prise en charge à l'aéroport",
+    "Prise en charge à l’aéroport",
     "Accompagnement personnalisé",
-    "Connexion internet + kit de bienvenue",
+    "Connexion internet lors des sorties",
+    "Eau",
   ];
 
   const nonInclus = [
-    "Billets d'avion international",
-    "Visa d'entrée au Bénin",
-    "Assurance voyage",
-    "Frais personnels et pourboires",
-    "Boissons alcoolisées",
+    "Boissons supplémentaires Boissons alcoolisées / dépenses personnelles",
+    "Assurance voyage (facultative)",
+    "Activités à la carte (rituel, massage, etc.)",
+    "Vol AR international",
+    "Frais de visa",
     "Activités optionnelles non mentionnées",
   ];
 
@@ -768,7 +795,12 @@ const InclusNonInclusComponent = ({ screenSize }: { screenSize: ReturnType<typeo
 
   return (
     <div className="w-full px-4 py-8">
-      <div className={`grid ${screenSize.isMobile ? 'grid-cols-1' : 'grid-cols-2'}`} style={{ gap: getResponsiveStyles.gap }}>
+      <div
+        className={`grid ${
+          screenSize.isMobile ? "grid-cols-1" : "grid-cols-2"
+        }`}
+        style={{ gap: getResponsiveStyles.gap }}
+      >
         {/* Section INCLUS */}
         <div
           style={{
@@ -796,7 +828,15 @@ const InclusNonInclusComponent = ({ screenSize }: { screenSize: ReturnType<typeo
           <ul className="space-y-2">
             {inclus.map((item, index) => (
               <li key={index} className="flex items-start">
-                <span style={{ paddingRight: "10px", color: "#36A330", fontWeight: "bold" }}>•</span>
+                <span
+                  style={{
+                    paddingRight: "10px",
+                    color: "#36A330",
+                    fontWeight: "bold",
+                  }}
+                >
+                  •
+                </span>
                 <Typography.Text
                   style={{
                     fontSize: getResponsiveStyles.textFontSize,
@@ -839,7 +879,15 @@ const InclusNonInclusComponent = ({ screenSize }: { screenSize: ReturnType<typeo
           <ul className="space-y-2">
             {nonInclus.map((item, index) => (
               <li key={index} className="flex items-start">
-                <span style={{ paddingRight: "10px", color: "#991D00", fontWeight: "bold" }}>•</span>
+                <span
+                  style={{
+                    paddingRight: "10px",
+                    color: "#991D00",
+                    fontWeight: "bold",
+                  }}
+                >
+                  •
+                </span>
                 <Typography.Text
                   style={{
                     fontSize: getResponsiveStyles.textFontSize,
@@ -914,7 +962,7 @@ const CircuitsSignature = () => {
         badgeMargin: "1.5vh 0 0 2vw",
         badgePadding: "10px 20px",
         badgeFontSize: "14px",
-        height: "120px",
+        height: "fit-content",
         padding: "20px",
         titleFontSize: "40px",
         subtitleFontSize: "16px",
@@ -926,7 +974,7 @@ const CircuitsSignature = () => {
         badgeMargin: "2vh 0 0 3vw",
         badgePadding: "12px 24px",
         badgeFontSize: "16px",
-        height: "150px",
+        height: "fit-content",
         padding: "24px",
         titleFontSize: "58px",
         subtitleFontSize: "18px",
@@ -952,28 +1000,42 @@ const CircuitsSignature = () => {
       {/* Section héros - Responsive */}
       <Flex
         vertical
-        className="relative w-full overflow-hidden"
         style={{
-          backgroundImage: `url(${debut})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
+          position: "relative",
+          overflow: "hidden",
           padding: heroStyles.padding,
           paddingBottom: heroStyles.paddingBottom,
+          backgroundColor: "#FEF1D9", // Fallback background
+          backgroundImage: `url(${debut})`, // Fallback background
+          backgroundSize: "cover",
+          backgroundPosition: "center",
         }}
       >
-        {/* Gradient overlay optimisé */}
-        <div
-          className="absolute inset-0"
+        {/* Optimized Video Background */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto" // Ensures early loading
           style={{
-            background: `linear-gradient(to right, 
-              rgba(250, 235, 215, 0.95) 0%,
-              rgba(250, 235, 215, 0.85) 20%,
-              rgba(250, 235, 215, 0.6) 40%,
-              rgba(250, 235, 215, 0.3) 60%,
-              rgba(250, 235, 215, 0.1) 80%,
-              transparent 100%)`,
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            zIndex: 0,
           }}
-        />
+          onError={(e) => {
+            console.error("Video error:", e);
+          }}
+        >
+          <source src={video} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+
+        {/* Content Layer */}
         <Flex
           style={{
             maxWidth: screenSize.isMobile ? "100%" : "1050px",
@@ -985,7 +1047,7 @@ const CircuitsSignature = () => {
           <Flex vertical gap={0}>
             <Typography.Text
               style={{
-                color: "#000000",
+                color: "#FFFFFF",
                 fontSize: heroStyles.categoryFontSize,
                 lineHeight: "1.1",
                 margin: "0",
@@ -1014,18 +1076,20 @@ const CircuitsSignature = () => {
             </Typography.Title>
             <Typography.Text
               style={{
-                color: "#000000",
+                color: "#FFFFFF",
                 fontSize: heroStyles.subtitleFontSize,
                 lineHeight: screenSize.isMobile ? "1.3" : "1",
                 marginTop: "0",
                 fontFamily: "DragonAngled",
               }}
             >
-              Sites incontournables, entre mémoire, spiritualité, artisanat et détente
+              Sites incontournables, entre mémoire, spiritualité, artisanat et
+              détente
             </Typography.Text>
           </Flex>
         </Flex>
       </Flex>
+      
 
       {/* Contenu principal - Responsive */}
       <Flex
@@ -1074,7 +1138,7 @@ const CircuitsSignature = () => {
                   fontFamily: "GeneralSans",
                 }}
               >
-                10 jours / 9 nuits
+                7 jours / 6 nuits
               </Typography>
             </Flex>
 
@@ -1092,7 +1156,10 @@ const CircuitsSignature = () => {
                 cursor: "pointer",
               }}
             >
-              <Flex vertical style={{ width: screenSize.isMobile ? "100%" : "auto" }}>
+              <Flex
+                vertical
+                style={{ width: screenSize.isMobile ? "100%" : "auto" }}
+              >
                 <Typography.Title
                   level={2}
                   style={{
@@ -1108,7 +1175,11 @@ const CircuitsSignature = () => {
                 >
                   <span style={{ color: "black" }}>L'Essentiel du Bénin</span>{" "}
                   {screenSize.isMobile ? <br /> : ""}
-                  <span style={{ fontSize: screenSize.isMobile ? "18px" : "inherit" }}>
+                  <span
+                    style={{
+                      fontSize: screenSize.isMobile ? "18px" : "inherit",
+                    }}
+                  >
                     (Best-seller)
                   </span>
                 </Typography.Title>
@@ -1123,7 +1194,13 @@ const CircuitsSignature = () => {
                     lineHeight: "1.4",
                   }}
                 >
-                  Voyageurs curieux, familles, groupes DOM-TOM, premiers séjours
+                  7 jours d’aventure, de culture et de bien-être au cœur d’un
+                  pays vibrant. Envie d’un voyage qui a du sens ? Envolez-vous
+                  pour le Bénin, berceau du vodoun, joyau de l’Afrique de
+                  l’Ouest et terre d’histoires puissantes. Ce circuit unique
+                  vous plonge au cœur d’un pays chaleureux, où chaque jour est
+                  une expérience forte, entre découvertes culturelles,
+                  spiritualité vivante, détente et rencontres inoubliables.
                 </Typography>
               </Flex>
             </Flex>
@@ -1136,7 +1213,10 @@ const CircuitsSignature = () => {
         </Flex>
 
         {/* Bouton de réservation */}
-        <Flex justify="center" style={{ padding: screenSize.isMobile ? "20px 0" : "0" }}>
+        <Flex
+          justify="center"
+          style={{ padding: screenSize.isMobile ? "20px 0" : "0" }}
+        >
           <Link to="/reserver">
             <Button
               type="primary"
@@ -1168,10 +1248,14 @@ const CircuitsSignature = () => {
       </Flex>
 
       {/* Galerie d'images - Responsive */}
-      <section 
-        style={{ 
-          height: screenSize.isMobile ? "60vw" : screenSize.isTablet ? "50vw" : "45vw",
-          width: "100%"
+      <section
+        style={{
+          height: screenSize.isMobile
+            ? "60vw"
+            : screenSize.isTablet
+            ? "50vw"
+            : "45vw",
+          width: "100%",
         }}
       >
         <ImageCarousel images={images} />

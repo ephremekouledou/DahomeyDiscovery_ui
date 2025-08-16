@@ -13,7 +13,8 @@ import popo from "../../assets/images/Circuit à la carte/Grand-Popo.webp";
 import ouidah from "../../assets/images/Circuit à la carte/Ouidah.webp";
 import porto from "../../assets/images/Circuit à la carte/Porto.webp";
 import possotome from "../../assets/images/Circuit à la carte/Possotomè.webp";
-
+import video from "../../assets/videos/usagevid1.mp4";
+import debut from "../../assets/images/Circuit signature/Début.webp";
 
 // Types
 interface Circuit {
@@ -316,58 +317,48 @@ const CircuitsCartes = () => {
       ville: "Cotonou",
       description:
         "Art urbain,\nmarchés, street\nfood, fresques &\nvie moderne",
-      image:
-        cotonou,
+      image: cotonou,
     },
     {
       ville: "Abomey",
       description: "Monuments,\nmusées, cuisine\nraffrinée & mode",
-      image:
-        abomey,
+      image: abomey,
     },
     {
       ville: "Dassa",
       description: "Tradition,\ntechnologie,\nculture pop &\narchitecture",
-      image:
-        dassa,
+      image: dassa,
     },
     {
       ville: "Ganvie",
       description: "Gratte-ciels,\nBroadway, diversité\n& énergie urbaine",
-      image:
-        ganvie,
+      image: ganvie,
     },
     {
       ville: "Gogotinkpon",
       description: "Histoire,\nthéâtres, pubs\n& architecture\nvictorienne",
-      image:
-        gogotinkpon,
+      image: gogotinkpon,
     },
     {
       ville: "Grand-Popo",
       description: "Gaudí,\narchitecture,\ntapas & vie\nnocturne",
-      image:
-        popo,
+      image: popo,
     },
     {
       ville: "Ouidah",
       description: "Culture,\ntraditions, art\ncontemporain &\nscène musicale",
-      image:
-        ouidah,
+      image: ouidah,
     },
     {
       ville: "Porto-Novo",
       description: "Plages,\nculture, gastronomie\n& vie nocturne",
-      image:
-        porto,
+      image: porto,
     },
     {
       ville: "Possotomè",
       description: "Nature,\nculture, artisanat\n& traditions",
-      image:
-        possotome,
+      image: possotome,
     },
-
   ];
 
   // État local pour le circuit sélectionné
@@ -388,7 +379,7 @@ const CircuitsCartes = () => {
     <Flex justify="center" vertical>
       {/* Header avec NavBar */}
       <div
-        className="relative z-20 flex items-center justify-center p-8"
+        className="relative z-20 flex items-center justify-center"
         style={{ backgroundColor: "#FEF1D9" }}
       >
         <NavBar menu="CIRCUITS" />
@@ -398,16 +389,46 @@ const CircuitsCartes = () => {
       <Flex
         vertical
         style={{
-          backgroundColor: "#FEF1D9",
+          position: "relative",
+          overflow: "hidden",
           padding: isMobile ? "4vh 6vw" : "8vh 8vw",
-          paddingBottom: isMobile ? "10vw" : "5vw",
+          paddingBottom: isMobile ? "10vh" : "20vh",
+          backgroundColor: "#FEF1D9", // Fallback background
+          backgroundImage: `url(${debut})`, // Fallback background
+          backgroundSize: "cover",
+          backgroundPosition: "center",
         }}
       >
-        <Flex style={{ maxWidth: "1050px", width: "100%", margin: "0 auto" }}>
+        {/* Optimized Video Background */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto" // Ensures early loading
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            zIndex: 0,
+          }}
+          onError={(e) => {
+            console.error("Video error:", e);
+          }}
+        >
+          <source src={video} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+
+        {/* Content Layer */}
+        <Flex style={{ maxWidth: "1050px", width: "100%", margin: "0 auto", zIndex: 1 }}>
           <Flex vertical gap={0}>
             <Typography.Text
               style={{
-                color: "#000000",
+                color: "#FFFFFF",
                 fontSize: isMobile ? "12px" : "16px",
                 lineHeight: "1.1",
                 margin: "0",
@@ -435,7 +456,7 @@ const CircuitsCartes = () => {
             </Typography.Title>
             <Typography.Text
               style={{
-                color: "#000000",
+                color: "#FFFFFF",
                 fontSize: isMobile ? "24px" : "45px",
                 lineHeight: "1.1",
                 marginTop: "0",
@@ -455,7 +476,7 @@ const CircuitsCartes = () => {
           width: "100%",
           margin: "0 auto",
           paddingTop: "60px",
-          paddingBottom: "60px"
+          paddingBottom: "60px",
         }}
       >
         <StaggeredGrid cities={cities} /* minItemWidth={4} */ />
