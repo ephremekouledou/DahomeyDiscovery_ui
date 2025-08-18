@@ -238,47 +238,14 @@ const Circuits = () => {
   const voyages = useMemo(
     () => [
       {
-        id: "circuit-signature",
+        id: "de774e84ds8e45s75fs",
         image: img,
         video: video,
-        title: "Esprit des Femmes - Féminin sacré et créatif",
+        title: "Spiritualité & Traditions Vodoun: L'invisible au cœur du Bénin",
         description:
-          "Groupes de femmes, voyages entre amies, militantes pour découvrir la richesse culturelle.",
-        days: 9,
-        nights: 8,
-        price: "50.000 FCFA",
-      },
-      {
-        id: "circuit",
-        image: img,
-        video: video,
-        title: "Racines & Héritage sur les traces de l'histoire",
-        description:
-          "Créez votre propre parcours personnalisé à travers l'histoire et les traditions.",
-        days: 9,
-        nights: 8,
-        price: "50.000 FCFA",
-      },
-      {
-        id: "circuit-thematiques",
-        image: img,
-        video: video,
-        title: "Immersion & Savoir-Faire",
-        description:
-          "Circuits spécialisés selon vos centres d'intérêt et passions culturelles.",
-        days: 9,
-        nights: 8,
-        price: "50.000 FCFA",
-      },
-      {
-        id: "circuit-a-la-carte",
-        image: img,
-        video: video,
-        title: "Spiritualité & Traditions Vodoun",
-        description:
-          "Créez votre propre parcours personnalisé dans l'univers spirituel.",
-        days: 9,
-        nights: 8,
+          "Explorer l’univers invisible du vodoun à travers des rencontres, des cérémonies, des lieux sacrés et des savoirs ancestraux.",
+        days: 8,
+        nights: 7,
         price: "50.000 FCFA",
       },
     ],
