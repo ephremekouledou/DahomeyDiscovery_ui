@@ -287,28 +287,10 @@ const CircuitsCartes = () => {
   // Configuration centralisée des circuits
   const circuits: Circuit[] = [
     {
-      id: "circuit-signature",
-      name: "Esprit des Femmes - Féminin sacré et créatif",
-      duration: "9 jours / 8 nuits",
-      description: "Groupes de femmes, voyages entre amies, militantes",
-    },
-    {
-      id: "circuits-thematiques",
-      name: "Immersion & Savoir-Faire",
-      duration: "9 jours / 8 nuits",
-      description: "Circuits spécialisés selon vos centres d'intérêt",
-    },
-    {
-      id: "circuit-a-la-carte",
-      name: "Spiritualité & Traditions Vodoun",
-      duration: "9 jours / 8 nuits",
-      description: "Créez votre propre parcours personnalisé",
-    },
-    {
-      id: "circuit",
-      name: "Racines & Héritage sur les traces de l'histoire",
-      duration: "9 jours / 8 nuits",
-      description: "Créez votre propre parcours personnalisé",
+      id: "de774e84ds8e45s75fs",
+      name: "Spiritualité & Traditions Vodoun: L'invisible au cœur du Bénin",
+      duration: "8 jours / 7 nuits",
+      description: "Plongez dans l’univers spirituel profond du Bénin, berceau du vodoun, à travers un circuit unique mêlant rites, rencontres, lieux sacrés et traditions vivantes.Ce parcours initiatique vous emmène à la découverte de temples mystiques, couvents secrets, cérémonies puissantes et savoirs transmis depuis des générations.",
     },
   ];
 
