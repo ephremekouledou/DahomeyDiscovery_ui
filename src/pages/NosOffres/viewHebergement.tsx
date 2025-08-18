@@ -11,6 +11,7 @@ import {
 import { Star } from "lucide-react";
 import { useTransaction } from "../../context/transactionContext";
 import Footer from "../../components/footer/footer";
+import BeginningButton from "../../components/dededed/BeginingButton";
 
 const ViewHebergementContent: React.FC<AccommodationData> = ({
   id,
@@ -307,6 +308,7 @@ const ViewHebergement = () => {
   }, []);
   return (
     <Flex justify="center" vertical>
+      <BeginningButton />
       {/* Header avec NavBar - Responsive */}
       <div
         className="relative z-20 flex items-center justify-center"

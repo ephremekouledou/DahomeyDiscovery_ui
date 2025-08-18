@@ -11,6 +11,7 @@ import img6 from "../../assets/images/6.jpg";
 import img8 from "../../assets/images/8.jpg";
 import img10 from "../../assets/images/10.jpg";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
+import BeginningButton from "../../components/dededed/BeginingButton";
 
 const images = [img2, img4, img6, img8, img10];
 const { Content } = Layout;
@@ -27,6 +28,7 @@ const Apropos = () => {
 
   return (
     <Flex justify="center" vertical>
+      <BeginningButton />
       {/* Navigation */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="A PROPOS" />

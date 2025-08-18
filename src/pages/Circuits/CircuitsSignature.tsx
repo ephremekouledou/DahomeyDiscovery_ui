@@ -15,6 +15,7 @@ import {
   DetailedTimeline,
   InclusNonInclusComponent,
 } from "../../components/CircuitView/Timeline";
+import BeginningButton from "../../components/dededed/BeginingButton";
 
 // Optimisation: Déplacer les images en constante pour éviter les re-rendus
 const images = [img1, img2, img3, img4, img5];
@@ -251,6 +252,7 @@ const CircuitsSignature = () => {
 
   return (
     <Flex justify="center" vertical>
+      <BeginningButton />
       {/* Header avec NavBar */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="CIRCUITS" />

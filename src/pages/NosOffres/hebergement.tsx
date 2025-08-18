@@ -38,6 +38,7 @@ import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
 import Footer from "../../components/footer/footer";
 import { useTransaction } from "../../context/transactionContext";
 import bonneAdressImg from "../../assets/images/bonnesAddresse.webp";
+import BeginningButton from "../../components/dededed/BeginingButton";
 
 const images = [
   // img1,
@@ -939,6 +940,7 @@ const Hebergements = () => {
 
   return (
     <Flex justify="center" vertical>
+      <BeginningButton />
       {/* Header avec NavBar */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="OFFRES" />

@@ -29,6 +29,7 @@ import img3 from "../../assets/images/Accueil/3_5.webp";
 import img4 from "../../assets/images/Accueil/4_5.webp";
 import img5 from "../../assets/images/Accueil/5_5.webp";
 import fin from "../../assets/images/Accueil/fin.webp";
+import BeginningButton from "../../components/dededed/BeginingButton";
 
 // Constants moved outside component to prevent recreations
 const IMAGES = [img1, img2, img3, img4, img5];
@@ -610,6 +611,7 @@ const Acceuil = () => {
       <div style={styles.percentageRight}>locales</div>
 
       <div id="mask-wrapper" className="absolute z-0 inset-0 origin-center">
+        <BeginningButton />
         <Flex vertical gap={0}>
           <section className="one">
             <VideoBackground />

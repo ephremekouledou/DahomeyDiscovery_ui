@@ -6,6 +6,7 @@ import React, { useState, useEffect, useRef } from "react";
 import image1 from "../../assets/images/img1.jpeg";
 import image2 from "../../assets/images/img2.jpg";
 import image3 from "../../assets/images/img3.jpg";
+import BeginningButton from "../dededed/BeginingButton";
 
 // Types
 interface Ville {
@@ -175,6 +176,7 @@ export const CircuitCarteView = () => {
 
   return (
     <Flex justify="center" vertical>
+      <BeginningButton />
       {/* Header avec NavBar - Responsive */}
       <div
         className="relative z-20 flex items-center justify-center p-8"

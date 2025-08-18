@@ -21,6 +21,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useTransaction } from "../../context/transactionContext";
+import BeginningButton from "../../components/dededed/BeginingButton";
 
 const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
   const { setTransaction } = useTransaction();
@@ -379,6 +380,7 @@ const ViewLocation = () => {
 
   return (
     <Flex justify="center" vertical>
+      <BeginningButton />
       {/* Header avec NavBar - Responsive */}
       <div
         className="relative z-20 flex items-center justify-center"

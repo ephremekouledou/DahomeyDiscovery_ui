@@ -15,6 +15,7 @@ import {
   InclusNonInclusComponent,
   useScreenSize,
 } from "./Timeline";
+import BeginningButton from "../dededed/BeginingButton";
 
 // Types
 interface Circuit {
@@ -406,6 +407,7 @@ export const CircuitView = () => {
 
   return (
     <Flex justify="center" vertical>
+      <BeginningButton />
       {/* Header avec NavBar */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="CIRCUITS" />

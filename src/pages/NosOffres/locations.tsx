@@ -43,6 +43,7 @@ import { Button, Flex, Typography } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import NavBar from "../../components/navBar/navBar";
 import { useTransaction } from "../../context/transactionContext";
+import BeginningButton from "../../components/dededed/BeginingButton";
 /* import img11 from "../../assets/images/11.jpg";
 import img12 from "../../assets/images/12.jpg";
 import img13 from "../../assets/images/13.jpg";
@@ -879,6 +880,7 @@ const Locations = () => {
 
   return (
     <Flex justify="center" vertical>
+      <BeginningButton />
       {/* Header avec NavBar */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="OFFRES" />

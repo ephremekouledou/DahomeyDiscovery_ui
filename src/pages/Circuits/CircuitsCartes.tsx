@@ -15,6 +15,7 @@ import porto from "../../assets/images/Circuit à la carte/Porto.webp";
 import possotome from "../../assets/images/Circuit à la carte/Possotomè.webp";
 import video from "../../assets/videos/usagevid1.mp4";
 import debut from "../../assets/images/Circuit signature/Début.webp";
+import BeginningButton from "../../components/dededed/BeginingButton";
 
 // Types
 interface Circuit {
@@ -359,6 +360,7 @@ const CircuitsCartes = () => {
 
   return (
     <Flex justify="center" vertical>
+      <BeginningButton />
       {/* Header avec NavBar */}
       <div
         className="relative z-20 flex items-center justify-center"
