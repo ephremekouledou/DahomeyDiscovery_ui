@@ -3,7 +3,6 @@ import React, {
   useState,
   useRef,
   useMemo,
-  useCallback,
 } from "react";
 import "./Acceuil.css";
 import backChevron from "../../assets/icons/backChevron.png";
@@ -30,19 +29,16 @@ import img4 from "../../assets/images/Accueil/4_5.webp";
 import img5 from "../../assets/images/Accueil/5_5.webp";
 import fin from "../../assets/images/Accueil/fin.webp";
 import BeginningButton from "../../components/dededed/BeginingButton";
+import { ThematicCircuitCard } from "../../components/CircuitView/Card";
+import { useScreenSizeResponsive } from "../../components/CircuitView/Timeline";
 
 // Constants moved outside component to prevent recreations
 const IMAGES = [img1, img2, img3, img4, img5];
 
-const BREAKPOINTS = {
-  MOBILE: 768,
-  TABLET: 1024,
-} as const;
-
 const TESTIMONIALS = [
   {
     id: 1,
-    name: "LA STYLISTE BAROUDEUSE", 
+    name: "LA STYLISTE BAROUDEUSE",
     service: "",
     text: "Une véritable expérience humaine ! Mon séjour au Bénin avec Dahomey Discovery a été parfaitement orchestré : découvertes, rencontres, paysages à couper le souffle… de Cotonou à Abomey en passant par Porto-Novo, Ganvié et Ouidah. Une équipe à l’écoute, pro et passionnée. Pour une immersion authentique et sereine, je recommande à 100 % !",
     avatar: "👩‍💼",
@@ -95,64 +91,20 @@ const CIRCUIT_CARDS = [
   {
     imageUrl: thematic,
     title: "Circuits Thématiques",
-    description: "Découvrez nos circuits thématiques, une immersion dans la culture locale.",
+    description:
+      "Découvrez nos circuits thématiques, une immersion dans la culture locale.",
     alt: "Circuit Thématiques",
     link: "/circuits-thematiques",
   },
   {
     imageUrl: alacarte,
     title: "Circuit à la carte",
-    description: "Découvrez notre circuit à la carte, une expérience personnalisée.",
+    description:
+      "Découvrez notre circuit à la carte, une expérience personnalisée.",
     alt: "Circuit à la carte",
     link: "/circuits-a-la-carte",
   },
 ] as const;
-
-// Custom hook for screen size detection with debouncing
-const useScreenSize = () => {
-  const [screenSize, setScreenSize] = useState(() => {
-    if (typeof window === "undefined") return "desktop";
-    const width = window.innerWidth;
-    return width < BREAKPOINTS.MOBILE
-      ? "mobile"
-      : width < BREAKPOINTS.TABLET
-      ? "tablet"
-      : "desktop";
-  });
-
-  const debouncedResize = useCallback(() => {
-    let timeoutId: ReturnType<typeof setTimeout>;
-    return () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        const width = window.innerWidth;
-        const newSize =
-          width < BREAKPOINTS.MOBILE
-            ? "mobile"
-            : width < BREAKPOINTS.TABLET
-            ? "tablet"
-            : "desktop";
-        setScreenSize((prev) => (prev !== newSize ? newSize : prev));
-      }, 100);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleResize = debouncedResize();
-    window.addEventListener("resize", handleResize, { passive: true });
-    return () => window.removeEventListener("resize", handleResize);
-  }, [debouncedResize]);
-
-  return useMemo(
-    () => ({
-      screenSize,
-      isMobile: screenSize === "mobile",
-      isTablet: screenSize === "tablet",
-      isDesktop: screenSize === "desktop",
-    }),
-    [screenSize]
-  );
-};
 
 // Memoized circuit card component
 const CircuitCard = React.memo(
@@ -237,49 +189,6 @@ const CircuitCard = React.memo(
 );
 CircuitCard.displayName = "CircuitCard";
 
-const ThematicCircuitCard = ({
-  imageUrl,
-  title,
-  description,
-  alt,
-}: {
-  imageUrl: string;
-  title: string;
-  description: string;
-  alt: string;
-  screenSize: string;
-}) => {
-  return (
-    <>
-      <div className="relative z-10 bg-white rounded-3xl p-0 shadow-2xl max-w-[400px] w-full overflow-hidden transform hover:scale-105 transition-transform duration-500">
-        {/* Card image container */}
-        <div className="w-full h-74 p-4 rounded-3xl">
-          <img
-            src={imageUrl}
-            alt={alt}
-            className="w-full h-full object-cover rounded-3xl"
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-
-        {/* Text content */}
-        <div className="p-8 bg-white pt-0">
-            <h1
-            className="text-3xl font-bold text-gray-900 mb-2 tracking-wider"
-            style={{ fontFamily: "DragonAngled", letterSpacing: "0.05em" }}
-            >
-            {title}
-            </h1>
-          <div className="text-sm text-gray-700 font-medium tracking-wide" style={{ fontFamily: "GeneralSans" }}>
-            {description}
-          </div>
-        </div>
-      </div>
-    </>
-  );
-};
-
 // Optimized testimonial carousel with virtual scrolling concept
 const TestimonialCarousel = React.memo(
   ({ screenSize }: { screenSize: string }) => {
@@ -323,31 +232,31 @@ const TestimonialCarousel = React.memo(
     useEffect(() => {
       const calculateMaxHeight = () => {
         // Vérifier que toutes les cartes sont présentes
-        const validCards = cardsRef.current.filter(card => card !== null);
+        const validCards = cardsRef.current.filter((card) => card !== null);
         if (validCards.length < TESTIMONIALS.length) {
           // Pas toutes les cartes sont encore montées, réessayer plus tard
           setTimeout(calculateMaxHeight, 50);
           return;
         }
-        
+
         let maxHeight = 0;
         const minHeight = parseInt(config.cardStyle.minHeight);
-        
+
         // Reset toutes les hauteurs à auto pour mesurer le contenu naturel
         validCards.forEach((cardRef) => {
           if (cardRef) {
-            cardRef.style.height = 'auto';
-            cardRef.style.minHeight = 'auto';
+            cardRef.style.height = "auto";
+            cardRef.style.minHeight = "auto";
           }
         });
-        
+
         // Forcer un reflow pour s'assurer que les mesures sont à jour
         validCards.forEach((cardRef) => {
           if (cardRef) {
             cardRef.offsetHeight; // Force reflow
           }
         });
-        
+
         // Mesurer les hauteurs après le reflow
         validCards.forEach((cardRef) => {
           if (cardRef) {
@@ -355,11 +264,11 @@ const TestimonialCarousel = React.memo(
             maxHeight = Math.max(maxHeight, cardHeight);
           }
         });
-        
+
         // S'assurer que la hauteur ne soit pas inférieure à la hauteur minimum
         const finalHeight = Math.max(maxHeight, minHeight);
         setMaxCardHeight(finalHeight);
-        
+
         // Appliquer la hauteur calculée à TOUTES les cartes (incluant les duplicatas)
         cardsRef.current.forEach((cardRef) => {
           if (cardRef) {
@@ -367,9 +276,9 @@ const TestimonialCarousel = React.memo(
             cardRef.style.minHeight = `${finalHeight}px`;
           }
         });
-        
+
         // Aussi appliquer aux cartes dupliquées
-        const allCards = document.querySelectorAll('[data-testimonial-card]');
+        const allCards = document.querySelectorAll("[data-testimonial-card]");
         allCards.forEach((card) => {
           (card as HTMLElement).style.height = `${finalHeight}px`;
           (card as HTMLElement).style.minHeight = `${finalHeight}px`;
@@ -380,19 +289,19 @@ const TestimonialCarousel = React.memo(
       const timer1 = setTimeout(calculateMaxHeight, 100);
       const timer2 = setTimeout(calculateMaxHeight, 300);
       const timer3 = setTimeout(calculateMaxHeight, 500);
-      
+
       // Recalculer si la taille d'écran change
       const handleResize = () => {
         setTimeout(calculateMaxHeight, 100);
       };
-      
-      window.addEventListener('resize', handleResize);
-      
+
+      window.addEventListener("resize", handleResize);
+
       return () => {
         clearTimeout(timer1);
         clearTimeout(timer2);
         clearTimeout(timer3);
-        window.removeEventListener('resize', handleResize);
+        window.removeEventListener("resize", handleResize);
       };
     }, [config.cardStyle.minHeight, duplicatedTestimonials, screenSize]);
 
@@ -546,7 +455,7 @@ const TestimonialCarousel = React.memo(
 TestimonialCarousel.displayName = "TestimonialCarousel";
 
 const Acceuil = () => {
-  const { screenSize, isMobile, isTablet } = useScreenSize();
+  const { screenSize, isMobile, isTablet } = useScreenSizeResponsive();
   const { pathname } = useLocation();
   const container = useRef<HTMLDivElement>(null);
   // const { hasRun, setHasRun } = useAnimation();
@@ -841,11 +750,11 @@ const Acceuil = () => {
                             screenSize={screenSize}
                           /> */}
                           <ThematicCircuitCard
-                          imageUrl={card.imageUrl}
-                          title={card.title}
-                          description={card.description}
-                          alt={card.alt}
-                          screenSize={screenSize}
+                            imageUrl={card.imageUrl}
+                            title={card.title}
+                            description={card.description}
+                            alt={card.alt}
+                            screenSize={screenSize}
                           />
                         </div>
                       </Link>

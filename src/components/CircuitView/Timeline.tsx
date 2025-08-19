@@ -1,6 +1,11 @@
 import { Typography } from "antd";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+const BREAKPOINTS = {
+  MOBILE: 768,
+  TABLET: 1024,
+} as const;
+
 const useScreenSize = () => {
   const [screenSize, setScreenSize] = useState({
     isMobile: false,
@@ -781,10 +786,56 @@ const InclusNonInclusComponent = ({
   );
 };
 
+const useScreenSizeResponsive = () => {
+  const [screenSize, setScreenSize] = useState(() => {
+    if (typeof window === "undefined") return "desktop";
+    const width = window.innerWidth;
+    return width < BREAKPOINTS.MOBILE
+      ? "mobile"
+      : width < BREAKPOINTS.TABLET
+      ? "tablet"
+      : "desktop";
+  });
+
+  const debouncedResize = useCallback(() => {
+    let timeoutId: ReturnType<typeof setTimeout>;
+    return () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        const width = window.innerWidth;
+        const newSize =
+          width < BREAKPOINTS.MOBILE
+            ? "mobile"
+            : width < BREAKPOINTS.TABLET
+            ? "tablet"
+            : "desktop";
+        setScreenSize((prev) => (prev !== newSize ? newSize : prev));
+      }, 100);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleResize = debouncedResize();
+    window.addEventListener("resize", handleResize, { passive: true });
+    return () => window.removeEventListener("resize", handleResize);
+  }, [debouncedResize]);
+
+  return useMemo(
+    () => ({
+      screenSize,
+      isMobile: screenSize === "mobile",
+      isTablet: screenSize === "tablet",
+      isDesktop: screenSize === "desktop",
+    }),
+    [screenSize]
+  );
+};
+
 export {
   DetailedTimeline,
   useScreenSize,
   TimelineItem,
   FinalElement,
   InclusNonInclusComponent,
+  useScreenSizeResponsive,
 };
