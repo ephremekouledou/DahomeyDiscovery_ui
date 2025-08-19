@@ -31,20 +31,20 @@ const { Title } = Typography;
 const { Step } = Steps;
 const { Option } = Select;
 
-interface Customer {
-  email: string;
-  first_name: string;
-  last_name: string;
-  phone: string;
-}
+// interface Customer {
+//   email: string;
+//   first_name: string;
+//   last_name: string;
+//   phone: string;
+// }
 
-interface PayementRequest {
-  amount: number;
-  currency: string;
-  description: string;
-  return_url: string;
-  customer: Customer;
-}
+// interface PayementRequest {
+//   amount: number;
+//   currency: string;
+//   description: string;
+//   return_url: string;
+//   customer: Customer;
+// }
 
 const ReservationCircuit = () => {
   const [messageApi, contextHolder] = message.useMessage();
@@ -443,7 +443,7 @@ const ReservationCircuit = () => {
 
     if (isValid) {
       console.log("Form submitted with values:", formValues);
-      // handlePost(formValues);
+      handlePost(formValues);
     } else {
       messageApi.error("Veuillez remplir tous les champs obligatoires");
     }
