@@ -318,6 +318,129 @@ const AllPackages: TravelPackage[] = [
       ],
     },
   },
+  {
+    id: "a92f8e7c3b5d4a1f9e6d", // random UUID style
+    baseInfo: {
+      day: 7,
+      night: 6,
+      title: "Esprit des Femmes – Rituels, Artisanat & Puissance Féminine",
+      description:
+        "Pendant 7 jours, laissez-vous emporter par une expérience unique où se rencontrent artisanes, prêtresses, stylistes et productrices inspirantes. Découvrez des lieux sacrés dédiés aux femmes et aux Amazones, participez à des ateliers créatifs (head wrap, peinture, cuisine, écriture) et vivez des instants de bien-être (spa, plage, bains thermaux). Ce séjour est une parenthèse intime et solidaire pour reconnecter le corps, l’esprit et la sororité.",
+    },
+    timeline: [
+      {
+        title: "Bienvenue au Bénin !",
+        subtitle: "Arrivée à l’aéroport de Cotonou",
+        times: [
+          "Accueil personnalisé & dîner convivial",
+          "Installation dans votre hébergement",
+        ],
+        position: "left",
+        image: img1,
+      },
+      {
+        title: "Cotonou : Beauté & Créativité",
+        subtitle: "07h30 - Petit-déjeuner",
+        times: [
+          "08h30 - Départ pour le Marché des Arts de Cotonou",
+          "09h00 - 10h30 : Découverte du marché des arts (échanges avec les artisanes)",
+          "10h30 - Balade : Mur de fresques patrimoniales & Place de l’Amazone",
+          "12h30 - Déjeuner dans un restaurant local",
+          "14h30 - Pause bien-être à l’Institut L.A Beauty (coiffure, pédicure, massage…)",
+          "18h00 - Atelier peinture en plein air à Fidjrossè",
+          "20h00 - Dîner",
+        ],
+        position: "right",
+        image: img2,
+      },
+      {
+        title: "Ouidah : Mémoire & Féminité",
+        subtitle: "07h30 - Petit-déjeuner",
+        times: [
+          "08h30 - Départ pour Ouidah",
+          "09h30 - Atelier culinaire au resto Kolè : préparation et dégustation d’un plat traditionnel oublié",
+          "15h00 - Découvertes : Temple des Pythons, Indigo Home (teinture indigo, artisanat local)",
+          "18h00 - Soirée détente à la plage (coucher de soleil, noix de coco)",
+          "20h00 - Retour à Cotonou & dîner",
+        ],
+        position: "left",
+        image: img3,
+      },
+      {
+        title: "Porto-Novo : Héritage & Nature",
+        subtitle: "07h00 - Petit-déjeuner",
+        times: [
+          "08h00 - Départ pour Adjarra",
+          "09h00 - Balade en pirogue sur la Rivière noire",
+          "Rencontre avec des productrices de vin & sodabi à Avrankou",
+          "13h00 - Déjeuner dans un restaurant local",
+          "14h00 - Visite du Musée Honmè & Jardin des Plantes et de la Nature",
+          "18h00 - Retour à Cotonou / temps libre",
+          "20h00 - Dîner",
+        ],
+        position: "right",
+        image: img4,
+      },
+      {
+        title: "Abomey : Amazones & Royauté",
+        subtitle: "07h00 - Petit-déjeuner express",
+        times: [
+          "10h30 - Visite du palais privé du Roi Agonglo + atelier de tissage traditionnel",
+          "12h30 - Découverte de la place ADANZOUNDJI (lieu sacré des Amazones du Dahomey)",
+          "13h00 - Brunch ou déjeuner en ville",
+          "14h30 - Visite du Lieu Unik + séance photo en accoutrements royaux et amazones",
+          "17h00 - Détente à la place Goho (statue de Béhanzin) + dégustation de jus de coco",
+          "19h00 - Dîner & nuit sur place",
+        ],
+        position: "left",
+        image: img5,
+      },
+      {
+        title: "Possotomè : Bien-être & Sororité",
+        subtitle: "07h00 - Petit-déjeuner express",
+        times: [
+          "10h00 - Matinée chic aux Merveilles du Lac Bopa (jeux aquatiques, détente)",
+          "13h00 - Déjeuner les pieds dans l’eau",
+          "15h00 - Détente chez Théo : massages, bains thermaux, piscine à débordement",
+          "19h00 - Dîner & nuit sur place",
+        ],
+        position: "right",
+        image: img1,
+      },
+      {
+        title: "Transmission & Célébration",
+        subtitle: "Matinée libre",
+        times: [
+          "Achats, détente, interviews vidéo si souhaitées",
+          "Atelier créatif + Bomba Picnic en tenue traditionnelle",
+          "Rencontre solidaire avec les structures soutenues par Dahomey Discovery",
+          "Dîner de clôture (surprise)",
+          "20h00 - Transfert vers l’aéroport ou point de retour",
+        ],
+        position: "left",
+        image: img2,
+      },
+    ],
+    inclusion: {
+      inclus: [
+        "Hébergement 6 nuits (hôtel ou maison d’hôte)",
+        "Transport tout au long du séjour",
+        "Guide certifié sur chaque site",
+        "Prise en charge à l’aéroport (pour touristes étrangers)",
+        "Accompagnement personnalisé",
+        "Connexion internet lors des sorties",
+        "Eau minérale",
+      ],
+      nonInclus: [
+        "Boissons supplémentaires et alcoolisées",
+        "Dépenses personnelles",
+        "Assurance voyage (facultative)",
+        "Activités à la carte (rituel, massage, etc.)",
+        "Vols internationaux A/R",
+        "Frais de visa",
+      ],
+    },
+  },
 ];
 
 export const CircuitView = () => {

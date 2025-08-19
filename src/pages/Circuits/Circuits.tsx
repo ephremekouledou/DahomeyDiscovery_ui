@@ -249,6 +249,17 @@ const Circuits = () => {
         nights: 7,
         price: "50.000 FCFA",
       },
+      {
+        id: "a92f8e7c3b5d4a1f9e6d",
+        image: img,
+        video: video,
+        title: "Esprit des Femmes – Rituels, Artisanat & Puissance Féminine",
+        description:
+          "Pendant 7 jours, laissez-vous emporter par une expérience unique où se rencontrent artisanes, prêtresses, stylistes et productrices inspirantes. Découvrez des lieux sacrés dédiés aux femmes et aux Amazones, participez à des ateliers créatifs (head wrap, peinture, cuisine, écriture) et vivez des instants de bien-être (spa, plage, bains thermaux). Ce séjour est une parenthèse intime et solidaire pour reconnecter le corps, l’esprit et la sororité.",
+        days: 7,
+        nights: 6,
+        price: "50.000 FCFA",
+      },
     ],
     []
   );
