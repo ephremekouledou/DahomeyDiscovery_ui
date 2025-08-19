@@ -166,7 +166,7 @@ const StaggeredGrid = ({
     {
       ville: "Cotonou",
       description:
-        "Art urbain,\nmarchés, street\nfood, fresques &\nvie moderne",
+        "Marchés, Arts et Culture Urbaine",
       image:
         "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
     },
@@ -299,47 +299,47 @@ const CircuitsCartes = () => {
     {
       ville: "Cotonou",
       description:
-        "Art urbain,\nmarchés, street\nfood, fresques &\nvie moderne",
+        "Marchés, Arts et Culture Urbaine",
       image: cotonou,
     },
     {
       ville: "Abomey",
-      description: "Monuments,\nmusées, cuisine\nraffrinée & mode",
+      description: "Histoire, Traditions et Artisanat",
       image: abomey,
     },
     {
       ville: "Dassa",
-      description: "Tradition,\ntechnologie,\nculture pop &\narchitecture",
+      description: "Montagnes et spiritualité",
       image: dassa,
     },
     {
       ville: "Ganvie",
-      description: "Gratte-ciels,\nBroadway, diversité\n& énergie urbaine",
+      description: "Vie lacustre et immersion",
       image: ganvie,
     },
     {
       ville: "Gogotinkpon",
-      description: "Histoire,\nthéâtres, pubs\n& architecture\nvictorienne",
+      description: "Immersion villageoise et écologie",
       image: gogotinkpon,
     },
     {
       ville: "Grand-Popo",
-      description: "Gaudí,\narchitecture,\ntapas & vie\nnocturne",
+      description: "Détente et Nature",
       image: popo,
     },
     {
       ville: "Ouidah",
-      description: "Culture,\ntraditions, art\ncontemporain &\nscène musicale",
+      description: "Culture , Histoire et découverte",
       image: ouidah,
     },
     {
       ville: "Porto-Novo",
-      description: "Plages,\nculture, gastronomie\n& vie nocturne",
+      description: "Histoire et Art",
       image: porto,
     },
     {
       ville: "Possotomè",
-      description: "Nature,\nculture, artisanat\n& traditions",
+      description: "Détente et Nature",
       image: possotome,
     },
   ];
