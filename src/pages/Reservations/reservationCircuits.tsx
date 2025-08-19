@@ -16,10 +16,8 @@ import {
 } from "antd";
 import {
   UserOutlined,
-  BankOutlined,
   MailOutlined,
   DeleteOutlined,
-  GlobalOutlined,
   ContactsOutlined,
   CalendarOutlined,
   TeamOutlined,
@@ -32,6 +30,21 @@ import NavBar from "../../components/navBar/navBar";
 const { Title } = Typography;
 const { Step } = Steps;
 const { Option } = Select;
+
+interface Customer {
+  email: string;
+  first_name: string;
+  last_name: string;
+  phone: string;
+}
+
+interface PayementRequest {
+  amount: number;
+  currency: string;
+  description: string;
+  return_url: string;
+  customer: Customer;
+}
 
 const ReservationCircuit = () => {
   const [messageApi, contextHolder] = message.useMessage();
@@ -52,13 +65,13 @@ const ReservationCircuit = () => {
   }, []);
 
   // Effet pour définir le titre de la page
-    useEffect(() => {
-      document.title = "Réservation de Circuit";
-    }, []);
+  useEffect(() => {
+    document.title = "Réservation de Circuit";
+  }, []);
 
   // Add circuit pricing
   const circuitPrices: { [key: string]: number } = {
-    "signature": 850,
+    signature: 850,
     "esprit-femmes": 1200,
     "immersion-savoir-faire": 650,
     "spiritualite-traditions-vodoun": 950,
@@ -102,7 +115,10 @@ const ReservationCircuit = () => {
               label: "Circuit Esprit des Femmes - Féminin sacré et créatif",
               value: "esprit-femmes",
             },
-            { label: "Circuit Immersion & Savoir-Faire", value: "immersion-savoir-faire" },
+            {
+              label: "Circuit Immersion & Savoir-Faire",
+              value: "immersion-savoir-faire",
+            },
             {
               label: "Circuit Spiritualité & Traditions Vodoun",
               value: "spiritualite-traditions-vodoun",
@@ -175,75 +191,75 @@ const ReservationCircuit = () => {
           prefix: <ContactsOutlined />,
           type: "text",
         },
-        {
-          name: "address",
-          label: "Adresse",
-          required: true,
-          errorMsg: "Veuillez entrer votre adresse",
-          placeholder: "123 rue de Paris",
-          prefix: <BankOutlined />,
-          type: "text",
-        },
-        {
-          name: "city",
-          label: "Ville",
-          required: true,
-          errorMsg: "Veuillez entrer votre ville",
-          placeholder: "Paris",
-          prefix: <EnvironmentOutlined />,
-          type: "text",
-        },
-        {
-          name: "state",
-          label: "Région/État",
-          required: true,
-          errorMsg: "Veuillez entrer votre région",
-          placeholder: "Île-de-France",
-          prefix: <GlobalOutlined />,
-          type: "text",
-        },
-        {
-          name: "country",
-          label: "Code pays",
-          required: true,
-          errorMsg: "Veuillez sélectionner votre pays",
-          placeholder: "Sélectionnez votre pays",
-          prefix: <GlobalOutlined />,
-          type: "select",
-          options: [
-            { label: "France (FR)", value: "FR" },
-            { label: "Belgique (BE)", value: "BE" },
-            { label: "Suisse (CH)", value: "CH" },
-            { label: "Canada (CA)", value: "CA" },
-            { label: "États-Unis (US)", value: "US" },
-            { label: "Allemagne (DE)", value: "DE" },
-            { label: "Espagne (ES)", value: "ES" },
-            { label: "Italie (IT)", value: "IT" },
-            { label: "Royaume-Uni (GB)", value: "GB" },
-            { label: "Bénin (BJ)", value: "BJ" },
-            { label: "Côte d'Ivoire (CI)", value: "CI" },
-            { label: "Sénégal (SN)", value: "SN" },
-            { label: "Mali (ML)", value: "ML" },
-            { label: "Burkina Faso (BF)", value: "BF" },
-            { label: "Niger (NE)", value: "NE" },
-            { label: "Togo (TG)", value: "TG" },
-            { label: "Ghana (GH)", value: "GH" },
-            { label: "Nigeria (NG)", value: "NG" },
-            { label: "Maroc (MA)", value: "MA" },
-            { label: "Tunisie (TN)", value: "TN" },
-            { label: "Algérie (DZ)", value: "DZ" },
-            { label: "Autre", value: "OTHER" },
-          ],
-        },
-        {
-          name: "zip",
-          label: "Code postal",
-          required: true,
-          errorMsg: "Veuillez entrer votre code postal",
-          placeholder: "75001",
-          prefix: <BankOutlined />,
-          type: "text",
-        },
+        // {
+        //   name: "address",
+        //   label: "Adresse",
+        //   required: true,
+        //   errorMsg: "Veuillez entrer votre adresse",
+        //   placeholder: "123 rue de Paris",
+        //   prefix: <BankOutlined />,
+        //   type: "text",
+        // },
+        // {
+        //   name: "city",
+        //   label: "Ville",
+        //   required: true,
+        //   errorMsg: "Veuillez entrer votre ville",
+        //   placeholder: "Paris",
+        //   prefix: <EnvironmentOutlined />,
+        //   type: "text",
+        // },
+        // {
+        //   name: "state",
+        //   label: "Région/État",
+        //   required: true,
+        //   errorMsg: "Veuillez entrer votre région",
+        //   placeholder: "Île-de-France",
+        //   prefix: <GlobalOutlined />,
+        //   type: "text",
+        // },
+        // {
+        //   name: "country",
+        //   label: "Code pays",
+        //   required: true,
+        //   errorMsg: "Veuillez sélectionner votre pays",
+        //   placeholder: "Sélectionnez votre pays",
+        //   prefix: <GlobalOutlined />,
+        //   type: "select",
+        //   options: [
+        //     { label: "France (FR)", value: "FR" },
+        //     { label: "Belgique (BE)", value: "BE" },
+        //     { label: "Suisse (CH)", value: "CH" },
+        //     { label: "Canada (CA)", value: "CA" },
+        //     { label: "États-Unis (US)", value: "US" },
+        //     { label: "Allemagne (DE)", value: "DE" },
+        //     { label: "Espagne (ES)", value: "ES" },
+        //     { label: "Italie (IT)", value: "IT" },
+        //     { label: "Royaume-Uni (GB)", value: "GB" },
+        //     { label: "Bénin (BJ)", value: "BJ" },
+        //     { label: "Côte d'Ivoire (CI)", value: "CI" },
+        //     { label: "Sénégal (SN)", value: "SN" },
+        //     { label: "Mali (ML)", value: "ML" },
+        //     { label: "Burkina Faso (BF)", value: "BF" },
+        //     { label: "Niger (NE)", value: "NE" },
+        //     { label: "Togo (TG)", value: "TG" },
+        //     { label: "Ghana (GH)", value: "GH" },
+        //     { label: "Nigeria (NG)", value: "NG" },
+        //     { label: "Maroc (MA)", value: "MA" },
+        //     { label: "Tunisie (TN)", value: "TN" },
+        //     { label: "Algérie (DZ)", value: "DZ" },
+        //     { label: "Autre", value: "OTHER" },
+        //   ],
+        // },
+        // {
+        //   name: "zip",
+        //   label: "Code postal",
+        //   required: true,
+        //   errorMsg: "Veuillez entrer votre code postal",
+        //   placeholder: "75001",
+        //   prefix: <BankOutlined />,
+        //   type: "text",
+        // },
       ],
     },
   ];
@@ -427,7 +443,7 @@ const ReservationCircuit = () => {
 
     if (isValid) {
       console.log("Form submitted with values:", formValues);
-      handlePost(formValues);
+      // handlePost(formValues);
     } else {
       messageApi.error("Veuillez remplir tous les champs obligatoires");
     }
@@ -590,7 +606,12 @@ const ReservationCircuit = () => {
 
   return (
     <>
-      <Flex justify="center" align="center" vertical style={{ backgroundColor: "#F9FAFB" }}>
+      <Flex
+        justify="center"
+        align="center"
+        vertical
+        style={{ backgroundColor: "#F9FAFB" }}
+      >
         {/* Header avec NavBar */}
         <div className="relative z-20 flex items-center justify-center">
           <NavBar menu="" />
@@ -728,7 +749,8 @@ const ReservationCircuit = () => {
                                 color: "#f59f00",
                               }}
                             >
-                              {calculateTotalAmount().toLocaleString("fr-FR")} FCFA
+                              {calculateTotalAmount().toLocaleString("fr-FR")}{" "}
+                              FCFA
                             </p>
                             <p style={{ fontSize: "14px", color: "#666" }}>
                               {circuitPrices[formValues.circuit]} FCFA{" "}

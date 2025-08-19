@@ -39,6 +39,14 @@ import Footer from "../../components/footer/footer";
 import { useTransaction } from "../../context/transactionContext";
 import bonneAdressImg from "../../assets/images/bonnesAddresse.webp";
 import BeginningButton from "../../components/dededed/BeginingButton";
+import imgElia1 from "../../assets/images/EliaPhoto/1.jpg";
+import imgElia2 from "../../assets/images/EliaPhoto/2.jpg";
+import imgElia3 from "../../assets/images/EliaPhoto/3.jpg";
+import imgElia4 from "../../assets/images/EliaPhoto/4.jpg";
+import imgElia5 from "../../assets/images/EliaPhoto/5.jpg";
+import imgElia6 from "../../assets/images/EliaPhoto/6.jpg";
+import imgElia7 from "../../assets/images/EliaPhoto/7.jpg";
+import imgElia8 from "../../assets/images/EliaPhoto/8.jpg";
 
 const images = [
   // img1,
@@ -130,17 +138,27 @@ interface AmenitiesGroup {
   [key: string]: Amenity[];
 }
 
-// Interface pour les données d'hébergement
+// Interface pour les options d'hébergement
+export interface AccommodationOption {
+  name: string;
+  description: string;
+  photo: string;
+  price: number;
+  amenities: AmenitiesGroup;
+}
+
+// Interface pour les données d'hébergement (modifiée)
 export interface AccommodationData {
   id: string;
   name: string;
-  price: number;
+  price?: number; // Optionnel maintenant si des options sont disponibles
   rating: number;
   reviewCount: number;
   mainImage: string;
   images: string[];
   description: string;
-  amenities: AmenitiesGroup;
+  amenities?: AmenitiesGroup; // Optionnel si des options sont disponibles
+  options?: AccommodationOption[]; // Nouvelles options
   owner: boolean; // Indique si l'hébergement est géré par l'utilisateur
 }
 
@@ -186,6 +204,21 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({
         }
       />
     ));
+  };
+
+  // Calculer le prix à afficher
+  const getPriceDisplay = () => {
+    if (accommodation.options && accommodation.options.length > 0) {
+      const prices = accommodation.options.map(option => option.price);
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      
+      if (minPrice === maxPrice) {
+        return `${minPrice}€`;
+      }
+      return `${minPrice}€ - ${maxPrice}€`;
+    }
+    return `${accommodation.price}€`;
   };
 
   return (
@@ -240,15 +273,7 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({
                     isMobile ? "text-xl" : "text-2xl"
                   }`}
                 >
-                  {accommodation.price}€
-                </span>
-                <span
-                  className={`text-gray-600 ${
-                    isMobile ? "text-xs" : "text-sm"
-                  }`}
-                >
-                  {" "}
-                  / nuit
+                  {getPriceDisplay()}
                 </span>
               </div>
 
@@ -284,8 +309,120 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({
   );
 };
 
-// Exemple d'utilisation avec données typées
+// Exemple d'utilisation avec données typées (modifié)
 export const createExampleAccommodation = (): AccommodationData[] => [
+  {
+    id: "846567erfsrfdrfdesew",
+    name: "ELIA",
+    rating: 4.8,
+    reviewCount: 124,
+    mainImage: imgElia1,
+    images: [
+      imgElia1,
+      imgElia2,
+      imgElia3,
+      imgElia4,
+      imgElia5,
+      imgElia6,
+      imgElia7,
+      imgElia8
+    ],
+    description:
+      "Face au murmure des vagues, Cette Résidence vous ouvre ses portes : chambres raffinées, piscine clé en main, jardins apaisants et restauration locale et internationale. À quelques minutes de l'aéroport de Cotonou, cette adresse incarne l'âme de la coste béninoise. Éléments préférés de nos voyageurs ? Le personnel chaleureux, la propreté du lieu, et ce sentiment d'être chez soi… tout en étant ailleurs.",
+    options: [
+      {
+        name: "Chambre Standard",
+        description: "Chambre confortable avec vue sur jardin",
+        photo: imgElia2,
+        price: 120,
+        amenities: {
+          entertainment: [{ name: "Télévision", icon: Tv, available: true }],
+          heating: [{ name: "Climatisation", icon: Snowflake, available: true }],
+          internet: [{ name: "Wifi", icon: Wifi, available: true }],
+          comfort: [
+            { name: "Équipements de base", icon: User, available: true },
+            { name: "Eau chaude", icon: Droplets, available: true },
+          ],
+        },
+      },
+      {
+        name: "Chambre Deluxe",
+        description: "Chambre spacieuse avec balcon et vue sur mer",
+        photo: imgElia3,
+        price: 180,
+        amenities: {
+          entertainment: [{ name: "Télévision", icon: Tv, available: true }],
+          heating: [{ name: "Climatisation", icon: Snowflake, available: true }],
+          internet: [
+            { name: "Wifi", icon: Wifi, available: true },
+            { name: "Espace de travail dédié", icon: User, available: true },
+          ],
+          location: [
+            {
+              name: "Accès plage ou bord de mer",
+              icon: MapPin,
+              available: true,
+              description: "Vue sur mer depuis le balcon",
+            },
+          ],
+          comfort: [
+            { name: "Équipements de base", icon: User, available: true },
+            { name: "Eau chaude", icon: Droplets, available: true },
+          ],
+        },
+      },
+      {
+        name: "Suite Présidentielle",
+        description: "Suite luxueuse avec salon séparé et vue panoramique sur l'océan",
+        photo: imgElia4,
+        price: 250,
+        amenities: {
+          entertainment: [{ name: "Télévision", icon: Tv, available: true }],
+          heating: [{ name: "Climatisation", icon: Snowflake, available: true }],
+          internet: [
+            { name: "Wifi", icon: Wifi, available: true },
+            { name: "Espace de travail dédié", icon: User, available: true },
+          ],
+          kitchen: [
+            {
+              name: "Mini-cuisine",
+              icon: UtensilsCrossed,
+              available: true,
+              description: "Kitchenette équipée",
+            },
+          ],
+          location: [
+            {
+              name: "Accès plage ou bord de mer",
+              icon: MapPin,
+              available: true,
+              description: "Vue panoramique sur l'océan",
+            },
+          ],
+          parking: [
+            { name: "Parking gratuit sur place", icon: Car, available: true },
+          ],
+          safety: [
+            {
+              name: "Caméras de surveillance extérieures",
+              icon: Camera,
+              available: true,
+            },
+          ],
+          laundry: [
+            { name: "Lave-linge", icon: Shirt, available: true },
+            { name: "Sèche-linge", icon: Wind, available: true },
+          ],
+          comfort: [
+            { name: "Équipements de base", icon: User, available: true },
+            { name: "Chauffage", icon: Thermometer, available: true },
+            { name: "Eau chaude", icon: Droplets, available: true },
+          ],
+        },
+      },
+    ],
+    owner: true,
+  },
   {
     id: "846567erfsrfdrf",
     name: "Villa Océane - Vue mer exceptionnelle",
@@ -365,7 +502,6 @@ export const createExampleAccommodation = (): AccommodationData[] => [
   {
     id: "es7f8s7f8s7f8s7f8s7f8s7f8s7f8s7f8",
     name: "Appartement Centre-ville - Moderne & lumineux",
-    price: 95,
     rating: 4.5,
     reviewCount: 87,
     mainImage:
@@ -377,43 +513,44 @@ export const createExampleAccommodation = (): AccommodationData[] => [
     ],
     description:
       "Appartement moderne situé au cœur du centre-ville, proche de toutes commodités. Idéal pour les voyageurs d'affaires ou les couples souhaitant découvrir la ville.",
-    amenities: {
-      entertainment: [{ name: "Télévision", icon: Tv, available: true }],
-      heating: [{ name: "Chauffage", icon: Thermometer, available: true }],
-      internet: [
-        { name: "Wifi", icon: Wifi, available: true },
-        { name: "Espace de travail dédié", icon: User, available: true },
-      ],
-      kitchen: [
-        {
-          name: "Cuisine équipée",
-          icon: UtensilsCrossed,
-          available: true,
+    options: [
+      {
+        name: "Studio",
+        description: "Studio moderne avec kitchenette",
+        photo: "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=600&h=400&fit=crop",
+        price: 85,
+        amenities: {
+          entertainment: [{ name: "Télévision", icon: Tv, available: true }],
+          heating: [{ name: "Chauffage", icon: Thermometer, available: true }],
+          internet: [{ name: "Wifi", icon: Wifi, available: true }],
+          kitchen: [{ name: "Kitchenette", icon: UtensilsCrossed, available: true }],
+          comfort: [
+            { name: "Équipements de base", icon: User, available: true },
+            { name: "Eau chaude", icon: Droplets, available: true },
+          ],
         },
-      ],
-      location: [
-        {
-          name: "Centre-ville",
-          icon: MapPin,
-          available: true,
+      },
+      {
+        name: "Appartement 2 pièces",
+        description: "Spacieux appartement avec chambre séparée",
+        photo: "https://images.unsplash.com/photo-1464983953574-0892a716854b?w=600&h=400&fit=crop",
+        price: 120,
+        amenities: {
+          entertainment: [{ name: "Télévision", icon: Tv, available: true }],
+          heating: [{ name: "Chauffage", icon: Thermometer, available: true }],
+          internet: [
+            { name: "Wifi", icon: Wifi, available: true },
+            { name: "Espace de travail dédié", icon: User, available: true },
+          ],
+          kitchen: [{ name: "Cuisine équipée", icon: UtensilsCrossed, available: true }],
+          laundry: [{ name: "Lave-linge", icon: Shirt, available: true }],
+          comfort: [
+            { name: "Équipements de base", icon: User, available: true },
+            { name: "Eau chaude", icon: Droplets, available: true },
+          ],
         },
-      ],
-      parking: [
-        { name: "Parking public à proximité", icon: Car, available: false },
-      ],
-      safety: [
-        {
-          name: "Détecteur de fumée",
-          icon: Flame,
-          available: true,
-        },
-      ],
-      laundry: [{ name: "Lave-linge", icon: Shirt, available: true }],
-      comfort: [
-        { name: "Équipements de base", icon: User, available: true },
-        { name: "Eau chaude", icon: Droplets, available: true },
-      ],
-    },
+      },
+    ],
     owner: false,
   },
   {
@@ -548,7 +685,7 @@ export const createExampleAccommodation = (): AccommodationData[] => [
   },
 ];
 
-// Interface pour les filtres
+// Interface pour les filtres (modifiée)
 interface FilterOptions {
   priceRange: [number, number];
   minRating: number;
@@ -583,25 +720,50 @@ const FilterSection = ({
     }));
   };
 
-  // Extraire toutes les commodités disponibles
+  // Extraire toutes les commodités disponibles (modifié pour supporter les options)
   const allAmenities = useMemo(() => {
     const amenitiesSet = new Set<string>();
     accommodations.forEach((acc) => {
-      Object.values(acc.amenities).forEach((categoryAmenities) => {
-        categoryAmenities.forEach((amenity) => {
-          if (amenity.available) {
-            amenitiesSet.add(amenity.name);
-          }
+      // Commodités de l'hébergement principal
+      if (acc.amenities) {
+        Object.values(acc.amenities).forEach((categoryAmenities) => {
+          categoryAmenities.forEach((amenity) => {
+            if (amenity.available) {
+              amenitiesSet.add(amenity.name);
+            }
+          });
         });
-      });
+      }
+      
+      // Commodités des options
+      if (acc.options) {
+        acc.options.forEach((option) => {
+          Object.values(option.amenities).forEach((categoryAmenities) => {
+            categoryAmenities.forEach((amenity) => {
+              if (amenity.available) {
+                amenitiesSet.add(amenity.name);
+              }
+            });
+          });
+        });
+      }
     });
     return Array.from(amenitiesSet).sort();
   }, [accommodations]);
 
-  // Obtenir les prix min et max
+  // Obtenir les prix min et max (modifié pour supporter les options)
   const priceRange = useMemo(() => {
-    const prices = accommodations.map((acc) => acc.price);
-    return [Math.min(...prices), Math.max(...prices)];
+    const prices: number[] = [];
+    accommodations.forEach((acc) => {
+      if (acc.options && acc.options.length > 0) {
+        // Si l'hébergement a des options, prendre tous les prix des options
+        acc.options.forEach(option => prices.push(option.price));
+      } else if (acc.price) {
+        // Sinon, prendre le prix principal
+        prices.push(acc.price);
+      }
+    });
+    return prices.length > 0 ? [Math.min(...prices), Math.max(...prices)] : [0, 500];
   }, [accommodations]);
 
   const handlePriceChange = (index: number, value: number) => {
@@ -850,7 +1012,7 @@ const Hebergements = () => {
   const [isTablet, setIsTablet] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<FilterOptions>({
-    priceRange: [0, 200],
+    priceRange: [0, 300], // Augmenté pour prendre en compte les options
     minRating: 0,
     selectedAmenities: [],
     accommodationType: "all",
@@ -862,7 +1024,7 @@ const Hebergements = () => {
 
   const accommodation = createExampleAccommodation();
 
-  // Filtrer les hébergements
+  // Filtrer les hébergements (modifié pour supporter les options)
   const filteredAccommodations = useMemo(() => {
     return accommodation.filter((accommodation) => {
       // Filtre par recherche textuelle
@@ -881,25 +1043,50 @@ const Hebergements = () => {
         if (accommodation.owner !== isOwner) return false;
       }
 
-      // Filtre par prix
-      if (
-        accommodation.price < filters.priceRange[0] ||
-        accommodation.price > filters.priceRange[1]
-      ) {
-        return false;
+      // Filtre par prix (modifié pour les options)
+      let priceMatches = false;
+      if (accommodation.options && accommodation.options.length > 0) {
+        // Vérifier si au moins une option est dans la fourchette de prix
+        priceMatches = accommodation.options.some(option => 
+          option.price >= filters.priceRange[0] && option.price <= filters.priceRange[1]
+        );
+      } else if (accommodation.price) {
+        // Vérifier le prix principal
+        priceMatches = accommodation.price >= filters.priceRange[0] && 
+                      accommodation.price <= filters.priceRange[1];
       }
+      if (!priceMatches) return false;
 
       // Filtre par note
       if (accommodation.rating < filters.minRating) {
         return false;
       }
 
-      // Filtre par équipements
+      // Filtre par équipements (modifié pour supporter les options)
       if (filters.selectedAmenities.length > 0) {
-        const accommodationAmenities = Object.values(accommodation.amenities)
-          .flat()
-          .filter((amenity) => amenity.available)
-          .map((amenity) => amenity.name);
+        let accommodationAmenities: string[] = [];
+        
+        // Commodités de l'hébergement principal
+        if (accommodation.amenities) {
+          accommodationAmenities = Object.values(accommodation.amenities)
+            .flat()
+            .filter((amenity) => amenity.available)
+            .map((amenity) => amenity.name);
+        }
+        
+        // Commodités des options
+        if (accommodation.options) {
+          accommodation.options.forEach(option => {
+            const optionAmenities = Object.values(option.amenities)
+              .flat()
+              .filter((amenity) => amenity.available)
+              .map((amenity) => amenity.name);
+            accommodationAmenities = [...accommodationAmenities, ...optionAmenities];
+          });
+        }
+        
+        // Supprimer les doublons
+        accommodationAmenities = [...new Set(accommodationAmenities)];
 
         const hasAllSelectedAmenities = filters.selectedAmenities.every(
           (selectedAmenity) => accommodationAmenities.includes(selectedAmenity)
@@ -1119,7 +1306,9 @@ const Hebergements = () => {
                         setTransaction({
                           id: acc.id,
                           title: acc.name,
-                          amount: acc.price,
+                          amount: acc.options && acc.options.length > 0
+                            ? Math.min(...acc.options.map((opt: any) => opt.price))
+                            : acc.price,
                         });
                         navigate("/reservations-locations");
                       }}
@@ -1165,7 +1354,9 @@ const Hebergements = () => {
                         setTransaction({
                           id: acc.id,
                           title: acc.name,
-                          amount: acc.price,
+                          amount: acc.options && acc.options.length > 0
+                            ? Math.min(...acc.options.map((opt: any) => opt.price))
+                            : acc.price,
                         });
                         navigate("/reservations-locations");
                       }}

@@ -5,7 +5,8 @@ import { useEffect, useState, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
 import debut from "../../assets/images/Circuit signature/Début.webp";
-import video from "../../assets/videos/usagevid1.mp4";
+// import video from "../../assets/videos/usagevid1.mp4";
+import reel from "../../assets/videos/video drone horizontale Abomey .mp4";
 import img1 from "../../assets/images/Circuit signature/1_5.webp";
 import img2 from "../../assets/images/Circuit signature/2_5.webp";
 import img3 from "../../assets/images/Circuit signature/3_5.jpeg";
@@ -292,7 +293,7 @@ const CircuitsSignature = () => {
             console.error("Video error:", e);
           }}
         >
-          <source src={video} type="video/mp4" />
+          <source src={reel} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
 

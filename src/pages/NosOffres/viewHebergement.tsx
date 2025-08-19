@@ -4,11 +4,12 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import NavBar from "../../components/navBar/navBar";
 import {
   AccommodationData,
+  AccommodationOption,
   Amenity,
   BalancedAmenities,
   createExampleAccommodation,
 } from "./hebergement";
-import { Star } from "lucide-react";
+import { Star, Check } from "lucide-react";
 import { useTransaction } from "../../context/transactionContext";
 import Footer from "../../components/footer/footer";
 import BeginningButton from "../../components/dededed/BeginingButton";
@@ -22,11 +23,20 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
   images,
   description,
   amenities,
+  options,
 }) => {
   const { setTransaction } = useTransaction();
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
+  const [selectedOption, setSelectedOption] = useState<AccommodationOption | null>(null);
+
+  // Si il y a des options, on sélectionne la première par défaut
+  useEffect(() => {
+    if (options && options.length > 0) {
+      setSelectedOption(null); // Ne pas sélectionner par défaut, forcer l'utilisateur à choisir
+    }
+  }, [options]);
 
   const nextImage = (): void => {
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
@@ -50,8 +60,8 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
     ));
   };
 
-  const getBalancedAmenities = (): BalancedAmenities => {
-    const amenityEntries = Object.entries(amenities);
+  const getBalancedAmenities = (amenitiesToUse: any): BalancedAmenities => {
+    const amenityEntries = Object.entries(amenitiesToUse) as [string, Amenity[]][];
     const totalSections = amenityEntries.length;
     const midPoint = Math.ceil(totalSections / 2);
 
@@ -125,7 +135,59 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
     );
   };
 
-  const { leftColumn, rightColumn } = getBalancedAmenities();
+  const renderOptionCard = (option: AccommodationOption, index: number): React.ReactNode => {
+    const isSelected = selectedOption === option;
+    
+    return (
+      <div
+        key={index}
+        onClick={() => setSelectedOption(option)}
+        className={`relative cursor-pointer rounded-lg border-2 transition-all duration-300 overflow-hidden ${
+          isSelected 
+            ? "border-blue-500 shadow-lg bg-blue-50" 
+            : "border-gray-200 hover:border-gray-300 hover:shadow-md"
+        }`}
+      >
+        {/* Checkbox indicator */}
+        <div className={`absolute top-3 right-3 z-10 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+          isSelected 
+            ? "bg-blue-500 border-blue-500" 
+            : "bg-white border-gray-300"
+        }`}>
+          {isSelected && <Check size={16} className="text-white" />}
+        </div>
+
+        {/* Image */}
+        <div className="aspect-video w-full overflow-hidden">
+          <img
+            src={option.photo}
+            alt={option.name}
+            className="w-full h-full object-cover"
+          />
+        </div>
+
+        {/* Content */}
+        <div className="p-4">
+          <div className="flex justify-between items-start mb-2">
+            <h4 className="font-semibold text-lg text-gray-800">{option.name}</h4>
+            <div className="text-right">
+              <div className="text-xl font-bold text-blue-600">{option.price}€</div>
+              <div className="text-sm text-gray-600">par nuit</div>
+            </div>
+          </div>
+          <p className="text-gray-600 text-sm leading-relaxed">{option.description}</p>
+        </div>
+      </div>
+    );
+  };
+
+  // Déterminer les équipements à afficher
+  const amenitiesToDisplay = selectedOption ? selectedOption.amenities : amenities;
+  const currentPrice = selectedOption ? selectedOption.price : price;
+  const { leftColumn, rightColumn } = amenitiesToDisplay ? getBalancedAmenities(amenitiesToDisplay) : { leftColumn: [], rightColumn: [] };
+
+  // Déterminer si le bouton de réservation doit être actif
+  const isReservationEnabled = options ? selectedOption !== null : true;
 
   return (
     <div className="flex-1 w-fit">
@@ -197,10 +259,12 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
             <span className="font-semibold ml-2 text-lg">{rating}</span>
             <span className="text-gray-600">({reviewCount} avis)</span>
           </div>
-          <div className="text-left md:text-right">
-            <div className="text-3xl font-bold text-blue-600">{price}€</div>
-            <div className="text-gray-600">par nuit</div>
-          </div>
+          {currentPrice && (
+            <div className="text-left md:text-right">
+              <div className="text-3xl font-bold text-blue-600">{currentPrice}€</div>
+              <div className="text-gray-600">par nuit</div>
+            </div>
+          )}
         </div>
 
         {/* Description */}
@@ -213,37 +277,64 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
           </p>
         </div>
 
-        {/* Équipements avec distribution équilibrée */}
-        <div className="mb-8">
-          <h3 className="text-xl font-semibold mb-6 text-gray-800 border-b pb-2">
-            Ce que propose ce logement
-          </h3>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Colonne de gauche */}
-            <div className="space-y-6">
-              {leftColumn.map(([key, amenities]) =>
-                renderAmenitySection(amenityTitles[key] || key, amenities)
-              )}
+        {/* Options disponibles */}
+        {options && options.length > 0 && (
+          <div className="mb-8">
+            <h3 className="text-xl font-semibold mb-6 text-gray-800 border-b pb-2">
+              Options disponibles
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {options.map((option, index) => renderOptionCard(option, index))}
             </div>
+            {!selectedOption && (
+              <p className="text-center text-gray-600 mt-4 text-sm">
+                Sélectionnez une option pour voir les équipements et pouvoir réserver
+              </p>
+            )}
+          </div>
+        )}
 
-            {/* Colonne de droite */}
-            <div className="space-y-6">
-              {rightColumn.map(([key, amenities]) =>
-                renderAmenitySection(amenityTitles[key] || key, amenities)
-              )}
+        {/* Équipements avec distribution équilibrée */}
+        {amenitiesToDisplay && (
+          <div className="mb-8">
+            <h3 className="text-xl font-semibold mb-6 text-gray-800 border-b pb-2">
+              {selectedOption 
+                ? `Équipements - ${selectedOption.name}`
+                : "Ce que propose ce logement"
+              }
+            </h3>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Colonne de gauche */}
+              <div className="space-y-6">
+                {leftColumn.map(([key, amenities]) =>
+                  renderAmenitySection(amenityTitles[key] || key, amenities)
+                )}
+              </div>
+
+              {/* Colonne de droite */}
+              <div className="space-y-6">
+                {rightColumn.map(([key, amenities]) =>
+                  renderAmenitySection(amenityTitles[key] || key, amenities)
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Bouton de réservation */}
         <div className="mt-8 pt-6 border-t">
           <Button
             type="primary"
             size="large"
+            disabled={!isReservationEnabled}
             style={{
-              backgroundColor: isHovered ? "#ff3100" : "#F59F00",
-              color: isHovered ? "white" : "black",
+              backgroundColor: !isReservationEnabled 
+                ? "#d1d5db" 
+                : (isHovered ? "#ff3100" : "#F59F00"),
+              color: !isReservationEnabled 
+                ? "#6b7280" 
+                : (isHovered ? "white" : "black"),
               borderRadius: "7px",
               border: "none",
               fontFamily: "GeneralSans",
@@ -253,20 +344,25 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
               padding: "0 20px",
               fontWeight: "bold",
               width: "100%",
+              cursor: !isReservationEnabled ? "not-allowed" : "pointer",
             }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             onClick={() => {
-              setTransaction({
-                id: id,
-                title: name,
-                amount: price,
-              });
-              // we redirect to the payment page
-              navigate("/reservations-locations");
+              if (isReservationEnabled && currentPrice) {
+                setTransaction({
+                  id: id,
+                  title: selectedOption ? `${name} - ${selectedOption.name}` : name,
+                  amount: currentPrice,
+                });
+                navigate("/reservations-locations");
+              }
             }}
           >
-            Réserver maintenant
+            {!isReservationEnabled 
+              ? "Sélectionnez une option pour réserver"
+              : "Réserver maintenant"
+            }
           </Button>
         </div>
       </div>
@@ -306,6 +402,7 @@ const ViewHebergement = () => {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+  
   return (
     <Flex justify="center" vertical>
       <BeginningButton />

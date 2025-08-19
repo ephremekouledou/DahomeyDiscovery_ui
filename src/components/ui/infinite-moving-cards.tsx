@@ -1,5 +1,3 @@
-"use client";
-
 import { cn } from "../../utils/cn.ts";
 import React, { useEffect, useState } from "react";
 
@@ -23,11 +21,14 @@ export const InfiniteMovingCards = ({
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const scrollerRef = React.useRef<HTMLUListElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     addAnimation();
   }, []);
+  
   const [start, setStart] = useState(false);
+  
   function addAnimation() {
     if (containerRef.current && scrollerRef.current) {
       const scrollerContent = Array.from(scrollerRef.current.children);
@@ -44,6 +45,7 @@ export const InfiniteMovingCards = ({
       setStart(true);
     }
   }
+  
   const getDirection = () => {
     if (containerRef.current) {
       if (direction === "left") {
@@ -59,6 +61,7 @@ export const InfiniteMovingCards = ({
       }
     }
   };
+  
   const getSpeed = () => {
     if (containerRef.current) {
       if (speed === "fast") {
@@ -70,6 +73,19 @@ export const InfiniteMovingCards = ({
       }
     }
   };
+
+  const handleMouseEnter = () => {
+    if (pauseOnHover) {
+      setIsHovered(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (pauseOnHover) {
+      setIsHovered(false);
+    }
+  };
+
   return (
     <div
       ref={containerRef}
@@ -77,14 +93,18 @@ export const InfiniteMovingCards = ({
         "scroller relative z-20 overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]",
         className,
       )}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <ul
         ref={scrollerRef}
         className={cn(
           "flex w-max min-w-full shrink-0 flex-nowrap gap-4 py-4",
           start && "animate-scroll",
-          pauseOnHover && "hover:[animation-play-state:paused]",
         )}
+        style={{
+          animationPlayState: pauseOnHover && isHovered ? 'paused' : 'running'
+        }}
       >
         {items.map((item) => (
           <li

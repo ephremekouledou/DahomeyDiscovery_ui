@@ -42,15 +42,15 @@ const BREAKPOINTS = {
 const TESTIMONIALS = [
   {
     id: 1,
-    name: "Jenny Wilson",
-    service: "Solar energy service",
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    name: "LA STYLISTE BAROUDEUSE", 
+    service: "",
+    text: "Une véritable expérience humaine ! Mon séjour au Bénin avec Dahomey Discovery a été parfaitement orchestré : découvertes, rencontres, paysages à couper le souffle… de Cotonou à Abomey en passant par Porto-Novo, Ganvié et Ouidah. Une équipe à l’écoute, pro et passionnée. Pour une immersion authentique et sereine, je recommande à 100 % !",
     avatar: "👩‍💼",
   },
   {
     id: 2,
     name: "Dianne Russell",
-    service: "EV service",
+    service: "",
     text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     avatar: "👩‍🦱",
   },
@@ -284,7 +284,10 @@ const ThematicCircuitCard = ({
 const TestimonialCarousel = React.memo(
   ({ screenSize }: { screenSize: string }) => {
     const [translateX, setTranslateX] = useState(0);
+    const [isPaused, setIsPaused] = useState(false);
+    const [_, setMaxCardHeight] = useState(0);
     const animationRef = useRef<number | null>(null);
+    const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
     const config = useMemo(() => {
       const isMobile = screenSize === "mobile";
@@ -292,12 +295,12 @@ const TestimonialCarousel = React.memo(
 
       return {
         cardWidth: isMobile ? 90 : isTablet ? 50 : 33.333,
-        scrollSpeed: 0.05 /* isMobile ? 0.05 : isTablet ? 0.08 : 0.1 */,
+        scrollSpeed: 0.05,
         cardStyle: {
           minWidth: isMobile ? "320px" : isTablet ? "350px" : "400px",
           width: isMobile ? "85vw" : isTablet ? "45vw" : "30vw",
           maxWidth: isMobile ? "400px" : isTablet ? "450px" : "500px",
-          height: isMobile ? "280px" : "300px",
+          minHeight: isMobile ? "280px" : "300px", // Hauteur minimum
         },
         fontSize: isMobile ? "14px" : isTablet ? "15px" : "17px",
       };
@@ -316,18 +319,97 @@ const TestimonialCarousel = React.memo(
       [translateX, config.cardWidth]
     );
 
+    // Calculer la hauteur maximale des cartes
+    useEffect(() => {
+      const calculateMaxHeight = () => {
+        // Vérifier que toutes les cartes sont présentes
+        const validCards = cardsRef.current.filter(card => card !== null);
+        if (validCards.length < TESTIMONIALS.length) {
+          // Pas toutes les cartes sont encore montées, réessayer plus tard
+          setTimeout(calculateMaxHeight, 50);
+          return;
+        }
+        
+        let maxHeight = 0;
+        const minHeight = parseInt(config.cardStyle.minHeight);
+        
+        // Reset toutes les hauteurs à auto pour mesurer le contenu naturel
+        validCards.forEach((cardRef) => {
+          if (cardRef) {
+            cardRef.style.height = 'auto';
+            cardRef.style.minHeight = 'auto';
+          }
+        });
+        
+        // Forcer un reflow pour s'assurer que les mesures sont à jour
+        validCards.forEach((cardRef) => {
+          if (cardRef) {
+            cardRef.offsetHeight; // Force reflow
+          }
+        });
+        
+        // Mesurer les hauteurs après le reflow
+        validCards.forEach((cardRef) => {
+          if (cardRef) {
+            const cardHeight = cardRef.getBoundingClientRect().height;
+            maxHeight = Math.max(maxHeight, cardHeight);
+          }
+        });
+        
+        // S'assurer que la hauteur ne soit pas inférieure à la hauteur minimum
+        const finalHeight = Math.max(maxHeight, minHeight);
+        setMaxCardHeight(finalHeight);
+        
+        // Appliquer la hauteur calculée à TOUTES les cartes (incluant les duplicatas)
+        cardsRef.current.forEach((cardRef) => {
+          if (cardRef) {
+            cardRef.style.height = `${finalHeight}px`;
+            cardRef.style.minHeight = `${finalHeight}px`;
+          }
+        });
+        
+        // Aussi appliquer aux cartes dupliquées
+        const allCards = document.querySelectorAll('[data-testimonial-card]');
+        allCards.forEach((card) => {
+          (card as HTMLElement).style.height = `${finalHeight}px`;
+          (card as HTMLElement).style.minHeight = `${finalHeight}px`;
+        });
+      };
+
+      // Attendre que le DOM soit stable
+      const timer1 = setTimeout(calculateMaxHeight, 100);
+      const timer2 = setTimeout(calculateMaxHeight, 300);
+      const timer3 = setTimeout(calculateMaxHeight, 500);
+      
+      // Recalculer si la taille d'écran change
+      const handleResize = () => {
+        setTimeout(calculateMaxHeight, 100);
+      };
+      
+      window.addEventListener('resize', handleResize);
+      
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+        clearTimeout(timer3);
+        window.removeEventListener('resize', handleResize);
+      };
+    }, [config.cardStyle.minHeight, duplicatedTestimonials, screenSize]);
+
     useEffect(() => {
       const animate = () => {
-        setTranslateX((prev) => {
-          const newTranslateX = prev - config.scrollSpeed;
-          if (
-            Math.abs(newTranslateX) >=
-            config.cardWidth * TESTIMONIALS.length
-          ) {
-            return 0;
-          }
-          return newTranslateX;
-        });
+        if (!isPaused) {
+          setTranslateX((prev) => {
+            const newTranslateX = prev - config.scrollSpeed;
+            if (
+              Math.abs(newTranslateX) >=
+              config.cardWidth * TESTIMONIALS.length
+            ) {
+              return 0;
+            }
+            return newTranslateX;
+          });
+        }
         animationRef.current = requestAnimationFrame(animate);
       };
 
@@ -337,15 +419,24 @@ const TestimonialCarousel = React.memo(
           cancelAnimationFrame(animationRef.current);
         }
       };
-    }, [config.scrollSpeed, config.cardWidth]);
+    }, [config.scrollSpeed, config.cardWidth, isPaused]);
+
+    const handleMouseEnter = () => {
+      setIsPaused(true);
+    };
+
+    const handleMouseLeave = () => {
+      setIsPaused(false);
+    };
 
     return (
       <div
         className="w-full"
         style={{
-          // maxWidth: screenSize === 'mobile' ? "100%" : "1200px",
           margin: "0 auto",
         }}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         <div className="overflow-hidden w-full">
           <div
@@ -366,11 +457,19 @@ const TestimonialCarousel = React.memo(
                 }}
               >
                 <div
+                  ref={(el) => {
+                    const originalIndex = index % TESTIMONIALS.length;
+                    if (!cardsRef.current[originalIndex]) {
+                      cardsRef.current[originalIndex] = el;
+                    }
+                  }}
+                  data-testimonial-card
                   className="bg-amber-50 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-shadow duration-300 flex flex-col justify-between"
                   style={{
-                    height: config.cardStyle.height,
                     margin: "0 auto",
                     maxWidth: config.cardStyle.maxWidth,
+                    minHeight: config.cardStyle.minHeight,
+                    // La hauteur sera définie dynamiquement par le useEffect
                   }}
                 >
                   <div className={screenSize === "mobile" ? "mb-4" : "mb-8"}>
