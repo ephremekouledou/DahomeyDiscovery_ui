@@ -18,7 +18,7 @@ const ThematicCircuitCard = ({
           <img
             src={imageUrl}
             alt={alt}
-            className="w-full h-full object-cover rounded-3xl"
+            className="w-full h-full object-cover object-top rounded-3xl"
             loading="lazy"
             decoding="async"
           />
