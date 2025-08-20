@@ -1,16 +1,18 @@
 import { Button, Flex, Typography } from "antd";
 import { useEffect, useState } from "react";
-import bgVideo from "/videos/bannieCoupe.mp4"
+import bgVideo from "/videos/banniereAccueil.mp4";
 import vector from "../../assets/icons/homeVector.png";
 import NavBar from "../navBar/navBar";
 import "../../assets/Fonts/font.css";
 import { FlipWords } from "../ui/flip-words";
+import { useAnimation } from "../../context/animationContext";
 
 const VideoBackground = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const [isSmallMobile, setIsSmallMobile] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const { setIsLoaded } = useAnimation();
   const [_, setScreenHeight] = useState(0);
 
   useEffect(() => {
@@ -28,6 +30,18 @@ const VideoBackground = () => {
     window.addEventListener("resize", checkResponsive);
     return () => window.removeEventListener("resize", checkResponsive);
   }, []);
+
+  // Fonction pour gérer le chargement de la vidéo
+  const handleVideoLoad = () => {
+    setIsLoaded(true);
+  };
+
+  // Fonction pour gérer les erreurs de chargement
+  const handleVideoError = () => {
+    console.error("Erreur lors du chargement de la vidéo");
+    // Optionnel: vous pouvez quand même marquer comme chargé si vous voulez afficher le contenu
+    setIsLoaded(true);
+  };
 
   // Get responsive vector image dimensions
   const getVectorDimensions = () => {
@@ -194,6 +208,8 @@ const VideoBackground = () => {
         muted
         playsInline
         className="background-video"
+        onLoadedData={handleVideoLoad}
+        onError={handleVideoError}
         style={{
           position: "absolute",
           top: "50%",

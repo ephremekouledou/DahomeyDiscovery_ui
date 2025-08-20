@@ -13,9 +13,9 @@ import Footer from "../../components/footer/footer";
 import "../../assets/Fonts/font.css";
 import { Link, useLocation } from "react-router-dom";
 import logo from "/images/Logo/logo-belge.png";
-// import { gsap } from "gsap";
-// import { useGSAP } from "@gsap/react";
-// import { useAnimation } from "../../context/animationContext";
+import { gsap } from "gsap";
+import { useGSAP } from "@gsap/react";
+import { useAnimation } from "../../context/animationContext";
 import { CardBody, CardContainer, CardItem } from "../../components/ui/3d-card";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
 import signature from "/images/Accueil/Signature du circuit.jpg";
@@ -458,8 +458,8 @@ const Acceuil = () => {
   const { screenSize, isMobile, isTablet } = useScreenSizeResponsive();
   const { pathname } = useLocation();
   const container = useRef<HTMLDivElement>(null);
-  // const { hasRun, setHasRun } = useAnimation();
-  // const location = useLocation();
+  const { isLoaded, hasRun, setHasRun } = useAnimation();
+  const location = useLocation();
 
   // Memoized style calculations
   const styles = useMemo(() => {
@@ -548,51 +548,53 @@ const Acceuil = () => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
-  // GSAP Animation
-  // useGSAP(
-  //   () => {
-  //     const isFirstLoad = location.pathname === "/";
-  //     if (!hasRun && isFirstLoad && container.current) {
-  //       const timeline = gsap.timeline();
+  // GSAP Animation - Maintenant déclenché seulement quand isLoaded est true
+  useGSAP(
+    () => {
+      const isFirstLoad = location.pathname === "/";
+      // Condition modifiée : animation ne démarre que si isLoaded ET la vidéo est chargée
+      if (!hasRun && isFirstLoad && isLoaded && container.current) {
+        const timeline = gsap.timeline();
 
-  //       gsap.set("#mask-wrapper", {
-  //         position: "absolute",
-  //         zIndex: 0,
-  //         overflow: "hidden",
-  //         clipPath: "polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%)",
-  //       });
+        gsap.set("#mask-wrapper", {
+          position: "absolute",
+          zIndex: 0,
+          overflow: "hidden",
+          clipPath: "polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%)",
+        });
 
-  //       gsap.set(["#navBar", "#videoContent"], { opacity: 0 });
+        gsap.set(["#navBar", "#videoContent"], { opacity: 0 });
 
-  //       timeline
-  //         .to("#mask-wrapper", {
-  //           clipPath: "polygon(40% 45%, 60% 45%, 60% 55%, 40% 55%)",
-  //           duration: 2,
-  //           ease: "sine.inOut",
-  //         })
-  //         .to("#mask-wrapper", {
-  //           clipPath: "polygon(0% -60%, 100% -60%, 100% 160%, 0% 160%)",
-  //           duration: 1,
-  //           delay: 0.4,
-  //           ease: "sine.inOut",
-  //         })
-  //         .set("#mask-wrapper", { height: "fit-content" })
-  //         .to("#navBar", {
-  //           opacity: 1,
-  //           duration: 1.5,
-  //           ease: "sine.inOut",
-  //         }, "<+=0.2")
-  //         .to("#videoContent", {
-  //           opacity: 1,
-  //           duration: 1.5,
-  //           ease: "sine.inOut",
-  //         }, "<+=0.7");
+        timeline
+          .to("#mask-wrapper", {
+            clipPath: "polygon(40% 45%, 60% 45%, 60% 55%, 40% 55%)",
+            duration: 2,
+            ease: "sine.inOut",
+          })
+          .to("#mask-wrapper", {
+            clipPath: "polygon(0% -60%, 100% -60%, 100% 160%, 0% 160%)",
+            duration: 1,
+            delay: 0.4,
+            ease: "sine.inOut",
+          })
+          .set("#mask-wrapper", { height: "fit-content" })
+          .to("#navBar", {
+            opacity: 1,
+            duration: 1.5,
+            ease: "sine.inOut",
+          }, "<+=0.2")
+          .to("#videoContent", {
+            opacity: 1,
+            duration: 1.5,
+            ease: "sine.inOut",
+          }, "<+=0.7");
 
-  //       setHasRun(true);
-  //     }
-  //   },
-  //   { dependencies: [hasRun, location], scope: container }
-  // );
+        setHasRun(true);
+      }
+    },
+    // Ajout de isLoaded dans les dépendances pour que l'animation se déclenche quand isLoaded change
+    { dependencies: [hasRun, location, isLoaded], scope: container }
+  );
 
   return (
     <div ref={container} className="h-screen relative bg-white">
