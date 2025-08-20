@@ -2,7 +2,6 @@ import { Divider, Flex, Typography } from "antd";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
 import { useEffect, useRef, useState } from "react";
-import circuitImage from "../../assets/images/circuitImage.png";
 import { useLocation, useNavigate } from "react-router-dom";
 import cotonou from "../../assets/images/Circuit à la carte/Cotonou.webp";
 import abomey from "../../assets/images/Circuit à la carte/abomey.webp";
@@ -16,13 +15,17 @@ import possotome from "../../assets/images/Circuit à la carte/Possotomè.webp";
 import video from "../../assets/videos/usagevid1.mp4";
 import debut from "../../assets/images/Circuit signature/Début.webp";
 import BeginningButton from "../../components/dededed/BeginingButton";
+import img1 from "../../assets/images/Circuit signature/1_5.webp";
+import img3 from "../../assets/images/Circuit signature/3_5.jpeg";
 
 // Types
 interface Circuit {
   id: string;
-  name: string;
-  duration: string;
-  description?: string;
+  image: string;
+  title: string;
+  description: string;
+  days: number;
+  nights: number;
 }
 
 interface CityCardProps {
@@ -288,10 +291,30 @@ const CircuitsCartes = () => {
   const circuits: Circuit[] = [
     {
       id: "de774e84ds8e45s75fs",
-      name: "Spiritualité & Traditions Vodoun: L'invisible au cœur du Bénin",
-      duration: "8 jours / 7 nuits",
+      image: img1,
+      title: "Spiritualité & Traditions Vodoun: L'invisible au cœur du Bénin",
       description:
         "Plongez dans l’univers spirituel profond du Bénin, berceau du vodoun, à travers un circuit unique mêlant rites, rencontres, lieux sacrés et traditions vivantes.Ce parcours initiatique vous emmène à la découverte de temples mystiques, couvents secrets, cérémonies puissantes et savoirs transmis depuis des générations.",
+      days: 8,
+      nights: 7,
+    },
+    {
+      id: "a92f8e7c3b5d4a1f9e6d",
+      image: img1,
+      title: "Esprit des Femmes – Rituels, Artisanat & Puissance Féminine",
+      description:
+        "Pendant 7 jours, laissez-vous emporter par une expérience unique où se rencontrent artisanes, prêtresses, stylistes et productrices inspirantes. Découvrez des lieux sacrés dédiés aux femmes et aux Amazones, participez à des ateliers créatifs (head wrap, peinture, cuisine, écriture) et vivez des instants de bien-être (spa, plage, bains thermaux). Ce séjour est une parenthèse intime et solidaire pour reconnecter le corps, l’esprit et la sororité.",
+      days: 7,
+      nights: 6,
+    },
+    {
+      id: "c83d9f1e7a4b5c6d8f2a",
+      image: img3,
+      title: "Circuit Immersion & Savoir-Faire – Le Bénin au quotidien",
+      description:
+        "Plongez au cœur du quotidien béninois à travers un voyage authentique et immersif. Ce circuit de 8 jours vous offre l’opportunité de découvrir les villages, les traditions et les savoir-faire locaux, de rencontrer les habitants et de participer à des ateliers culturels et artisanaux. Entre marchés animés, ateliers culinaires, artisanat traditionnel et balades lacustres, vous vivrez le Bénin loin des sentiers touristiques classiques, en prenant le temps d’observer, d’apprendre et d’échanger. Une expérience idéale pour les voyageurs curieux et adeptes de slow travel, qui souhaitent comprendre le quotidien et les richesses culturelles du pays.",
+      days: 8,
+      nights: 7,
     },
   ];
 
@@ -566,7 +589,7 @@ const CircuitOtherCard: React.FC<CircuitCardOtherProps> = ({
             fontFamily: "GeneralSans",
           }}
         >
-          {circuit.duration}
+          {circuit.days} jours / {circuit.nights} nuits
         </Typography>
       </Flex>
 
@@ -598,7 +621,7 @@ const CircuitOtherCard: React.FC<CircuitCardOtherProps> = ({
               transition: "all 0.5s ease",
             }}
           >
-            {circuit.name}
+            {circuit.title}
           </Typography.Title>
           {isSelected && (
             <Typography
@@ -618,7 +641,7 @@ const CircuitOtherCard: React.FC<CircuitCardOtherProps> = ({
         {/* Image affichée uniquement pour le circuit sélectionné */}
         {isSelected && (
           <img
-            src={circuitImage}
+            src={circuit.image}
             style={{
               height: isMobile ? "5rem" : "15rem",
               width: "auto",
@@ -633,7 +656,7 @@ const CircuitOtherCard: React.FC<CircuitCardOtherProps> = ({
                   : "0",
             }}
             className="Accueil_image_2"
-            alt={`${circuit.name} Logo`}
+            alt={`${circuit.title} Logo`}
           />
         )}
       </Flex>
