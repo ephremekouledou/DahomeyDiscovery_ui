@@ -836,7 +836,7 @@ const useFontLoadedRobust = () => {
   const fontFamily = "DragonAngled";
 
   useEffect(() => {
-    let timeoutId;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
     const checkFontLoaded = () => {
       // Créer un élément de test
@@ -884,15 +884,15 @@ const useFontLoadedRobust = () => {
       setIsFontLoaded(true);
     }, 3000);
 
-    timeoutId = ""
-
     return () => {
+      if (timeoutId) clearTimeout(timeoutId);
       clearTimeout(safetyTimeout);
     };
   }, [fontFamily]);
 
   return isFontLoaded;
 };
+
 
 export {
   DetailedTimeline,
