@@ -165,8 +165,7 @@ const StaggeredGrid = ({
   const defaultCities = [
     {
       ville: "Cotonou",
-      description:
-        "Marchés, Arts et Culture Urbaine",
+      description: "Marchés, Arts et Culture Urbaine",
       image:
         "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
     },
@@ -291,55 +290,55 @@ const CircuitsCartes = () => {
       id: "de774e84ds8e45s75fs",
       name: "Spiritualité & Traditions Vodoun: L'invisible au cœur du Bénin",
       duration: "8 jours / 7 nuits",
-      description: "Plongez dans l’univers spirituel profond du Bénin, berceau du vodoun, à travers un circuit unique mêlant rites, rencontres, lieux sacrés et traditions vivantes.Ce parcours initiatique vous emmène à la découverte de temples mystiques, couvents secrets, cérémonies puissantes et savoirs transmis depuis des générations.",
+      description:
+        "Plongez dans l’univers spirituel profond du Bénin, berceau du vodoun, à travers un circuit unique mêlant rites, rencontres, lieux sacrés et traditions vivantes.Ce parcours initiatique vous emmène à la découverte de temples mystiques, couvents secrets, cérémonies puissantes et savoirs transmis depuis des générations.",
     },
   ];
 
   const cities = [
     {
       ville: "Cotonou",
-      description:
-        "Marchés, Arts et Culture Urbaine",
+      description: "Ville Dynamique et Créative",
       image: cotonou,
     },
     {
       ville: "Abomey",
-      description: "Histoire, Traditions et Artisanat",
+      description: "Royauté, Histoire et Traditions",
       image: abomey,
     },
     {
       ville: "Dassa",
-      description: "Montagnes et spiritualité",
+      description: "Collines Sacrées Verdoyantes et Nature paisible",
       image: dassa,
     },
     {
       ville: "Ganvie",
-      description: "Vie lacustre et immersion",
+      description: "La Cité Lacustre aux charmes Uniques et Authentique",
       image: ganvie,
     },
     {
       ville: "Gogotinkpon",
-      description: "Immersion villageoise et écologie",
+      description: "Village Authentique et Vivant",
       image: gogotinkpon,
     },
     {
       ville: "Grand-Popo",
-      description: "Détente et Nature",
+      description: "Charme Côtier et Culture Vibrante",
       image: popo,
     },
     {
       ville: "Ouidah",
-      description: "Culture , Histoire et découverte",
+      description: "Entre Histoire, Spiritualité  et  Mémoire Vivante",
       image: ouidah,
     },
     {
       ville: "Porto-Novo",
-      description: "Histoire et Art",
+      description: "Capitale aux mille Visages Historique et Culturels",
       image: porto,
     },
     {
       ville: "Possotomè",
-      description: "Détente et Nature",
+      description: "Destination Paisible et Naturelle",
       image: possotome,
     },
   ];
@@ -408,7 +407,14 @@ const CircuitsCartes = () => {
         </video>
 
         {/* Content Layer */}
-        <Flex style={{ maxWidth: "1050px", width: "100%", margin: "0 auto", zIndex: 1 }}>
+        <Flex
+          style={{
+            maxWidth: "1050px",
+            width: "100%",
+            margin: "0 auto",
+            zIndex: 1,
+          }}
+        >
           <Flex vertical gap={0}>
             <Typography.Text
               style={{
