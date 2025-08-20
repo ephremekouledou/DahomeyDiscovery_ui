@@ -475,6 +475,7 @@ const Acceuil = () => {
       fontFamily: "DragonAngled",
       fontSize: isMobile ? "2rem" : isTablet ? "3rem" : "4rem",
       top: isMobile ? "40vh" : isTablet ? "42vh" : "45vh",
+      zIndex: 10, // Ajouté pour s'assurer qu'ils sont au-dessus
     };
 
     return {
@@ -491,28 +492,22 @@ const Acceuil = () => {
     };
   }, [isMobile, isTablet]);
 
-  // Memoized animation styles
+  // Memoized animation styles - nettoyé et simplifié
   const animationStyles = useMemo(
     () => `
     @keyframes floatUp1 {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(${
-        isMobile ? "-10px" : isTablet ? "-15px" : "-20px"
-      }); }
+      50% { transform: translateY(${isMobile ? "-10px" : isTablet ? "-15px" : "-20px"}); }
     }
     
     @keyframes floatUp2 {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(${
-        isMobile ? "-25px" : isTablet ? "-35px" : "-50px"
-      }); }
+      50% { transform: translateY(${isMobile ? "-25px" : isTablet ? "-35px" : "-50px"}); }
     }
     
     @keyframes floatUp3 {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(${
-        isMobile ? "-15px" : isTablet ? "-20px" : "-30px"
-      }); }
+      50% { transform: translateY(${isMobile ? "-15px" : isTablet ? "-20px" : "-30px"}); }
     }
     
     .circuit-card-1 {
@@ -548,14 +543,22 @@ const Acceuil = () => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
-  // GSAP Animation - Maintenant déclenché seulement quand isLoaded est true
+  // Animation GSAP corrigée
   useGSAP(
     () => {
       const isFirstLoad = location.pathname === "/";
-      // Condition modifiée : animation ne démarre que si isLoaded ET la vidéo est chargée
+      
       if (!hasRun && isFirstLoad && isLoaded && container.current) {
-        const timeline = gsap.timeline();
+        const timeline = gsap.timeline({
+          onStart: () => {
+            // S'assurer que les éléments sont dans l'état initial correct
+            gsap.set("#logo-container", { opacity: 1 });
+            gsap.set("#percentage-left", { opacity: 1 });
+            gsap.set("#percentage-right", { opacity: 1 });
+          }
+        });
 
+        // État initial du masque
         gsap.set("#mask-wrapper", {
           position: "absolute",
           zIndex: 0,
@@ -563,70 +566,93 @@ const Acceuil = () => {
           clipPath: "polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%)",
         });
 
+        // Cacher les éléments de contenu initialement
         gsap.set(["#navBar", "#videoContent"], { opacity: 0 });
 
         timeline
+          // Phase 1: Affichage du logo et des pourcentages (durée plus courte)
+          .to({}, { duration: 1.5 }) // Pause pour voir le logo et les pourcentages
+          
+          // Phase 2: Début de l'ouverture du masque
           .to("#mask-wrapper", {
             clipPath: "polygon(40% 45%, 60% 45%, 60% 55%, 40% 55%)",
-            duration: 2,
-            ease: "sine.inOut",
+            duration: 1.5,
+            ease: "power2.inOut",
           })
+          
+          // Phase 3: Ouverture complète du masque
           .to("#mask-wrapper", {
             clipPath: "polygon(0% -60%, 100% -60%, 100% 160%, 0% 160%)",
-            duration: 1,
-            delay: 0.4,
-            ease: "sine.inOut",
+            duration: 1.2,
+            delay: 0.2,
+            ease: "power2.inOut",
           })
+          
+          // Phase 4: Faire disparaître les éléments d'intro
+          .to(["#logo-container", "#percentage-left", "#percentage-right"], {
+            opacity: 0,
+            duration: 0.8,
+            ease: "power2.inOut",
+          }, "<+=0.3")
+          
+          // Phase 5: Ajuster le masque et afficher le contenu
           .set("#mask-wrapper", { height: "fit-content" })
           .to("#navBar", {
             opacity: 1,
-            duration: 1.5,
-            ease: "sine.inOut",
+            duration: 1,
+            ease: "power2.inOut",
           }, "<+=0.2")
           .to("#videoContent", {
             opacity: 1,
-            duration: 1.5,
-            ease: "sine.inOut",
-          }, "<+=0.7");
+            duration: 1,
+            ease: "power2.inOut",
+          }, "<+=0.3");
 
         setHasRun(true);
       }
     },
-    // Ajout de isLoaded dans les dépendances pour que l'animation se déclenche quand isLoaded change
     { dependencies: [hasRun, location, isLoaded], scope: container }
   );
 
   return (
     <div ref={container} className="h-screen relative bg-white">
-      <div className="w-full">
-        <div
-          style={{
-            margin: "0 auto",
-            width: "fit-content",
-            position: "relative",
-            top: styles.logoPosition,
-          }}
-        >
-          <img
-            src={logo}
-            style={styles.logoDimensions}
-            alt="Logo"
-            loading="eager"
-            decoding="async"
-          />
-        </div>
+      {/* Logo - avec ID pour l'animation */}
+      <div
+        id="logo-container"
+        style={{
+          margin: "0 auto",
+          width: "fit-content",
+          position: "relative",
+          top: styles.logoPosition,
+        }}
+      >
+        <img
+          src={logo}
+          style={styles.logoDimensions}
+          alt="Logo"
+          loading="eager"
+          decoding="async"
+        />
       </div>
 
-      <div style={styles.percentageLeft}>100 %</div>
-      <div style={styles.percentageRight}>locales</div>
+      {/* Pourcentages - avec IDs pour l'animation */}
+      <div id="percentage-left" style={styles.percentageLeft}>
+        100 %
+      </div>
+      <div id="percentage-right" style={styles.percentageRight}>
+        locales
+      </div>
 
+      {/* Contenu principal avec masque */}
       <div id="mask-wrapper" className="absolute z-0 inset-0 origin-center">
         <BeginningButton />
         <Flex vertical gap={0}>
+          {/* Section vidéo */}
           <section className="one">
             <VideoBackground />
           </section>
 
+          {/* Section principale avec circuits */}
           <section
             className="two"
             style={{
@@ -639,6 +665,7 @@ const Acceuil = () => {
               position: "relative",
             }}
           >
+            {/* Overlay blanc */}
             <div
               style={{
                 position: "absolute",
@@ -651,6 +678,7 @@ const Acceuil = () => {
               }}
             />
 
+            {/* Contenu */}
             <div style={{ position: "relative", zIndex: 2 }}>
               <Flex>
                 <img
@@ -667,6 +695,7 @@ const Acceuil = () => {
                 />
               </Flex>
 
+              {/* Titre principal */}
               <Flex
                 vertical
                 align="center"
@@ -681,11 +710,7 @@ const Acceuil = () => {
                   level={1}
                   style={{
                     color: "#3B1B19",
-                    fontSize: isMobile
-                      ? "2.2rem"
-                      : isTablet
-                      ? "3.5rem"
-                      : "5rem",
+                    fontSize: isMobile ? "2.2rem" : isTablet ? "3.5rem" : "5rem",
                     fontWeight: "800",
                     textAlign: "center",
                     lineHeight: "1.1",
@@ -710,6 +735,7 @@ const Acceuil = () => {
                 />
               </Flex>
 
+              {/* Cartes de circuits */}
               <Flex
                 align="center"
                 justify="center"
@@ -737,20 +763,12 @@ const Acceuil = () => {
                       style={{
                         marginTop:
                           index === 1 && !isMobile
-                            ? isTablet
-                              ? "60px"
-                              : "110px"
+                            ? isTablet ? "60px" : "110px"
                             : "0px",
                       }}
                     >
                       <Link to={card.link}>
                         <div className={`circuit-card-${index + 1}`}>
-                          {/* <CircuitCard
-                            imageUrl={card.imageUrl}
-                            title={card.title}
-                            alt={card.alt}
-                            screenSize={screenSize}
-                          /> */}
                           <ThematicCircuitCard
                             imageUrl={card.imageUrl}
                             title={card.title}
@@ -767,14 +785,11 @@ const Acceuil = () => {
             </div>
           </section>
 
+          {/* Section témoignages */}
           <section
             className="three"
             style={{
-              padding: isMobile
-                ? "2rem 1rem"
-                : isTablet
-                ? "3rem 2rem"
-                : "4rem 5vw",
+              padding: isMobile ? "2rem 1rem" : isTablet ? "3rem 2rem" : "4rem 5vw",
             }}
           >
             <Flex
@@ -804,16 +819,17 @@ const Acceuil = () => {
             </Flex>
           </section>
 
+          {/* Section carrousel d'images */}
           <section
             style={{
               height: isMobile ? "60vw" : isTablet ? "50vw" : "45vw",
               minHeight: "300px",
-              // maxHeight: "600px"
             }}
           >
             <ImageCarousel images={IMAGES} />
           </section>
 
+          {/* Section finale */}
           <section className="four">
             <img
               src={fin}
