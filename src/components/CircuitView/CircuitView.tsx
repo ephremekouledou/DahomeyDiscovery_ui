@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import NavBar from "../navBar/navBar";
 import Footer from "../footer/footer";
 import React, { useState, useEffect, useMemo } from "react";
-import circuitImage from "../../assets/images/circuitImage.png";
 import img1 from "../../assets/images/Circuit signature/1_5.webp";
 import img2 from "../../assets/images/Circuit signature/2_5.webp";
 import img3 from "../../assets/images/Circuit signature/3_5.jpeg";
@@ -20,9 +19,11 @@ import BeginningButton from "../dededed/BeginingButton";
 // Types
 interface Circuit {
   id: string;
-  name: string;
-  duration: string;
-  description?: string;
+  image: string;
+  title: string;
+  description: string;
+  days: number;
+  nights: number;
 }
 
 interface CircuitCardOtherProps {
@@ -68,7 +69,7 @@ const CircuitOtherCard: React.FC<CircuitCardOtherProps> = ({
             fontFamily: "GeneralSans",
           }}
         >
-          {circuit.duration}
+          {circuit.days} jours / {circuit.nights} nuits
         </Typography>
       </Flex>
 
@@ -100,7 +101,7 @@ const CircuitOtherCard: React.FC<CircuitCardOtherProps> = ({
               transition: "all 0.5s ease",
             }}
           >
-            {circuit.name}
+            {circuit.title}
           </Typography.Title>
           {isSelected && (
             <Typography
@@ -120,7 +121,7 @@ const CircuitOtherCard: React.FC<CircuitCardOtherProps> = ({
         {/* Image affichée uniquement pour le circuit sélectionné */}
         {isSelected && (
           <img
-            src={circuitImage}
+            src={circuit.image}
             style={{
               height: isMobile ? "5rem" : "15rem",
               width: "auto",
@@ -135,7 +136,7 @@ const CircuitOtherCard: React.FC<CircuitCardOtherProps> = ({
                   : "0",
             }}
             className="Accueil_image_2"
-            alt={`${circuit.name} Logo`}
+            alt={`${circuit.title} Logo`}
           />
         )}
       </Flex>
@@ -441,6 +442,140 @@ const AllPackages: TravelPackage[] = [
       ],
     },
   },
+  {
+    id: "c83d9f1e7a4b5c6d8f2a", // random UUID style
+    baseInfo: {
+      day: 8,
+      night: 7,
+      title: "Circuit Immersion & Savoir-Faire – Le Bénin au quotidien",
+      description:
+        "Plongez au cœur du quotidien béninois à travers un voyage authentique et immersif. Ce circuit de 8 jours vous offre l’opportunité de découvrir les villages, les traditions et les savoir-faire locaux, de rencontrer les habitants et de participer à des ateliers culturels et artisanaux. Entre marchés animés, ateliers culinaires, artisanat traditionnel et balades lacustres, vous vivrez le Bénin loin des sentiers touristiques classiques, en prenant le temps d’observer, d’apprendre et d’échanger. Une expérience idéale pour les voyageurs curieux et adeptes de slow travel, qui souhaitent comprendre le quotidien et les richesses culturelles du pays.",
+    },
+    timeline: [
+      {
+        title: "Bienvenue au Bénin !",
+        subtitle: "Arrivée à l’aéroport de Cotonou",
+        times: [
+          "Accueil personnalisé par le guide",
+          "Dîner de bienvenue",
+          "Transfert vers l’hébergement choisi",
+        ],
+        position: "left",
+        image: img1,
+      },
+      {
+        title: "Ouidah : Mémoire, Racines & Savoir-faire",
+        subtitle: "07h30 - Petit-déjeuner",
+        times: [
+          "08h30 - Départ pour Ouidah et visite du Temple des Pythons",
+          "09h30 - Route des Esclaves (place aux enchères, case Zomai, mémorial de Zougbodji, Porte du Non-Retour)",
+          "11h30 - Atelier culinaire traditionnel (resto Kolè) et déjeuner local",
+          "15h00 - Atelier de fabrication de sel à Djègbadji",
+          "17h00 - Temps libre / promenade",
+          "20h00 - Dîner culturel et nuit en maison d’hôtes",
+        ],
+        position: "right",
+        image: img2,
+      },
+      {
+        title: "Gogotinkpon : Immersion villageoise",
+        subtitle: "07h30 - Petit-déjeuner",
+        times: [
+          "08h30 - Départ pour Gogotinkpon et rencontre avec les habitants",
+          "09h30 - Balade découverte sur le lac Ahémé",
+          "11h30 - Déjeuner avec une famille locale",
+          "15h00 - Atelier cuisine traditionnelle",
+          "17h00 - Temps libre / promenade dans le village",
+          "20h00 - Dîner et nuit en maison d’hôtes",
+        ],
+        position: "left",
+        image: img3,
+      },
+      {
+        title: "Grand-Popo : Immersion culturelle & Bord de mer",
+        subtitle: "07h30 - Petit-déjeuner",
+        times: [
+          "08h30 - Rencontre avec les habitants, découverte de la vie locale",
+          "09h30 - Atelier artisanat local ou pêche traditionnelle",
+          "11h30 - Déjeuner",
+          "14h00 - Balade sur la plage et observation de la vie des pêcheurs",
+          "16h00 - Temps libre pour détente et échanges avec la communauté",
+          "20h00 - Dîner traditionnel et nuit à Grand-Popo",
+        ],
+        position: "right",
+        image: img4,
+      },
+      {
+        title: "Possotomè : Détente & Immersion lacustre",
+        subtitle: "07h00 - Petit-déjeuner express",
+        times: [
+          "08h30 - Départ pour Possotomè",
+          "09h30 - Découverte du lac Ahémé et observation de la vie locale",
+          "12h30 - Déjeuner au bord du lac",
+          "14h00 - Atelier pêche ou artisanat local",
+          "16h00 - Balade autour du lac et échanges avec les habitants",
+          "20h00 - Dîner et nuit en maison traditionnelle",
+        ],
+        position: "left",
+        image: img5,
+      },
+      {
+        title: "Abomey : Patrimoine Royal & Savoir-faire",
+        subtitle: "07h00 - Petit-déjeuner express",
+        times: [
+          "10h00 - Visite du Palais Royal Agonglo",
+          "12h30 - Déjeuner en ville",
+          "15h00 - Rencontre avec des artisans locaux",
+          "17h00 - Temps libre / promenade en ville",
+          "20h00 - Dîner traditionnel et nuit en maison d’hôtes",
+        ],
+        position: "right",
+        image: img1,
+      },
+      {
+        title: "Ganvié : Immersion au cœur de la cité lacustre",
+        subtitle: "08h00 - Petit-déjeuner",
+        times: [
+          "09h00 - Départ de Cotonou vers Ganvié",
+          "10h00 - Balade en pirogue à travers la cité lacustre",
+          "12h30 - Déjeuner au bord du lac Nokoué",
+          "15h00 - Rencontre avec les habitants et immersion dans les activités locales (pêche traditionnelle)",
+          "17h00 - Temps libre / détente au bord du lac",
+          "17h30 - Retour vers Cotonou",
+          "20h00 - Dîner et nuit à Cotonou",
+        ],
+        position: "left",
+        image: img2,
+      },
+      {
+        title: "Départ",
+        subtitle: "Matinée libre",
+        times: [
+          "Achats et souvenirs",
+          "19h00 - Transfert à l’aéroport et accompagnement jusqu’à l’embarquement",
+        ],
+        position: "right",
+        image: img3,
+      },
+    ],
+    inclusion: {
+      inclus: [
+        "Hébergement 7 nuits (maison d’hôtes ou hôtels locaux)",
+        "Transport tout au long du circuit",
+        "Guide certifié sur chaque site",
+        "Accueil et accompagnement personnalisé",
+        "Activités et ateliers mentionnés",
+        "Eau potable pendant les sorties",
+      ],
+      nonInclus: [
+        "Vol international aller-retour",
+        "Frais de visa",
+        "Boissons alcoolisées et dépenses personnelles",
+        "Assurance voyage (facultative)",
+        "Activités à la carte supplémentaires",
+      ],
+    },
+  },
 ];
 
 export const CircuitView = () => {
@@ -517,10 +652,31 @@ export const CircuitView = () => {
   // Configuration centralisée des circuits
   const circuits: Circuit[] = [
     {
-      id: "circuit-signature",
-      name: "Esprit des Femmes - Féminin sacré et créatif",
-      duration: "9 jours / 8 nuits",
-      description: "Groupes de femmes, voyages entre amies, militantes",
+      id: "de774e84ds8e45s75fs",
+      image: img1,
+      title: "Spiritualité & Traditions Vodoun: L'invisible au cœur du Bénin",
+      description:
+        "Plongez dans l’univers spirituel profond du Bénin, berceau du vodoun, à travers un circuit unique mêlant rites, rencontres, lieux sacrés et traditions vivantes.Ce parcours initiatique vous emmène à la découverte de temples mystiques, couvents secrets, cérémonies puissantes et savoirs transmis depuis des générations.",
+      days: 8,
+      nights: 7,
+    },
+    {
+      id: "a92f8e7c3b5d4a1f9e6d",
+      image: img2,
+      title: "Esprit des Femmes – Rituels, Artisanat & Puissance Féminine",
+      description:
+        "Pendant 7 jours, laissez-vous emporter par une expérience unique où se rencontrent artisanes, prêtresses, stylistes et productrices inspirantes. Découvrez des lieux sacrés dédiés aux femmes et aux Amazones, participez à des ateliers créatifs (head wrap, peinture, cuisine, écriture) et vivez des instants de bien-être (spa, plage, bains thermaux). Ce séjour est une parenthèse intime et solidaire pour reconnecter le corps, l’esprit et la sororité.",
+      days: 7,
+      nights: 6,
+    },
+    {
+      id: "c83d9f1e7a4b5c6d8f2a",
+      image: img3,
+      title: "Circuit Immersion & Savoir-Faire – Le Bénin au quotidien",
+      description:
+        "Plongez au cœur du quotidien béninois à travers un voyage authentique et immersif. Ce circuit de 8 jours vous offre l’opportunité de découvrir les villages, les traditions et les savoir-faire locaux, de rencontrer les habitants et de participer à des ateliers culturels et artisanaux. Entre marchés animés, ateliers culinaires, artisanat traditionnel et balades lacustres, vous vivrez le Bénin loin des sentiers touristiques classiques, en prenant le temps d’observer, d’apprendre et d’échanger. Une expérience idéale pour les voyageurs curieux et adeptes de slow travel, qui souhaitent comprendre le quotidien et les richesses culturelles du pays.",
+      days: 8,
+      nights: 7,
     },
   ];
 

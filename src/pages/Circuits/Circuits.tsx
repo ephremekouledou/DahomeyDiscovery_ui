@@ -260,6 +260,17 @@ const Circuits = () => {
         nights: 6,
         price: "50.000 FCFA",
       },
+      {
+        id: "c83d9f1e7a4b5c6d8f2a",
+        image: img,
+        video: video,
+        title: "Circuit Immersion & Savoir-Faire – Le Bénin au quotidien",
+        description:
+          "Plongez au cœur du quotidien béninois à travers un voyage authentique et immersif. Ce circuit de 8 jours vous offre l’opportunité de découvrir les villages, les traditions et les savoir-faire locaux, de rencontrer les habitants et de participer à des ateliers culturels et artisanaux. Entre marchés animés, ateliers culinaires, artisanat traditionnel et balades lacustres, vous vivrez le Bénin loin des sentiers touristiques classiques, en prenant le temps d’observer, d’apprendre et d’échanger. Une expérience idéale pour les voyageurs curieux et adeptes de slow travel, qui souhaitent comprendre le quotidien et les richesses culturelles du pays.",
+        days: 8,
+        nights: 7,
+        price: "50.000 FCFA",
+      },
     ],
     []
   );
@@ -274,7 +285,7 @@ const Circuits = () => {
 
   return (
     <Flex justify="center" vertical>
-      <BeginningButton /> 
+      <BeginningButton />
       {/* Header avec NavBar */}
       <div>
         <NavBar menu="CIRCUITS" />

@@ -26,25 +26,26 @@ import {
 import dayjs from "dayjs";
 import { FormPage, InputType } from "./reservationsModels";
 import NavBar from "../../components/navBar/navBar";
+import axios from "axios";
 
 const { Title } = Typography;
 const { Step } = Steps;
 const { Option } = Select;
 
-// interface Customer {
-//   email: string;
-//   first_name: string;
-//   last_name: string;
-//   phone: string;
-// }
+interface Customer {
+  email: string;
+  first_name: string;
+  last_name: string;
+  phone: string;
+}
 
-// interface PayementRequest {
-//   amount: number;
-//   currency: string;
-//   description: string;
-//   return_url: string;
-//   customer: Customer;
-// }
+interface PayementRequest {
+  amount: number;
+  currency: string;
+  description: string;
+  return_url: string;
+  customer: Customer;
+}
 
 const ReservationCircuit = () => {
   const [messageApi, contextHolder] = message.useMessage();
@@ -375,19 +376,27 @@ const ReservationCircuit = () => {
           first_name: data.firstName,
           last_name: data.lastName,
           phone: data.phone,
-          address: data.address,
-          city: data.city,
-          state: data.state,
-          country: data.country,
-          zip: data.zip,
         },
       };
 
       console.log("Formatted data to be sent:", formattedData);
 
+      const paymentRequest: PayementRequest = {
+        amount: totalAmount,
+        currency: "XOF",
+        description: "Réservation Dahomey Discovery",
+        return_url: "https://dahomeydiscovery.com",
+        customer: {
+          email: data.email,
+          first_name: data.firstName,
+          last_name: data.lastName,
+          phone: data.phone,
+        },
+      };
+
       // Uncomment and modify the API endpoint as needed
-      /*
-      const res = await axios.post('https://your-api-endpoint.com/api/reservation', formattedData, {
+
+      const res = await axios.post('https://dahomeydiscovery.com/api/payments', paymentRequest, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -396,14 +405,14 @@ const ReservationCircuit = () => {
       // Check if response status is in the 2xx range
       if (res.status >= 200 && res.status < 300) {
         messageApi.success("Réservation soumise avec succès!");
-        setTimeout(() => {
+        /* setTimeout(() => {
           messageApi.info("Redirection vers la page d'accueil...");
           navigate('/');
-        }, 2000);
+        }, 2000); */
       } else {
         messageApi.error(`Echec de la soumission de la réservation! Statut: ${res.status}`);
       }
-      */
+     
 
       // Simulation for demo purposes
       messageApi.success("Paiement effectué avec succès!");
