@@ -65,6 +65,21 @@ const images = [
   // img14,
 ];
 
+// Liste des villes disponibles
+export const CITIES = [
+  "Ouidah",
+  "Possotomè",
+  "Abomey",
+  "Porto-Novo",
+  "Dassa",
+  "Ganvie",
+  "Gogotinkpon",
+  "Grand-Popo",
+  "Cotonou",
+] as const;
+
+export type City = (typeof CITIES)[number];
+
 const BonneAdresse = () => {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -147,7 +162,7 @@ export interface AccommodationOption {
   amenities: AmenitiesGroup;
 }
 
-// Interface pour les données d'hébergement (modifiée)
+// Interface pour les données d'hébergement (modifiée avec ville)
 export interface AccommodationData {
   id: string;
   name: string;
@@ -157,6 +172,7 @@ export interface AccommodationData {
   mainImage: string;
   images: string[];
   description: string;
+  ville: City; // Nouvel attribut ville
   amenities?: AmenitiesGroup; // Optionnel si des options sont disponibles
   options?: AccommodationOption[]; // Nouvelles options
   owner: boolean; // Indique si l'hébergement est géré par l'utilisateur
@@ -209,10 +225,10 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({
   // Calculer le prix à afficher
   const getPriceDisplay = () => {
     if (accommodation.options && accommodation.options.length > 0) {
-      const prices = accommodation.options.map(option => option.price);
+      const prices = accommodation.options.map((option) => option.price);
       const minPrice = Math.min(...prices);
       const maxPrice = Math.max(...prices);
-      
+
       if (minPrice === maxPrice) {
         return `${minPrice}€`;
       }
@@ -235,6 +251,13 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({
             alt={accommodation.name}
             className={`w-full object-cover ${isMobile ? "h-40" : "h-48"}`}
           />
+          {/* Badge ville */}
+          <div className="absolute top-3 left-3 bg-white bg-opacity-90 rounded-full px-3 py-1">
+            <span className="text-xs font-semibold text-gray-700 flex items-center gap-1">
+              <MapPin size={12} />
+              {accommodation.ville}
+            </span>
+          </div>
         </div>
 
         <div className={`${isMobile ? "p-3" : "p-4"}`}>
@@ -309,7 +332,7 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({
   );
 };
 
-// Exemple d'utilisation avec données typées (modifié)
+// Exemple d'utilisation avec données typées (modifié avec villes)
 export const createExampleAccommodation = (): AccommodationData[] => [
   {
     id: "846567erfsrfdrfdesew",
@@ -317,6 +340,7 @@ export const createExampleAccommodation = (): AccommodationData[] => [
     rating: 4.8,
     reviewCount: 124,
     mainImage: imgElia1,
+    ville: "Cotonou",
     images: [
       imgElia1,
       imgElia2,
@@ -325,7 +349,7 @@ export const createExampleAccommodation = (): AccommodationData[] => [
       imgElia5,
       imgElia6,
       imgElia7,
-      imgElia8
+      imgElia8,
     ],
     description:
       "Face au murmure des vagues, Cette Résidence vous ouvre ses portes : chambres raffinées, piscine clé en main, jardins apaisants et restauration locale et internationale. À quelques minutes de l'aéroport de Cotonou, cette adresse incarne l'âme de la coste béninoise. Éléments préférés de nos voyageurs ? Le personnel chaleureux, la propreté du lieu, et ce sentiment d'être chez soi… tout en étant ailleurs.",
@@ -337,7 +361,9 @@ export const createExampleAccommodation = (): AccommodationData[] => [
         price: 120,
         amenities: {
           entertainment: [{ name: "Télévision", icon: Tv, available: true }],
-          heating: [{ name: "Climatisation", icon: Snowflake, available: true }],
+          heating: [
+            { name: "Climatisation", icon: Snowflake, available: true },
+          ],
           internet: [{ name: "Wifi", icon: Wifi, available: true }],
           comfort: [
             { name: "Équipements de base", icon: User, available: true },
@@ -352,7 +378,9 @@ export const createExampleAccommodation = (): AccommodationData[] => [
         price: 180,
         amenities: {
           entertainment: [{ name: "Télévision", icon: Tv, available: true }],
-          heating: [{ name: "Climatisation", icon: Snowflake, available: true }],
+          heating: [
+            { name: "Climatisation", icon: Snowflake, available: true },
+          ],
           internet: [
             { name: "Wifi", icon: Wifi, available: true },
             { name: "Espace de travail dédié", icon: User, available: true },
@@ -373,12 +401,15 @@ export const createExampleAccommodation = (): AccommodationData[] => [
       },
       {
         name: "Suite Présidentielle",
-        description: "Suite luxueuse avec salon séparé et vue panoramique sur l'océan",
+        description:
+          "Suite luxueuse avec salon séparé et vue panoramique sur l'océan",
         photo: imgElia4,
         price: 250,
         amenities: {
           entertainment: [{ name: "Télévision", icon: Tv, available: true }],
-          heating: [{ name: "Climatisation", icon: Snowflake, available: true }],
+          heating: [
+            { name: "Climatisation", icon: Snowflake, available: true },
+          ],
           internet: [
             { name: "Wifi", icon: Wifi, available: true },
             { name: "Espace de travail dédié", icon: User, available: true },
@@ -431,6 +462,7 @@ export const createExampleAccommodation = (): AccommodationData[] => [
     reviewCount: 124,
     mainImage:
       "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=250&fit=crop",
+    ville: "Ouidah",
     images: [
       "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&h=400&fit=crop",
       "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=600&h=400&fit=crop",
@@ -506,6 +538,7 @@ export const createExampleAccommodation = (): AccommodationData[] => [
     reviewCount: 87,
     mainImage:
       "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=400&h=250&fit=crop",
+    ville: "Porto-Novo",
     images: [
       "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=600&h=400&fit=crop",
       "https://images.unsplash.com/photo-1464983953574-0892a716854b?w=600&h=400&fit=crop",
@@ -517,13 +550,16 @@ export const createExampleAccommodation = (): AccommodationData[] => [
       {
         name: "Studio",
         description: "Studio moderne avec kitchenette",
-        photo: "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=600&h=400&fit=crop",
+        photo:
+          "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=600&h=400&fit=crop",
         price: 85,
         amenities: {
           entertainment: [{ name: "Télévision", icon: Tv, available: true }],
           heating: [{ name: "Chauffage", icon: Thermometer, available: true }],
           internet: [{ name: "Wifi", icon: Wifi, available: true }],
-          kitchen: [{ name: "Kitchenette", icon: UtensilsCrossed, available: true }],
+          kitchen: [
+            { name: "Kitchenette", icon: UtensilsCrossed, available: true },
+          ],
           comfort: [
             { name: "Équipements de base", icon: User, available: true },
             { name: "Eau chaude", icon: Droplets, available: true },
@@ -533,7 +569,8 @@ export const createExampleAccommodation = (): AccommodationData[] => [
       {
         name: "Appartement 2 pièces",
         description: "Spacieux appartement avec chambre séparée",
-        photo: "https://images.unsplash.com/photo-1464983953574-0892a716854b?w=600&h=400&fit=crop",
+        photo:
+          "https://images.unsplash.com/photo-1464983953574-0892a716854b?w=600&h=400&fit=crop",
         price: 120,
         amenities: {
           entertainment: [{ name: "Télévision", icon: Tv, available: true }],
@@ -542,7 +579,9 @@ export const createExampleAccommodation = (): AccommodationData[] => [
             { name: "Wifi", icon: Wifi, available: true },
             { name: "Espace de travail dédié", icon: User, available: true },
           ],
-          kitchen: [{ name: "Cuisine équipée", icon: UtensilsCrossed, available: true }],
+          kitchen: [
+            { name: "Cuisine équipée", icon: UtensilsCrossed, available: true },
+          ],
           laundry: [{ name: "Lave-linge", icon: Shirt, available: true }],
           comfort: [
             { name: "Équipements de base", icon: User, available: true },
@@ -555,12 +594,13 @@ export const createExampleAccommodation = (): AccommodationData[] => [
   },
   {
     id: "deef8s7f8s7f8s7f8s7f8s7f8s7f8s7f8",
-    name: "Villa Océane - Vue mer exceptionnelle",
+    name: "Villa Palmeraie - Authentique & spacieuse",
     price: 150,
     rating: 4.8,
     reviewCount: 124,
     mainImage:
       "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=250&fit=crop",
+    ville: "Abomey",
     images: [
       "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&h=400&fit=crop",
       "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=600&h=400&fit=crop",
@@ -569,7 +609,7 @@ export const createExampleAccommodation = (): AccommodationData[] => [
       "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=400&fit=crop",
     ],
     description:
-      "Magnifique villa en bord de mer avec une vue panoramique sur l'océan. Parfaite pour des vacances en famille ou entre amis. Située à proximité de la plage, cette propriété offre tout le confort moderne dans un cadre idyllique.",
+      "Villa traditionnelle rénovée avec goût, offrant une expérience authentique au cœur de l'histoire béninoise. Proche des sites historiques d'Abomey.",
     amenities: {
       entertainment: [{ name: "Télévision", icon: Tv, available: true }],
       heating: [{ name: "Climatisation", icon: Snowflake, available: true }],
@@ -587,10 +627,10 @@ export const createExampleAccommodation = (): AccommodationData[] => [
       ],
       location: [
         {
-          name: "Accès plage ou bord de mer",
+          name: "Centre historique",
           icon: MapPin,
           available: true,
-          description: "Les voyageurs peuvent profiter d'une plage à proximité",
+          description: "Proche des palais royaux d'Abomey",
         },
       ],
       parking: [
@@ -631,25 +671,166 @@ export const createExampleAccommodation = (): AccommodationData[] => [
   },
   {
     id: "deef8s7f8s7f8s7f8s7f8s7f8s7f8s7f9",
-    name: "Appartement Centre-ville - Moderne & lumineux",
+    name: "Maison Lacustre - Sur pilotis",
     price: 95,
     rating: 4.5,
     reviewCount: 87,
     mainImage:
       "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=400&h=250&fit=crop",
+    ville: "Ganvie",
     images: [
       "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=600&h=400&fit=crop",
       "https://images.unsplash.com/photo-1464983953574-0892a716854b?w=600&h=400&fit=crop",
       "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?w=600&h=400&fit=crop",
     ],
     description:
-      "Appartement moderne situé au cœur du centre-ville, proche de toutes commodités. Idéal pour les voyageurs d'affaires ou les couples souhaitant découvrir la ville.",
+      "Expérience unique dans une maison traditionnelle sur pilotis au cœur de la cité lacustre de Ganvié. Une immersion totale dans la culture locale.",
     amenities: {
       entertainment: [{ name: "Télévision", icon: Tv, available: true }],
-      heating: [{ name: "Chauffage", icon: Thermometer, available: true }],
+      heating: [{ name: "Ventilation naturelle", icon: Wind, available: true }],
+      internet: [{ name: "Wifi", icon: Wifi, available: true }],
+      kitchen: [
+        {
+          name: "Cuisine traditionnelle",
+          icon: UtensilsCrossed,
+          available: true,
+        },
+      ],
+      location: [
+        {
+          name: "Sur l'eau",
+          icon: MapPin,
+          available: true,
+        },
+      ],
+      parking: [{ name: "Embarcadère privé", icon: Car, available: true }],
+      safety: [
+        {
+          name: "Garde traditionnelle",
+          icon: Shield,
+          available: true,
+        },
+      ],
+      laundry: [{ name: "Service de lessive", icon: Shirt, available: true }],
+      comfort: [
+        { name: "Équipements de base", icon: User, available: true },
+        { name: "Eau douce", icon: Droplets, available: true },
+      ],
+    },
+    owner: true,
+  },
+  {
+    id: "possotome123456789",
+    name: "Lodge Écologique - Nature & Sérénité",
+    price: 130,
+    rating: 4.7,
+    reviewCount: 56,
+    mainImage:
+      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=250&fit=crop",
+    ville: "Possotomè",
+    images: [
+      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=600&h=400&fit=crop",
+    ],
+    description:
+      "Lodge écologique au bord du lac Nokoué, offrant une expérience naturelle unique. Parfait pour les amoureux de la nature et les passionnés d'écotourisme.",
+    amenities: {
+      entertainment: [
+        { name: "Observation des oiseaux", icon: Camera, available: true },
+      ],
+      heating: [{ name: "Ventilation naturelle", icon: Wind, available: true }],
+      internet: [{ name: "Wifi", icon: Wifi, available: true }],
+      kitchen: [
+        {
+          name: "Cuisine bio",
+          icon: UtensilsCrossed,
+          available: true,
+        },
+      ],
+      location: [
+        {
+          name: "Bord de lac",
+          icon: MapPin,
+          available: true,
+        },
+      ],
+      parking: [{ name: "Parking écologique", icon: Car, available: true }],
+      safety: [
+        {
+          name: "Surveillance naturelle",
+          icon: Shield,
+          available: true,
+        },
+      ],
+      comfort: [
+        { name: "Équipements éco-responsables", icon: User, available: true },
+        { name: "Eau filtrée", icon: Droplets, available: true },
+      ],
+    },
+    owner: false,
+  },
+  {
+    id: "dassa987654321",
+    name: "Auberge des Collines",
+    price: 75,
+    rating: 4.3,
+    reviewCount: 42,
+    mainImage:
+      "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=400&h=250&fit=crop",
+    ville: "Dassa",
+    images: [
+      "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1464983953574-0892a716854b?w=600&h=400&fit=crop",
+    ],
+    description:
+      "Auberge chaleureuse nichée dans les collines de Dassa-Zoumè. Point de départ idéal pour découvrir les grottes et la spiritualité locale.",
+    amenities: {
+      entertainment: [{ name: "Télévision", icon: Tv, available: true }],
+      heating: [{ name: "Ventilation", icon: Wind, available: true }],
+      internet: [{ name: "Wifi", icon: Wifi, available: true }],
+      kitchen: [
+        {
+          name: "Cuisine partagée",
+          icon: UtensilsCrossed,
+          available: true,
+        },
+      ],
+      location: [
+        {
+          name: "Collines sacrées",
+          icon: MapPin,
+          available: true,
+        },
+      ],
+      parking: [{ name: "Parking gratuit", icon: Car, available: true }],
+      comfort: [
+        { name: "Équipements simples", icon: User, available: true },
+        { name: "Eau courante", icon: Droplets, available: true },
+      ],
+    },
+    owner: true,
+  },
+  {
+    id: "gogotinkpon123",
+    name: "Résidence Moderne Gogotinkpon",
+    price: 110,
+    rating: 4.6,
+    reviewCount: 73,
+    mainImage:
+      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=250&fit=crop",
+    ville: "Gogotinkpon",
+    images: [
+      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=600&h=400&fit=crop",
+    ],
+    description:
+      "Résidence moderne dans le quartier résidentiel de Gogotinkpon. Idéale pour un séjour confortable proche de Cotonou.",
+    amenities: {
+      entertainment: [{ name: "Télévision", icon: Tv, available: true }],
+      heating: [{ name: "Climatisation", icon: Snowflake, available: true }],
       internet: [
         { name: "Wifi", icon: Wifi, available: true },
-        { name: "Espace de travail dédié", icon: User, available: true },
+        { name: "Espace de travail", icon: User, available: true },
       ],
       kitchen: [
         {
@@ -660,38 +841,99 @@ export const createExampleAccommodation = (): AccommodationData[] => [
       ],
       location: [
         {
-          name: "Centre-ville",
+          name: "Quartier résidentiel",
           icon: MapPin,
           available: true,
         },
       ],
-      parking: [
-        { name: "Parking public à proximité", icon: Car, available: false },
-      ],
+      parking: [{ name: "Parking sécurisé", icon: Car, available: true }],
       safety: [
         {
-          name: "Détecteur de fumée",
-          icon: Flame,
+          name: "Sécurité 24h/24",
+          icon: Shield,
           available: true,
         },
       ],
       laundry: [{ name: "Lave-linge", icon: Shirt, available: true }],
       comfort: [
-        { name: "Équipements de base", icon: User, available: true },
+        { name: "Équipements modernes", icon: User, available: true },
         { name: "Eau chaude", icon: Droplets, available: true },
+      ],
+    },
+    owner: false,
+  },
+  {
+    id: "grandpopo456",
+    name: "Villa Balnéaire Grand-Popo",
+    price: 180,
+    rating: 4.9,
+    reviewCount: 95,
+    mainImage:
+      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=250&fit=crop",
+    ville: "Grand-Popo",
+    images: [
+      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=400&fit=crop",
+    ],
+    description:
+      "Villa de luxe face à l'océan Atlantique à Grand-Popo. Plage privée, piscine et service de qualité pour des vacances inoubliables.",
+    amenities: {
+      entertainment: [{ name: "Télévision", icon: Tv, available: true }],
+      heating: [{ name: "Climatisation", icon: Snowflake, available: true }],
+      internet: [
+        { name: "Wifi haut débit", icon: Wifi, available: true },
+        { name: "Espace de travail luxueux", icon: User, available: true },
+      ],
+      kitchen: [
+        {
+          name: "Cuisine gastronomique",
+          icon: UtensilsCrossed,
+          available: true,
+        },
+      ],
+      location: [
+        {
+          name: "Plage privée",
+          icon: MapPin,
+          available: true,
+        },
+      ],
+      parking: [{ name: "Parking privé", icon: Car, available: true }],
+      safety: [
+        {
+          name: "Sécurité privée",
+          icon: Shield,
+          available: true,
+        },
+        {
+          name: "Surveillance 24h/24",
+          icon: Camera,
+          available: true,
+        },
+      ],
+      laundry: [
+        { name: "Service de pressing", icon: Shirt, available: true },
+        { name: "Sèche-linge", icon: Wind, available: true },
+      ],
+      comfort: [
+        { name: "Équipements de luxe", icon: User, available: true },
+        { name: "Eau chaude", icon: Droplets, available: true },
+        { name: "Piscine chauffée", icon: Thermometer, available: true },
       ],
     },
     owner: true,
   },
 ];
 
-// Interface pour les filtres (modifiée)
+// Interface pour les filtres (modifiée avec ville)
 interface FilterOptions {
   priceRange: [number, number];
   minRating: number;
   selectedAmenities: string[];
   accommodationType: "all" | "owner" | "partner";
   searchTerm: string;
+  selectedCities: City[]; // Nouveau filtre par ville
 }
 
 const FilterSection = ({
@@ -707,6 +949,7 @@ const FilterSection = ({
 }) => {
   const [openSections, setOpenSections] = useState({
     type: true,
+    cities: true, // Nouvelle section pour les villes
     price: true,
     rating: true,
     amenities: false,
@@ -734,7 +977,7 @@ const FilterSection = ({
           });
         });
       }
-      
+
       // Commodités des options
       if (acc.options) {
         acc.options.forEach((option) => {
@@ -757,13 +1000,15 @@ const FilterSection = ({
     accommodations.forEach((acc) => {
       if (acc.options && acc.options.length > 0) {
         // Si l'hébergement a des options, prendre tous les prix des options
-        acc.options.forEach(option => prices.push(option.price));
+        acc.options.forEach((option) => prices.push(option.price));
       } else if (acc.price) {
         // Sinon, prendre le prix principal
         prices.push(acc.price);
       }
     });
-    return prices.length > 0 ? [Math.min(...prices), Math.max(...prices)] : [0, 500];
+    return prices.length > 0
+      ? [Math.min(...prices), Math.max(...prices)]
+      : [0, 500];
   }, [accommodations]);
 
   const handlePriceChange = (index: number, value: number) => {
@@ -779,6 +1024,14 @@ const FilterSection = ({
     setFilters({ ...filters, selectedAmenities: newAmenities });
   };
 
+  // Nouvelle fonction pour gérer les villes
+  const handleCityToggle = (city: City) => {
+    const newCities = filters.selectedCities.includes(city)
+      ? filters.selectedCities.filter((c) => c !== city)
+      : [...filters.selectedCities, city];
+    setFilters({ ...filters, selectedCities: newCities });
+  };
+
   const clearFilters = () => {
     setFilters({
       priceRange: [priceRange[0], priceRange[1]],
@@ -786,6 +1039,7 @@ const FilterSection = ({
       selectedAmenities: [],
       accommodationType: "all",
       searchTerm: "",
+      selectedCities: [], // Reset des villes
     });
   };
 
@@ -832,6 +1086,43 @@ const FilterSection = ({
             }
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
           />
+        )}
+      </div>
+
+      {/* Villes - Nouvelle section */}
+      <div className="mb-6">
+        <button
+          onClick={() => toggleSection("cities")}
+          className="flex items-center justify-between w-full text-left font-semibold text-gray-700 mb-3"
+        >
+          <span className="flex items-center gap-2">
+            <MapPin size={16} />
+            Villes
+          </span>
+          {openSections.cities ? (
+            <ChevronUp size={16} />
+          ) : (
+            <ChevronDown size={16} />
+          )}
+        </button>
+        {openSections.cities && (
+          <div className="space-y-2 max-h-60 overflow-y-auto">
+            {CITIES.map((city) => (
+              <label key={city} className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={filters.selectedCities.includes(city)}
+                  onChange={() => handleCityToggle(city)}
+                  className="mr-2 text-orange-500"
+                />
+                <span className="text-sm text-gray-700">{city}</span>
+                {/* Afficher le nombre d'hébergements par ville */}
+                <span className="text-xs text-gray-500 ml-auto">
+                  ({accommodations.filter((acc) => acc.ville === city).length})
+                </span>
+              </label>
+            ))}
+          </div>
         )}
       </div>
 
@@ -1017,6 +1308,7 @@ const Hebergements = () => {
     selectedAmenities: [],
     accommodationType: "all",
     searchTerm: "",
+    selectedCities: [], // Nouveau filtre initialisé vide
   });
   const { pathname } = useLocation();
   const { setTransaction } = useTransaction();
@@ -1024,7 +1316,7 @@ const Hebergements = () => {
 
   const accommodation = createExampleAccommodation();
 
-  // Filtrer les hébergements (modifié pour supporter les options)
+  // Filtrer les hébergements (modifié pour supporter les villes)
   const filteredAccommodations = useMemo(() => {
     return accommodation.filter((accommodation) => {
       // Filtre par recherche textuelle
@@ -1037,6 +1329,13 @@ const Hebergements = () => {
         return false;
       }
 
+      // Filtre par ville - nouveau filtre
+      if (filters.selectedCities.length > 0) {
+        if (!filters.selectedCities.includes(accommodation.ville)) {
+          return false;
+        }
+      }
+
       // Filtre par type
       if (filters.accommodationType !== "all") {
         const isOwner = filters.accommodationType === "owner";
@@ -1047,13 +1346,16 @@ const Hebergements = () => {
       let priceMatches = false;
       if (accommodation.options && accommodation.options.length > 0) {
         // Vérifier si au moins une option est dans la fourchette de prix
-        priceMatches = accommodation.options.some(option => 
-          option.price >= filters.priceRange[0] && option.price <= filters.priceRange[1]
+        priceMatches = accommodation.options.some(
+          (option) =>
+            option.price >= filters.priceRange[0] &&
+            option.price <= filters.priceRange[1]
         );
       } else if (accommodation.price) {
         // Vérifier le prix principal
-        priceMatches = accommodation.price >= filters.priceRange[0] && 
-                      accommodation.price <= filters.priceRange[1];
+        priceMatches =
+          accommodation.price >= filters.priceRange[0] &&
+          accommodation.price <= filters.priceRange[1];
       }
       if (!priceMatches) return false;
 
@@ -1065,7 +1367,7 @@ const Hebergements = () => {
       // Filtre par équipements (modifié pour supporter les options)
       if (filters.selectedAmenities.length > 0) {
         let accommodationAmenities: string[] = [];
-        
+
         // Commodités de l'hébergement principal
         if (accommodation.amenities) {
           accommodationAmenities = Object.values(accommodation.amenities)
@@ -1073,18 +1375,21 @@ const Hebergements = () => {
             .filter((amenity) => amenity.available)
             .map((amenity) => amenity.name);
         }
-        
+
         // Commodités des options
         if (accommodation.options) {
-          accommodation.options.forEach(option => {
+          accommodation.options.forEach((option) => {
             const optionAmenities = Object.values(option.amenities)
               .flat()
               .filter((amenity) => amenity.available)
               .map((amenity) => amenity.name);
-            accommodationAmenities = [...accommodationAmenities, ...optionAmenities];
+            accommodationAmenities = [
+              ...accommodationAmenities,
+              ...optionAmenities,
+            ];
           });
         }
-        
+
         // Supprimer les doublons
         accommodationAmenities = [...new Set(accommodationAmenities)];
 
@@ -1289,80 +1594,73 @@ const Hebergements = () => {
                 Nos meilleures offres d'hébergements sélectionnées pour vous
               </Typography.Title>
 
-              {/* Grille d'hébergements propriétaire */}
-              <div
-                className="grid gap-6"
-                style={{
-                  gridTemplateColumns: `repeat(${getGridColumns()}, 1fr)`,
-                }}
-              >
-                {filteredAccommodations
-                  .filter((acc: AccommodationData) => acc.owner === true)
-                  .map((acc: any, index: any) => (
+              {/* Affichage du nombre de résultats */}
+              <div className="mb-6 text-sm text-gray-600">
+                {filteredAccommodations.length} hébergement
+                {filteredAccommodations.length > 1 ? "s" : ""} trouvé
+                {filteredAccommodations.length > 1 ? "s" : ""}
+                {filters.selectedCities.length > 0 && (
+                  <span> dans {filters.selectedCities.join(", ")}</span>
+                )}
+              </div>
+
+              {/* Message si aucun résultat */}
+              {filteredAccommodations.length === 0 && (
+                <div className="text-center py-12">
+                  <div className="text-gray-500 text-lg mb-4">
+                    Aucun hébergement trouvé pour vos critères
+                  </div>
+                  <Button
+                    onClick={() =>
+                      setFilters({
+                        priceRange: [0, 300],
+                        minRating: 0,
+                        selectedAmenities: [],
+                        accommodationType: "all",
+                        searchTerm: "",
+                        selectedCities: [],
+                      })
+                    }
+                    type="primary"
+                    style={{
+                      backgroundColor: "#F59F00",
+                      borderColor: "#F59F00",
+                    }}
+                  >
+                    Réinitialiser les filtres
+                  </Button>
+                </div>
+              )}
+
+              {/* Grille d'hébergements */}
+              {filteredAccommodations.length > 0 && (
+                <div
+                  className="grid gap-6"
+                  style={{
+                    gridTemplateColumns: `repeat(${getGridColumns()}, 1fr)`,
+                  }}
+                >
+                  {filteredAccommodations.map((acc: any) => (
                     <AccommodationCard
-                      key={index}
+                      key={acc.id}
                       accommodation={acc}
                       onBook={() => {
                         setTransaction({
                           id: acc.id,
                           title: acc.name,
-                          amount: acc.options && acc.options.length > 0
-                            ? Math.min(...acc.options.map((opt: any) => opt.price))
-                            : acc.price,
+                          amount:
+                            acc.options && acc.options.length > 0
+                              ? Math.min(
+                                  ...acc.options.map((opt: any) => opt.price)
+                                )
+                              : acc.price,
                         });
                         navigate("/reservations-locations");
                       }}
                     />
                   ))}
-              </div>
-            </div>
-
-            {/* Nos partenaires */}
-            <div className={`${isMobile ? "px-4" : "px-0"}`}>
-              <Typography.Title
-                level={2}
-                style={{
-                  color: "#3B1B19",
-                  fontSize: isMobile
-                    ? "1.25rem"
-                    : isTablet
-                    ? "1.75rem"
-                    : "2.5rem",
-                  fontWeight: "200",
-                  margin: "0 0 24px 0",
-                  fontFamily: "DragonAngled",
-                  lineHeight: "1.2",
-                }}
-              >
-                Nos partenaires
-              </Typography.Title>
-
-              {/* Grille d'hébergements partenaires */}
-              <div
-                className="grid gap-6"
-                style={{
-                  gridTemplateColumns: `repeat(${getGridColumns()}, 1fr)`,
-                }}
-              >
-                {filteredAccommodations
-                  .filter((acc: AccommodationData) => acc.owner === false)
-                  .map((acc: any, index: any) => (
-                    <AccommodationCard
-                      key={index}
-                      accommodation={acc}
-                      onBook={() => {
-                        setTransaction({
-                          id: acc.id,
-                          title: acc.name,
-                          amount: acc.options && acc.options.length > 0
-                            ? Math.min(...acc.options.map((opt: any) => opt.price))
-                            : acc.price,
-                        });
-                        navigate("/reservations-locations");
-                      }}
-                    />
-                  ))}
-              </div>
+                </div>
+              )}
             </div>
           </Flex>
         </div>

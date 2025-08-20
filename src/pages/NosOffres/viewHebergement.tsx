@@ -9,7 +9,7 @@ import {
   BalancedAmenities,
   createExampleAccommodation,
 } from "./hebergement";
-import { Star, Check } from "lucide-react";
+import { Star, Check, MapPin } from "lucide-react";
 import { useTransaction } from "../../context/transactionContext";
 import Footer from "../../components/footer/footer";
 import BeginningButton from "../../components/dededed/BeginingButton";
@@ -20,6 +20,7 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
   price,
   rating,
   reviewCount,
+  ville,
   images,
   description,
   amenities,
@@ -29,7 +30,8 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
-  const [selectedOption, setSelectedOption] = useState<AccommodationOption | null>(null);
+  const [selectedOption, setSelectedOption] =
+    useState<AccommodationOption | null>(null);
 
   // Si il y a des options, on sélectionne la première par défaut
   useEffect(() => {
@@ -61,7 +63,10 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
   };
 
   const getBalancedAmenities = (amenitiesToUse: any): BalancedAmenities => {
-    const amenityEntries = Object.entries(amenitiesToUse) as [string, Amenity[]][];
+    const amenityEntries = Object.entries(amenitiesToUse) as [
+      string,
+      Amenity[]
+    ][];
     const totalSections = amenityEntries.length;
     const midPoint = Math.ceil(totalSections / 2);
 
@@ -135,25 +140,30 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
     );
   };
 
-  const renderOptionCard = (option: AccommodationOption, index: number): React.ReactNode => {
+  const renderOptionCard = (
+    option: AccommodationOption,
+    index: number
+  ): React.ReactNode => {
     const isSelected = selectedOption === option;
-    
+
     return (
       <div
         key={index}
         onClick={() => setSelectedOption(option)}
         className={`relative cursor-pointer rounded-lg border-2 transition-all duration-300 overflow-hidden ${
-          isSelected 
-            ? "border-blue-500 shadow-lg bg-blue-50" 
+          isSelected
+            ? "border-blue-500 shadow-lg bg-blue-50"
             : "border-gray-200 hover:border-gray-300 hover:shadow-md"
         }`}
       >
         {/* Checkbox indicator */}
-        <div className={`absolute top-3 right-3 z-10 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-          isSelected 
-            ? "bg-blue-500 border-blue-500" 
-            : "bg-white border-gray-300"
-        }`}>
+        <div
+          className={`absolute top-3 right-3 z-10 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+            isSelected
+              ? "bg-blue-500 border-blue-500"
+              : "bg-white border-gray-300"
+          }`}
+        >
           {isSelected && <Check size={16} className="text-white" />}
         </div>
 
@@ -169,22 +179,32 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
         {/* Content */}
         <div className="p-4">
           <div className="flex justify-between items-start mb-2">
-            <h4 className="font-semibold text-lg text-gray-800">{option.name}</h4>
+            <h4 className="font-semibold text-lg text-gray-800">
+              {option.name}
+            </h4>
             <div className="text-right">
-              <div className="text-xl font-bold text-blue-600">{option.price}€</div>
+              <div className="text-xl font-bold text-blue-600">
+                {option.price}€
+              </div>
               <div className="text-sm text-gray-600">par nuit</div>
             </div>
           </div>
-          <p className="text-gray-600 text-sm leading-relaxed">{option.description}</p>
+          <p className="text-gray-600 text-sm leading-relaxed">
+            {option.description}
+          </p>
         </div>
       </div>
     );
   };
 
   // Déterminer les équipements à afficher
-  const amenitiesToDisplay = selectedOption ? selectedOption.amenities : amenities;
+  const amenitiesToDisplay = selectedOption
+    ? selectedOption.amenities
+    : amenities;
   const currentPrice = selectedOption ? selectedOption.price : price;
-  const { leftColumn, rightColumn } = amenitiesToDisplay ? getBalancedAmenities(amenitiesToDisplay) : { leftColumn: [], rightColumn: [] };
+  const { leftColumn, rightColumn } = amenitiesToDisplay
+    ? getBalancedAmenities(amenitiesToDisplay)
+    : { leftColumn: [], rightColumn: [] };
 
   // Déterminer si le bouton de réservation doit être actif
   const isReservationEnabled = options ? selectedOption !== null : true;
@@ -258,10 +278,16 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
             {renderStars(rating)}
             <span className="font-semibold ml-2 text-lg">{rating}</span>
             <span className="text-gray-600">({reviewCount} avis)</span>
+            <span className="text-lg font-semibold text-gray-700 flex items-center gap-1">
+              <MapPin size={15} />
+              {ville}
+            </span>
           </div>
           {currentPrice && (
             <div className="text-left md:text-right">
-              <div className="text-3xl font-bold text-blue-600">{currentPrice}€</div>
+              <div className="text-3xl font-bold text-blue-600">
+                {currentPrice}€
+              </div>
               <div className="text-gray-600">par nuit</div>
             </div>
           )}
@@ -288,7 +314,8 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
             </div>
             {!selectedOption && (
               <p className="text-center text-gray-600 mt-4 text-sm">
-                Sélectionnez une option pour voir les équipements et pouvoir réserver
+                Sélectionnez une option pour voir les équipements et pouvoir
+                réserver
               </p>
             )}
           </div>
@@ -298,10 +325,9 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
         {amenitiesToDisplay && (
           <div className="mb-8">
             <h3 className="text-xl font-semibold mb-6 text-gray-800 border-b pb-2">
-              {selectedOption 
+              {selectedOption
                 ? `Équipements - ${selectedOption.name}`
-                : "Ce que propose ce logement"
-              }
+                : "Ce que propose ce logement"}
             </h3>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -329,12 +355,16 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
             size="large"
             disabled={!isReservationEnabled}
             style={{
-              backgroundColor: !isReservationEnabled 
-                ? "#d1d5db" 
-                : (isHovered ? "#ff3100" : "#F59F00"),
-              color: !isReservationEnabled 
-                ? "#6b7280" 
-                : (isHovered ? "white" : "black"),
+              backgroundColor: !isReservationEnabled
+                ? "#d1d5db"
+                : isHovered
+                ? "#ff3100"
+                : "#F59F00",
+              color: !isReservationEnabled
+                ? "#6b7280"
+                : isHovered
+                ? "white"
+                : "black",
               borderRadius: "7px",
               border: "none",
               fontFamily: "GeneralSans",
@@ -352,17 +382,18 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
               if (isReservationEnabled && currentPrice) {
                 setTransaction({
                   id: id,
-                  title: selectedOption ? `${name} - ${selectedOption.name}` : name,
+                  title: selectedOption
+                    ? `${name} - ${selectedOption.name}`
+                    : name,
                   amount: currentPrice,
                 });
                 navigate("/reservations-locations");
               }
             }}
           >
-            {!isReservationEnabled 
+            {!isReservationEnabled
               ? "Sélectionnez une option pour réserver"
-              : "Réserver maintenant"
-            }
+              : "Réserver maintenant"}
           </Button>
         </div>
       </div>
@@ -402,7 +433,7 @@ const ViewHebergement = () => {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
-  
+
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
