@@ -1,9 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  useMemo,
-} from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import "./Acceuil.css";
 import backChevron from "../../assets/icons/backChevron.png";
 import vector from "../../assets/icons/homeVector.png";
@@ -30,7 +25,10 @@ import img5 from "/images/Accueil/5_5.webp";
 import fin from "/images/Accueil/fin.webp";
 import BeginningButton from "../../components/dededed/BeginingButton";
 import { ThematicCircuitCard } from "../../components/CircuitView/Card";
-import { useFontLoadedRobust, useScreenSizeResponsive } from "../../components/CircuitView/Timeline";
+import {
+  useFontLoadedRobust,
+  useScreenSizeResponsive,
+} from "../../components/CircuitView/Timeline";
 
 // Constants moved outside component to prevent recreations
 const IMAGES = [img1, img2, img3, img4, img5];
@@ -498,17 +496,23 @@ const Acceuil = () => {
     () => `
     @keyframes floatUp1 {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(${isMobile ? "-10px" : isTablet ? "-15px" : "-20px"}); }
+      50% { transform: translateY(${
+        isMobile ? "-10px" : isTablet ? "-15px" : "-20px"
+      }); }
     }
     
     @keyframes floatUp2 {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(${isMobile ? "-25px" : isTablet ? "-35px" : "-50px"}); }
+      50% { transform: translateY(${
+        isMobile ? "-25px" : isTablet ? "-35px" : "-50px"
+      }); }
     }
     
     @keyframes floatUp3 {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(${isMobile ? "-15px" : isTablet ? "-20px" : "-30px"}); }
+      50% { transform: translateY(${
+        isMobile ? "-15px" : isTablet ? "-20px" : "-30px"
+      }); }
     }
     
     .circuit-card-1 {
@@ -548,71 +552,85 @@ const Acceuil = () => {
   useGSAP(
     () => {
       const isFirstLoad = location.pathname === "/";
-      
-      if (!hasRun && isFirstLoad && isLoaded && fontLoaded && container.current) {
+
+      // Toujours initialiser le masque à l'état fermé
+      gsap.set("#mask-wrapper", {
+        position: "absolute",
+        zIndex: 0,
+        overflow: "hidden",
+        clipPath: "polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%)",
+      });
+
+      // Également cacher le contenu tant que l'anim n'est pas prête
+      gsap.set(["#navBar", "#videoContent"], { opacity: 0 });
+      gsap.set(["#logo-container", "#percentage-left", "#percentage-right"], {
+        opacity: 1,
+      });
+
+      // Ne lancer l'animation que si tout est prêt
+      if (
+        !hasRun &&
+        isFirstLoad &&
+        isLoaded &&
+        fontLoaded &&
+        container.current
+      ) {
         const timeline = gsap.timeline({
           onStart: () => {
-            // S'assurer que les éléments sont dans l'état initial correct
-            gsap.set("#logo-container", { opacity: 1 });
-            gsap.set("#percentage-left", { opacity: 1 });
-            gsap.set("#percentage-right", { opacity: 1 });
-          }
+            console.log("Animation start");
+          },
+          onComplete: () => {
+            console.log("Animation complete");
+          },
         });
-
-        // État initial du masque
-        gsap.set("#mask-wrapper", {
-          position: "absolute",
-          zIndex: 0,
-          overflow: "hidden",
-          clipPath: "polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%)",
-        });
-
-        // Cacher les éléments de contenu initialement
-        gsap.set(["#navBar", "#videoContent"], { opacity: 0 });
 
         timeline
-          // Phase 1: Affichage du logo et des pourcentages (durée plus courte)
-          .to({}, { duration: 1.5 }) // Pause pour voir le logo et les pourcentages
-          
-          // Phase 2: Début de l'ouverture du masque
+          // Pause pour afficher logo et pourcentages
+          .to({}, { duration: 1.5 })
+
+          // Ouverture partielle du masque
           .to("#mask-wrapper", {
             clipPath: "polygon(40% 45%, 60% 45%, 60% 55%, 40% 55%)",
             duration: 1.5,
             ease: "power2.inOut",
           })
-          
-          // Phase 3: Ouverture complète du masque
+
+          // Ouverture complète
           .to("#mask-wrapper", {
             clipPath: "polygon(0% -60%, 100% -60%, 100% 160%, 0% 160%)",
             duration: 1.2,
             delay: 0.2,
             ease: "power2.inOut",
           })
-          
-          // Phase 4: Faire disparaître les éléments d'intro
-          .to(["#logo-container", "#percentage-left", "#percentage-right"], {
-            opacity: 0,
-            duration: 0.8,
-            ease: "power2.inOut",
-          }, "<+=0.3")
-          
-          // Phase 5: Ajuster le masque et afficher le contenu
+
+          // Disparition logo et textes
+          .to(
+            ["#logo-container", "#percentage-left", "#percentage-right"],
+            {
+              opacity: 0,
+              duration: 0.8,
+              ease: "power2.inOut",
+            },
+            "<+=0.3"
+          )
+
+          // Révélation du contenu
           .set("#mask-wrapper", { height: "fit-content" })
-          .to("#navBar", {
-            opacity: 1,
-            duration: 1,
-            ease: "power2.inOut",
-          }, "<+=0.2")
-          .to("#videoContent", {
-            opacity: 1,
-            duration: 1,
-            ease: "power2.inOut",
-          }, "<+=0.3");
+          .to(
+            "#navBar",
+            { opacity: 1, duration: 1, ease: "power2.inOut" },
+            "<+=0.2"
+          )
+          .to(
+            "#videoContent",
+            { opacity: 1, duration: 1, ease: "power2.inOut" },
+            "<+=0.3"
+          );
 
         setHasRun(true);
       }
     },
-    { dependencies: [hasRun, location, isLoaded], scope: container }
+    { dependencies: [hasRun, location, isLoaded, fontLoaded], scope: container }
   );
 
   return (
@@ -711,7 +729,11 @@ const Acceuil = () => {
                   level={1}
                   style={{
                     color: "#3B1B19",
-                    fontSize: isMobile ? "2.2rem" : isTablet ? "3.5rem" : "5rem",
+                    fontSize: isMobile
+                      ? "2.2rem"
+                      : isTablet
+                      ? "3.5rem"
+                      : "5rem",
                     fontWeight: "800",
                     textAlign: "center",
                     lineHeight: "1.1",
@@ -764,7 +786,9 @@ const Acceuil = () => {
                       style={{
                         marginTop:
                           index === 1 && !isMobile
-                            ? isTablet ? "60px" : "110px"
+                            ? isTablet
+                              ? "60px"
+                              : "110px"
                             : "0px",
                       }}
                     >
@@ -790,7 +814,11 @@ const Acceuil = () => {
           <section
             className="three"
             style={{
-              padding: isMobile ? "2rem 1rem" : isTablet ? "3rem 2rem" : "4rem 5vw",
+              padding: isMobile
+                ? "2rem 1rem"
+                : isTablet
+                ? "3rem 2rem"
+                : "4rem 5vw",
             }}
           >
             <Flex
