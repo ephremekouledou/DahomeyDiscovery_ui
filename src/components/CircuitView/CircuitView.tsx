@@ -225,20 +225,6 @@ const AllPackages: TravelPackage[] = [
         image: img3,
       },
       {
-        title: "Porto-Novo, la ville aux trois noms",
-        subtitle: "07h00 - Petit déjeuner",
-        times: [
-          "08h00 - Départ pour Adjarra",
-          "09h00 - Découverte : Rivière noire, vin & sodabi de raphia à Avrankou",
-          "13h00 - Déjeuner dans un Restaurant local",
-          "14h00 - Visite des sites emblématiques de la ville : Musée Honmè (ancien palais royal), Place Toffa 1er, Ancienne Mosquée afro-brésilienne, Place Abessan, Place Adjina…",
-          "17h00 - Retour à Cotonou / temps libre",
-          "20h00 - Dîner",
-        ],
-        position: "right",
-        image: img4,
-      },
-      {
         title: "Grand-Popo : Plantes, esprits et traditions vivantes",
         subtitle: "07h30 - Petit-déjeuner",
         times: [
@@ -249,7 +235,7 @@ const AllPackages: TravelPackage[] = [
           "17h00 - Détente à la plage ",
           "20h00 - Dîner et nuit sur place",
         ],
-        position: "left",
+        position: "right",
         image: img5,
       },
       {
@@ -262,7 +248,7 @@ const AllPackages: TravelPackage[] = [
           "18h00 - Pause à la place Goho + dégustation de jus de coco",
           "20h00 - Dîner et nuit à Abomey",
         ],
-        position: "right",
+        position: "left",
         image: img1,
       },
       {
@@ -275,7 +261,7 @@ const AllPackages: TravelPackage[] = [
           "16h00 - Retour à Cotonou",
           "20h00 - Dîner",
         ],
-        position: "left",
+        position: "right",
         image: img2,
       },
       {
@@ -285,7 +271,7 @@ const AllPackages: TravelPackage[] = [
           "10h00 - Journée libre avec des activités à la carte : Teinture indigo, body painting rituel, initiation symbolique, etc.",
           "19h00  - Dîner de clôture & surprise",
         ],
-        position: "right",
+        position: "left",
         image: img2,
       },
       {
@@ -295,7 +281,7 @@ const AllPackages: TravelPackage[] = [
           "Interviews vidéo si souhaitées",
           "Transfert à l’aéroport + accompagnement jusqu’à l’embarquement",
         ],
-        position: "left",
+        position: "right",
         image: img2,
       },
     ],
