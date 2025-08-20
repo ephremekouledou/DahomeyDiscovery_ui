@@ -1,5 +1,5 @@
 import { useRouteError } from "react-router-dom";
-import ErrorImage from '../assets/images/Error404.png'
+import ErrorImage from '/images/Error404.png'
 import { Typography } from 'antd'
 
 const { Title, Text } = Typography

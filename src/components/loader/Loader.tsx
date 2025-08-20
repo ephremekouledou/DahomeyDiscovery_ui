@@ -1,5 +1,5 @@
-import bgVideo from "../../assets/videos/background.mp4";
-import logo from "../../assets/images/Logo/logo-blanc.png";
+import bgVideo from "/videos/background.mp4";
+import logo from "/images/Logo/logo-blanc.png";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useRef } from "react";

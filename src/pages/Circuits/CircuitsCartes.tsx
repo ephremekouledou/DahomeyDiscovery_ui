@@ -3,20 +3,20 @@ import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import cotonou from "../../assets/images/Circuit à la carte/Cotonou.webp";
-import abomey from "../../assets/images/Circuit à la carte/abomey.webp";
-import dassa from "../../assets/images/Circuit à la carte/dassa.webp";
-import ganvie from "../../assets/images/Circuit à la carte/Ganvié.webp";
-import gogotinkpon from "../../assets/images/Circuit à la carte/Gogotinkpon.webp";
-import popo from "../../assets/images/Circuit à la carte/Grand-Popo.webp";
-import ouidah from "../../assets/images/Circuit à la carte/Ouidah.webp";
-import porto from "../../assets/images/Circuit à la carte/Porto.webp";
-import possotome from "../../assets/images/Circuit à la carte/Possotomè.webp";
-import video from "../../assets/videos/usagevid1.mp4";
-import debut from "../../assets/images/Circuit signature/Début.webp";
+import cotonou from "/images/Circuit à la carte/Cotonou.webp";
+import abomey from "/images/Circuit à la carte/abomey.webp";
+import dassa from "/images/Circuit à la carte/dassa.webp";
+import ganvie from "/images/Circuit à la carte/Ganvié.webp";
+import gogotinkpon from "/images/Circuit à la carte/Gogotinkpon.webp";
+import popo from "/images/Circuit à la carte/Grand-Popo.webp";
+import ouidah from "/images/Circuit à la carte/Ouidah.webp";
+import porto from "/images/Circuit à la carte/Porto.webp";
+import possotome from "/images/Circuit à la carte/Possotomè.webp";
+import video from "/videos/usagevid1.mp4";
+import debut from "/images/Circuit signature/Début.webp";
 import BeginningButton from "../../components/dededed/BeginingButton";
-import img1 from "../../assets/images/Circuit signature/1_5.webp";
-import img3 from "../../assets/images/Circuit signature/3_5.jpeg";
+import img1 from "/images/Circuit signature/1_5.webp";
+import img3 from "/images/Circuit signature/3_5.jpeg";
 
 // Types
 interface Circuit {

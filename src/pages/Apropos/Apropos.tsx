@@ -1,15 +1,15 @@
 import Footer from "../../components/footer/footer";
 import NavBar from "../../components/navBar/navBar";
 import { Layout, Flex, Row, Col, Typography, Button } from "antd";
-import vector from "../../assets/icons/aproposVector.svg";
-import mmeDerby from "../../assets/images/mmeDerby.png";
+import vector from "../../assets../../assets/icons/aproposVector.svg";
+import mmeDerby from "/images/mmeDerby.png";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import img2 from "../../assets/images/2.jpg";
-import img4 from "../../assets/images/4.jpg";
-import img6 from "../../assets/images/6.jpg";
-import img8 from "../../assets/images/8.jpg";
-import img10 from "../../assets/images/10.jpg";
+import img2 from "/images/2.jpg";
+import img4 from "/images/4.jpg";
+import img6 from "/images/6.jpg";
+import img8 from "/images/8.jpg";
+import img10 from "/images/10.jpg";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
 import BeginningButton from "../../components/dededed/BeginingButton";
 

@@ -5,11 +5,11 @@ import { useEffect, useState } from "react";
 import Footer from "../../components/footer/footer";
 import { useLocation } from "react-router-dom";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
-import img2 from "../../assets/images/2.jpg";
-import img4 from "../../assets/images/4.jpg";
-import img6 from "../../assets/images/6.jpg";
-import img8 from "../../assets/images/8.jpg";
-import img10 from "../../assets/images/10.jpg";
+import img2 from "/images/2.jpg";
+import img4 from "/images/4.jpg";
+import img6 from "/images/6.jpg";
+import img8 from "/images/8.jpg";
+import img10 from "/images/10.jpg";
 import BeginningButton from "../../components/dededed/BeginingButton";
 
 const images = [img2, img4, img6, img8, img10];

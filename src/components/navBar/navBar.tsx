@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import "./navBar.css";
-import logo from "../../assets/images/Logo/logo-belge.png";
-import menuVector from "../../assets/icons/menuVector.png";
+import logo from "/images/Logo/logo-belge.png";
+import menuVector from "../../assets../../assets/icons/menuVector.png";
 import { Button, Flex, Drawer, Dropdown } from "antd";
 import { useState, useEffect } from "react";
 import { MenuOutlined, CloseOutlined, DownOutlined } from "@ant-design/icons";

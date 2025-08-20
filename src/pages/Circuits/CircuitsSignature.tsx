@@ -4,14 +4,14 @@ import Footer from "../../components/footer/footer";
 import { useEffect, useState, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
-import debut from "../../assets/images/Circuit signature/Début.webp";
-import reel from "../../assets/videos/usagevid1.mp4";
-// import reel from "../../assets/videos/video drone horizontale Abomey .mp4";
-import img1 from "../../assets/images/Circuit signature/1_5.webp";
-import img2 from "../../assets/images/Circuit signature/2_5.webp";
-import img3 from "../../assets/images/Circuit signature/3_5.jpeg";
-import img4 from "../../assets/images/Circuit signature/4_5.webp";
-import img5 from "../../assets/images/Circuit signature/5_5.webp";
+import debut from "/images/Circuit signature/Début.webp";
+import reel from "/videos/usagevid1.mp4";
+// import reel from "/videos/video drone horizontale Abomey .mp4";
+import img1 from "/images/Circuit signature/1_5.webp";
+import img2 from "/images/Circuit signature/2_5.webp";
+import img3 from "/images/Circuit signature/3_5.jpeg";
+import img4 from "/images/Circuit signature/4_5.webp";
+import img5 from "/images/Circuit signature/5_5.webp";
 import {
   DetailedTimeline,
   InclusNonInclusComponent,

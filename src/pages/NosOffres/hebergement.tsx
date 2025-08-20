@@ -24,29 +24,29 @@ import {
 import { Button, Flex, Typography, Drawer } from "antd";
 import NavBar from "../../components/navBar/navBar";
 import { useLocation, useNavigate } from "react-router-dom";
-// import img1 from "../../assets/images/1.jpg";
-import img2 from "../../assets/images/2.jpg";
-// import img3 from "../../assets/images/3.jpg";
-import img4 from "../../assets/images/4.jpg";
-// import img5 from "../../assets/images/5.jpg";
-import img6 from "../../assets/images/6.jpg";
-// import img7 from "../../assets/images/7.jpg";
-import img8 from "../../assets/images/8.jpg";
-// import img9 from "../../assets/images/9.jpg";
-import img10 from "../../assets/images/10.jpg";
+// import img1 from "/images/1.jpg";
+import img2 from "/images/2.jpg";
+// import img3 from "/images/3.jpg";
+import img4 from "/images/4.jpg";
+// import img5 from "/images/5.jpg";
+import img6 from "/images/6.jpg";
+// import img7 from "/images/7.jpg";
+import img8 from "/images/8.jpg";
+// import img9 from "/images/9.jpg";
+import img10 from "/images/10.jpg";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
 import Footer from "../../components/footer/footer";
 import { useTransaction } from "../../context/transactionContext";
-import bonneAdressImg from "../../assets/images/bonnesAddresse.webp";
+import bonneAdressImg from "/images/bonnesAddresse.webp";
 import BeginningButton from "../../components/dededed/BeginingButton";
-import imgElia1 from "../../assets/images/EliaPhoto/1.jpg";
-import imgElia2 from "../../assets/images/EliaPhoto/2.jpg";
-import imgElia3 from "../../assets/images/EliaPhoto/3.jpg";
-import imgElia4 from "../../assets/images/EliaPhoto/4.jpg";
-import imgElia5 from "../../assets/images/EliaPhoto/5.jpg";
-import imgElia6 from "../../assets/images/EliaPhoto/6.jpg";
-import imgElia7 from "../../assets/images/EliaPhoto/7.jpg";
-import imgElia8 from "../../assets/images/EliaPhoto/8.jpg";
+import imgElia1 from "/images/EliaPhoto/1.jpg";
+import imgElia2 from "/images/EliaPhoto/2.jpg";
+import imgElia3 from "/images/EliaPhoto/3.jpg";
+import imgElia4 from "/images/EliaPhoto/4.jpg";
+import imgElia5 from "/images/EliaPhoto/5.jpg";
+import imgElia6 from "/images/EliaPhoto/6.jpg";
+import imgElia7 from "/images/EliaPhoto/7.jpg";
+import imgElia8 from "/images/EliaPhoto/8.jpg";
 
 const images = [
   // img1,

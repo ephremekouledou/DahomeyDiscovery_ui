@@ -3,12 +3,12 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import NavBar from "../navBar/navBar";
 import Footer from "../footer/footer";
 import React, { useState, useEffect, useMemo } from "react";
-import img1 from "../../assets/images/Circuit signature/1_5.webp";
-import img2 from "../../assets/images/Circuit signature/2_5.webp";
-import img3 from "../../assets/images/Circuit signature/3_5.jpeg";
-import img4 from "../../assets/images/Circuit signature/4_5.webp";
-import img5 from "../../assets/images/Circuit signature/5_5.webp";
-import video from "../../assets/videos/usagevid1.mp4";
+import img1 from "/images/Circuit signature/1_5.webp";
+import img2 from "/images/Circuit signature/2_5.webp";
+import img3 from "/images/Circuit signature/3_5.jpeg";
+import img4 from "/images/Circuit signature/4_5.webp";
+import img5 from "/images/Circuit signature/5_5.webp";
+import video from "/videos/usagevid1.mp4";
 import {
   DetailedTimeline,
   InclusNonInclusComponent,

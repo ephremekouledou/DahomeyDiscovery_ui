@@ -1,6 +1,6 @@
 import { Flex, Typography } from "antd";
 import { useState, useEffect } from "react";
-import logo from "../../assets/images/Logo/monoChrome-blanc.png";
+import logo from "/images/Logo/monoChrome-blanc.png";
 import {
   FacebookFilled,
   InstagramFilled,
