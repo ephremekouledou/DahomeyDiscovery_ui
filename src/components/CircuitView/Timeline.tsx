@@ -831,6 +831,69 @@ const useScreenSizeResponsive = () => {
   );
 };
 
+const useFontLoadedRobust = () => {
+  const [isFontLoaded, setIsFontLoaded] = useState(false);
+  const fontFamily = "DragonAngled";
+
+  useEffect(() => {
+    let timeoutId;
+
+    const checkFontLoaded = () => {
+      // Créer un élément de test
+      const testElement = document.createElement('div');
+      testElement.style.fontFamily = fontFamily;
+      testElement.style.fontSize = '100px';
+      testElement.style.position = 'absolute';
+      testElement.style.left = '-9999px';
+      testElement.style.visibility = 'hidden';
+      testElement.innerHTML = 'Test';
+      
+      document.body.appendChild(testElement);
+      
+      const initialWidth = testElement.offsetWidth;
+      
+      // Fallback font pour comparaison
+      testElement.style.fontFamily = `${fontFamily}, Arial, sans-serif`;
+      const fallbackWidth = testElement.offsetWidth;
+      
+      document.body.removeChild(testElement);
+      
+      // Si les largeurs sont différentes, la police est chargée
+      if (initialWidth !== fallbackWidth || document.fonts?.check?.(`12px ${fontFamily}`)) {
+        setIsFontLoaded(true);
+      } else {
+        timeoutId = setTimeout(checkFontLoaded, 100);
+      }
+    };
+
+    // Vérifier immédiatement
+    if (document.fonts?.ready) {
+      document.fonts.ready.then(() => {
+        if (document.fonts.check(`12px ${fontFamily}`)) {
+          setIsFontLoaded(true);
+        } else {
+          checkFontLoaded();
+        }
+      });
+    } else {
+      checkFontLoaded();
+    }
+
+    // Timeout de sécurité
+    const safetyTimeout = setTimeout(() => {
+      setIsFontLoaded(true);
+    }, 3000);
+
+    timeoutId = ""
+
+    return () => {
+      clearTimeout(safetyTimeout);
+    };
+  }, [fontFamily]);
+
+  return isFontLoaded;
+};
+
 export {
   DetailedTimeline,
   useScreenSize,
@@ -838,4 +901,5 @@ export {
   FinalElement,
   InclusNonInclusComponent,
   useScreenSizeResponsive,
+  useFontLoadedRobust,
 };

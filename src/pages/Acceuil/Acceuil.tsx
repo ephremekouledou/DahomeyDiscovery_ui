@@ -30,7 +30,7 @@ import img5 from "/images/Accueil/5_5.webp";
 import fin from "/images/Accueil/fin.webp";
 import BeginningButton from "../../components/dededed/BeginingButton";
 import { ThematicCircuitCard } from "../../components/CircuitView/Card";
-import { useScreenSizeResponsive } from "../../components/CircuitView/Timeline";
+import { useFontLoadedRobust, useScreenSizeResponsive } from "../../components/CircuitView/Timeline";
 
 // Constants moved outside component to prevent recreations
 const IMAGES = [img1, img2, img3, img4, img5];
@@ -459,6 +459,7 @@ const Acceuil = () => {
   const { pathname } = useLocation();
   const container = useRef<HTMLDivElement>(null);
   const { isLoaded, hasRun, setHasRun } = useAnimation();
+  const fontLoaded = useFontLoadedRobust();
   const location = useLocation();
 
   // Memoized style calculations
@@ -548,7 +549,7 @@ const Acceuil = () => {
     () => {
       const isFirstLoad = location.pathname === "/";
       
-      if (!hasRun && isFirstLoad && isLoaded && container.current) {
+      if (!hasRun && isFirstLoad && isLoaded && fontLoaded && container.current) {
         const timeline = gsap.timeline({
           onStart: () => {
             // S'assurer que les éléments sont dans l'état initial correct
