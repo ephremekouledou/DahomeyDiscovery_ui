@@ -184,7 +184,7 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
             </h4>
             <div className="text-right">
               <div className="text-xl font-bold text-blue-600">
-                {option.price}€
+                {option.price} FCFA
               </div>
               <div className="text-sm text-gray-600">par nuit</div>
             </div>
@@ -222,7 +222,7 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
         <img
           src={images[currentImageIndex]}
           alt={`${name} - Image ${currentImageIndex + 1}`}
-          className="w-full h-100 object-cover"
+          className="w-full h-150 object-cover"
         />
 
         {images.length > 1 && (
@@ -286,7 +286,7 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
           {currentPrice && (
             <div className="text-left md:text-right">
               <div className="text-3xl font-bold text-blue-600">
-                {currentPrice}€
+                {currentPrice} FCFA
               </div>
               <div className="text-gray-600">par nuit</div>
             </div>

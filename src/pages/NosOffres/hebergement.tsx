@@ -2,17 +2,11 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Star,
   Wifi,
-  Car,
   Tv,
   Snowflake,
   UtensilsCrossed,
   MapPin,
-  Camera,
-  Shirt,
   User,
-  Shield,
-  Flame,
-  Wind,
   Thermometer,
   Droplets,
   LucideIcon,
@@ -20,6 +14,10 @@ import {
   ChevronDown,
   Filter,
   X,
+  Lock,
+  Sofa,
+  Bubbles,
+  ShowerHead,
 } from "lucide-react";
 import { Button, Flex, Typography, Drawer } from "antd";
 import NavBar from "../../components/navBar/navBar";
@@ -39,14 +37,30 @@ import Footer from "../../components/footer/footer";
 import { useTransaction } from "../../context/transactionContext";
 import bonneAdressImg from "/images/bonnesAddresse.webp";
 import BeginningButton from "../../components/dededed/BeginingButton";
-import imgElia1 from "/images/EliaPhoto/1.jpg";
-import imgElia2 from "/images/EliaPhoto/2.jpg";
-import imgElia3 from "/images/EliaPhoto/3.jpg";
-import imgElia4 from "/images/EliaPhoto/4.jpg";
-import imgElia5 from "/images/EliaPhoto/5.jpg";
-import imgElia6 from "/images/EliaPhoto/6.jpg";
-import imgElia7 from "/images/EliaPhoto/7.jpg";
-import imgElia8 from "/images/EliaPhoto/8.jpg";
+import imgElia1 from "/images/Hebergements/ElaRedidence/1.jpg";
+import imgElia2 from "/images/Hebergements/ElaRedidence/2.jpg";
+import imgElia3 from "/images/Hebergements/ElaRedidence/3.jpg";
+import imgElia4 from "/images/Hebergements/ElaRedidence/4.jpg";
+import imgElia5 from "/images/Hebergements/ElaRedidence/5.jpg";
+import imgElia6 from "/images/Hebergements/ElaRedidence/6.jpg";
+import imgElia7 from "/images/Hebergements/ElaRedidence/7.jpg";
+import imgElia8 from "/images/Hebergements/ElaRedidence/8.jpg";
+import imgEliagbessi from "/images/Hebergements/ElaRedidence/gbessi.jpg";
+import imgEliahoundji from "/images/Hebergements/ElaRedidence/houndji.jpg";
+import imgEliaife from "/images/Hebergements/ElaRedidence/ife.jpg";
+import imgEliamabou from "/images/Hebergements/ElaRedidence/mabou.jpg";
+import imgEliasedo from "/images/Hebergements/ElaRedidence/sedo.jpg";
+import imgCasaCelio1 from "/images/Hebergements/CasaCielo/casa de cielo.jpg";
+import imgCasaCielo2 from "/images/Hebergements/CasaCielo/chambre prestige (2).jpg";
+import imgCasaCielo3 from "/images/Hebergements/CasaCielo/Chambre Prestige.jpg";
+import imgCasaCielo4 from "/images/Hebergements/CasaCielo/chambre Standard.jpg";
+import imgCasaCielo5 from "/images/Hebergements/CasaCielo/lit deu place vue sur mer.jpg";
+import imgCasaCielo6 from "/images/Hebergements/CasaCielo/piscine.jpg";
+import imgCasaCielo7 from "/images/Hebergements/CasaCielo/prestige lit 3 place.jpg";
+import imgCasaCielo8 from "/images/Hebergements/CasaCielo/prestige lit deux place.jpg";
+import imgCasaCielo9 from "/images/Hebergements/CasaCielo/restaurant.jpg";
+import imgCasaCielo10 from "/images/Hebergements/CasaCielo/sale de réunion.jpg";
+import imgCasaCielo11 from "/images/Hebergements/CasaCielo/Suite Ryal Présidentiel.jpg";
 
 const images = [
   // img1,
@@ -230,11 +244,11 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({
       const maxPrice = Math.max(...prices);
 
       if (minPrice === maxPrice) {
-        return `${minPrice}€`;
+        return `${minPrice} FCFA`;
       }
-      return `${minPrice}€ - ${maxPrice}€`;
+      return `${minPrice} FCFA - ${maxPrice} FCFA`;
     }
-    return `${accommodation.price}€`;
+    return `${accommodation.price} FCFA`;
   };
 
   return (
@@ -293,7 +307,7 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({
               <div>
                 <span
                   className={`font-bold text-gray-800 ${
-                    isMobile ? "text-xl" : "text-2xl"
+                    isMobile ? "text-xl" : "text-lg"
                   }`}
                 >
                   {getPriceDisplay()}
@@ -336,10 +350,10 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({
 export const createExampleAccommodation = (): AccommodationData[] => [
   {
     id: "846567erfsrfdrfdesew",
-    name: "ELIA",
-    rating: 4.8,
-    reviewCount: 124,
-    mainImage: imgElia1,
+    name: "Elia Résidence",
+    rating: 4.1,
+    reviewCount: 7,
+    mainImage: imgElia2,
     ville: "Cotonou",
     images: [
       imgElia1,
@@ -352,240 +366,221 @@ export const createExampleAccommodation = (): AccommodationData[] => [
       imgElia8,
     ],
     description:
-      "Face au murmure des vagues, Cette Résidence vous ouvre ses portes : chambres raffinées, piscine clé en main, jardins apaisants et restauration locale et internationale. À quelques minutes de l'aéroport de Cotonou, cette adresse incarne l'âme de la coste béninoise. Éléments préférés de nos voyageurs ? Le personnel chaleureux, la propreté du lieu, et ce sentiment d'être chez soi… tout en étant ailleurs.",
+      "Face au murmure des vagues, Cette Résidence vous ouvre ses portes : chambres raffinées, piscine clé en main, jardins apaisants et restauration locale et internationale. À quelques minutes de l’aéroport de Cotonou, cette adresse incarne l’âme de la cote béninoise. Éléments préférés de nos voyageurs ? Le personnel chaleureux, la propreté du lieu, et ce sentiment d’être chez soi… tout en étant ailleurs.",
     options: [
       {
-        name: "Chambre Standard",
-        description: "Chambre confortable avec vue sur jardin",
-        photo: imgElia2,
-        price: 120,
-        amenities: {
-          entertainment: [{ name: "Télévision", icon: Tv, available: true }],
-          heating: [
-            { name: "Climatisation", icon: Snowflake, available: true },
-          ],
-          internet: [{ name: "Wifi", icon: Wifi, available: true }],
-          comfort: [
-            { name: "Équipements de base", icon: User, available: true },
-            { name: "Eau chaude", icon: Droplets, available: true },
-          ],
-        },
-      },
-      {
-        name: "Chambre Deluxe",
-        description: "Chambre spacieuse avec balcon et vue sur mer",
-        photo: imgElia3,
-        price: 180,
-        amenities: {
-          entertainment: [{ name: "Télévision", icon: Tv, available: true }],
-          heating: [
-            { name: "Climatisation", icon: Snowflake, available: true },
-          ],
-          internet: [
-            { name: "Wifi", icon: Wifi, available: true },
-            { name: "Espace de travail dédié", icon: User, available: true },
-          ],
-          location: [
-            {
-              name: "Accès plage ou bord de mer",
-              icon: MapPin,
-              available: true,
-              description: "Vue sur mer depuis le balcon",
-            },
-          ],
-          comfort: [
-            { name: "Équipements de base", icon: User, available: true },
-            { name: "Eau chaude", icon: Droplets, available: true },
-          ],
-        },
-      },
-      {
-        name: "Suite Présidentielle",
+        name: "KOUAKOU Prestige",
         description:
-          "Suite luxueuse avec salon séparé et vue panoramique sur l'océan",
-        photo: imgElia4,
-        price: 250,
+          "Au rez-de-chaussée de la Résidence; découvrez notre belle Chambre Prestige Standard KOUAKOU, avec une vue donnant sur le Jardin intérieur et la Piscine.",
+        photo: imgEliamabou,
+        price: 65000,
         amenities: {
-          entertainment: [{ name: "Télévision", icon: Tv, available: true }],
+          entertainment: [
+            { name: "Télévision", icon: Tv, available: true },
+            { name: "Mini-bar", icon: UtensilsCrossed, available: true },
+          ],
           heating: [
             { name: "Climatisation", icon: Snowflake, available: true },
+            { name: "Chauffage", icon: Thermometer, available: true },
           ],
           internet: [
             { name: "Wifi", icon: Wifi, available: true },
             { name: "Espace de travail dédié", icon: User, available: true },
           ],
-          kitchen: [
-            {
-              name: "Mini-cuisine",
-              icon: UtensilsCrossed,
-              available: true,
-              description: "Kitchenette équipée",
-            },
-          ],
-          location: [
-            {
-              name: "Accès plage ou bord de mer",
-              icon: MapPin,
-              available: true,
-              description: "Vue panoramique sur l'océan",
-            },
-          ],
-          parking: [
-            { name: "Parking gratuit sur place", icon: Car, available: true },
+          comfort: [
+            { name: "Équipements de base", icon: User, available: true },
+            { name: "Eau chaude", icon: Droplets, available: true },
           ],
           safety: [
             {
-              name: "Caméras de surveillance extérieures",
-              icon: Camera,
+              name: "Coffre fort",
+              icon: Lock,
               available: true,
             },
           ],
-          laundry: [
-            { name: "Lave-linge", icon: Shirt, available: true },
-            { name: "Sèche-linge", icon: Wind, available: true },
+          // kitchen: [
+          //   {
+          //     name: "Cuisine",
+          //     icon: UtensilsCrossed,
+          //     available: true,
+          //     description: "Espace où les voyageurs peuvent cuisiner",
+          //   },
+          // ],
+          // location: [
+          //   {
+          //     name: "Accès plage ou bord de mer",
+          //     icon: MapPin,
+          //     available: true,
+          //     description:
+          //       "Les voyageurs peuvent profiter d'une plage à proximité",
+          //   },
+          // ],
+          // parking: [
+          //   { name: "Parking gratuit sur place", icon: Car, available: true },
+          // ],
+          // laundry: [
+          //   { name: "Lave-linge", icon: Shirt, available: true },
+          //   { name: "Sèche-linge", icon: Wind, available: true },
+          // ],
+        },
+      },
+      {
+        name: "MABOU Prestige",
+        description:
+          "Au rez-de-chaussée de la Résidence; découvrez notre belle Chambre Prestige Standard MABOU, avec une vue donnant sur le Jardin intérieur et la Piscine.",
+        photo: imgEliamabou,
+        price: 65000,
+        amenities: {
+          entertainment: [
+            { name: "Télévision", icon: Tv, available: true },
+            { name: "Mini-bar", icon: UtensilsCrossed, available: true },
           ],
-          comfort: [
-            { name: "Équipements de base", icon: User, available: true },
+          heating: [
+            { name: "Climatisation", icon: Snowflake, available: true },
             { name: "Chauffage", icon: Thermometer, available: true },
-            { name: "Eau chaude", icon: Droplets, available: true },
           ],
-        },
-      },
-    ],
-    owner: true,
-  },
-  {
-    id: "846567erfsrfdrf",
-    name: "Villa Océane - Vue mer exceptionnelle",
-    price: 150,
-    rating: 4.8,
-    reviewCount: 124,
-    mainImage:
-      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=250&fit=crop",
-    ville: "Ouidah",
-    images: [
-      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=600&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=400&fit=crop",
-    ],
-    description:
-      "Magnifique villa en bord de mer avec une vue panoramique sur l'océan. Parfaite pour des vacances en famille ou entre amis. Située à proximité de la plage, cette propriété offre tout le confort moderne dans un cadre idyllique.",
-    amenities: {
-      entertainment: [{ name: "Télévision", icon: Tv, available: true }],
-      heating: [{ name: "Climatisation", icon: Snowflake, available: true }],
-      internet: [
-        { name: "Wifi", icon: Wifi, available: true },
-        { name: "Espace de travail dédié", icon: User, available: true },
-      ],
-      kitchen: [
-        {
-          name: "Cuisine",
-          icon: UtensilsCrossed,
-          available: true,
-          description: "Espace où les voyageurs peuvent cuisiner",
-        },
-      ],
-      location: [
-        {
-          name: "Accès plage ou bord de mer",
-          icon: MapPin,
-          available: true,
-          description: "Les voyageurs peuvent profiter d'une plage à proximité",
-        },
-      ],
-      parking: [
-        { name: "Parking gratuit sur place", icon: Car, available: true },
-      ],
-      safety: [
-        {
-          name: "Caméras de surveillance extérieures",
-          icon: Camera,
-          available: true,
-        },
-        {
-          name: "Détecteur de fumée",
-          icon: Flame,
-          available: false,
-          description:
-            "Ce logement n'est peut-être pas équipé d'un détecteur de fumée",
-        },
-        {
-          name: "Détecteur de monoxyde de carbone",
-          icon: Shield,
-          available: false,
-          description:
-            "Ce logement n'est peut-être pas équipé d'un détecteur de monoxyde de carbone",
-        },
-      ],
-      laundry: [
-        { name: "Lave-linge", icon: Shirt, available: true },
-        { name: "Sèche-linge", icon: Wind, available: true },
-      ],
-      comfort: [
-        { name: "Équipements de base", icon: User, available: true },
-        { name: "Chauffage", icon: Thermometer, available: true },
-        { name: "Eau chaude", icon: Droplets, available: true },
-      ],
-    },
-    owner: true,
-  },
-  {
-    id: "es7f8s7f8s7f8s7f8s7f8s7f8s7f8s7f8",
-    name: "Appartement Centre-ville - Moderne & lumineux",
-    rating: 4.5,
-    reviewCount: 87,
-    mainImage:
-      "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=400&h=250&fit=crop",
-    ville: "Porto-Novo",
-    images: [
-      "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=600&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1464983953574-0892a716854b?w=600&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?w=600&h=400&fit=crop",
-    ],
-    description:
-      "Appartement moderne situé au cœur du centre-ville, proche de toutes commodités. Idéal pour les voyageurs d'affaires ou les couples souhaitant découvrir la ville.",
-    options: [
-      {
-        name: "Studio",
-        description: "Studio moderne avec kitchenette",
-        photo:
-          "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=600&h=400&fit=crop",
-        price: 85,
-        amenities: {
-          entertainment: [{ name: "Télévision", icon: Tv, available: true }],
-          heating: [{ name: "Chauffage", icon: Thermometer, available: true }],
-          internet: [{ name: "Wifi", icon: Wifi, available: true }],
-          kitchen: [
-            { name: "Kitchenette", icon: UtensilsCrossed, available: true },
-          ],
-          comfort: [
-            { name: "Équipements de base", icon: User, available: true },
-            { name: "Eau chaude", icon: Droplets, available: true },
-          ],
-        },
-      },
-      {
-        name: "Appartement 2 pièces",
-        description: "Spacieux appartement avec chambre séparée",
-        photo:
-          "https://images.unsplash.com/photo-1464983953574-0892a716854b?w=600&h=400&fit=crop",
-        price: 120,
-        amenities: {
-          entertainment: [{ name: "Télévision", icon: Tv, available: true }],
-          heating: [{ name: "Chauffage", icon: Thermometer, available: true }],
           internet: [
             { name: "Wifi", icon: Wifi, available: true },
             { name: "Espace de travail dédié", icon: User, available: true },
           ],
-          kitchen: [
-            { name: "Cuisine équipée", icon: UtensilsCrossed, available: true },
-          ],
-          laundry: [{ name: "Lave-linge", icon: Shirt, available: true }],
           comfort: [
             { name: "Équipements de base", icon: User, available: true },
             { name: "Eau chaude", icon: Droplets, available: true },
+          ],
+          safety: [
+            {
+              name: "Coffre fort",
+              icon: Lock,
+              available: true,
+            },
+          ],
+        },
+      },
+      {
+        name: "SEDO Prestige",
+        description:
+          "Au premier et seul étage de la Résidence; découvrez notre spacieuse chambre salon, avec une vue donnant sur la Piscine et la Plage.",
+        photo: imgEliasedo,
+        price: 99000,
+        amenities: {
+          entertainment: [
+            { name: "Télévision", icon: Tv, available: true },
+            { name: "Mini-bar", icon: UtensilsCrossed, available: true },
+          ],
+          heating: [
+            { name: "Climatisation", icon: Snowflake, available: true },
+            { name: "Chauffage", icon: Thermometer, available: true },
+          ],
+          internet: [
+            { name: "Wifi", icon: Wifi, available: true },
+            { name: "Espace de travail dédié", icon: User, available: true },
+          ],
+          comfort: [
+            { name: "Équipements de base", icon: User, available: true },
+            { name: "Eau chaude", icon: Droplets, available: true },
+          ],
+          safety: [
+            {
+              name: "Coffre fort",
+              icon: Lock,
+              available: true,
+            },
+          ],  
+        },
+      },
+      {
+        name: "IFE Prestige",
+        description:
+          "Au rez-de-chaussée de la Résidence; découvrez notre spacieuse chambre salon, avec une vue donnant sur une cour et l’entrée face à la Plage.",
+        photo: imgEliaife,
+        price: 109000,
+        amenities: {
+          entertainment: [
+            { name: "Télévision", icon: Tv, available: true },
+            { name: "Mini-bar", icon: UtensilsCrossed, available: true },
+          ],
+          heating: [
+            { name: "Climatisation", icon: Snowflake, available: true },
+            { name: "Chauffage", icon: Thermometer, available: true },
+          ],
+          internet: [
+            { name: "Wifi", icon: Wifi, available: true },
+            { name: "Espace de travail dédié", icon: User, available: true },
+          ],
+          comfort: [
+            { name: "Équipements de base", icon: User, available: true },
+            { name: "Eau chaude", icon: Droplets, available: true },
+          ],
+          safety: [
+            {
+              name: "Coffre fort",
+              icon: Lock,
+              available: true,
+            },
+          ],
+        },
+      },
+      {
+        name: "GBESSI Deluxe",
+        description:
+          "Au premier et seul étage de la Résidence; découvrez notre somptueuse Chambre Deluxe GBESSI, dotée d'une chambre salon spacieuse, d'une terrasse privée donnant sur la Piscine.",
+        photo: imgEliagbessi,
+        price: 139000,
+        amenities: {
+          entertainment: [
+            { name: "Télévision", icon: Tv, available: true },
+            { name: "Mini-bar", icon: UtensilsCrossed, available: true },
+          ],
+          heating: [
+            { name: "Climatisation", icon: Snowflake, available: true },
+            { name: "Chauffage", icon: Thermometer, available: true },
+          ],
+          internet: [
+            { name: "Wifi", icon: Wifi, available: true },
+            { name: "Espace de travail dédié", icon: User, available: true },
+          ],
+          comfort: [
+            { name: "Équipements de base", icon: User, available: true },
+            { name: "Eau chaude", icon: Droplets, available: true },
+          ],
+          safety: [
+            {
+              name: "Coffre fort",
+              icon: Lock,
+              available: true,
+            },
+          ],
+        },
+      },
+      {
+        name: "HOUNDJI Suite",
+        description:
+          "Au premier et seul étage de la Résidence; découvrez notre somptueuse Suite Deluxe HOUNDJI, dotée d'une chambre spacieuse, d'une terrasse privée et d'un salon télé séparé. Idéale pour se détendre au calme face à la Plage.",
+        photo: imgEliahoundji,
+        price: 169000,
+        amenities: {
+          entertainment: [
+            { name: "Télévision", icon: Tv, available: true },
+            { name: "Mini-bar", icon: UtensilsCrossed, available: true },
+          ],
+          heating: [
+            { name: "Climatisation", icon: Snowflake, available: true },
+            { name: "Chauffage", icon: Thermometer, available: true },
+          ],
+          internet: [
+            { name: "Wifi", icon: Wifi, available: true },
+            { name: "Espace de travail dédié", icon: User, available: true },
+          ],
+          comfort: [
+            { name: "Équipements de base", icon: User, available: true },
+            { name: "Eau chaude", icon: Droplets, available: true },
+          ],
+          safety: [
+            {
+              name: "Coffre fort",
+              icon: Lock,
+              available: true,
+            },
           ],
         },
       },
@@ -593,337 +588,327 @@ export const createExampleAccommodation = (): AccommodationData[] => [
     owner: false,
   },
   {
-    id: "deef8s7f8s7f8s7f8s7f8s7f8s7f8s7f8",
-    name: "Villa Palmeraie - Authentique & spacieuse",
-    price: 150,
-    rating: 4.8,
-    reviewCount: 124,
-    mainImage:
-      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=250&fit=crop",
-    ville: "Abomey",
+    id: "846567e63587745rfsrfdrfdesew",
+    name: "CASA CIELO",
+    rating: 4.2,
+    reviewCount: 489,
+    mainImage: imgCasaCielo11,
+    ville: "Cotonou",
     images: [
-      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=600&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=400&fit=crop",
+      imgCasaCelio1,
+      imgCasaCielo2,
+      imgCasaCielo3,
+      imgCasaCielo4,
+      imgCasaCielo5,
+      imgCasaCielo6,
+      imgCasaCielo7,
+      imgCasaCielo8,
+      imgCasaCielo9,
+      imgCasaCielo10,
+      imgCasaCielo11,
     ],
     description:
-      "Villa traditionnelle rénovée avec goût, offrant une expérience authentique au cœur de l'histoire béninoise. Proche des sites historiques d'Abomey.",
-    amenities: {
-      entertainment: [{ name: "Télévision", icon: Tv, available: true }],
-      heating: [{ name: "Climatisation", icon: Snowflake, available: true }],
-      internet: [
-        { name: "Wifi", icon: Wifi, available: true },
-        { name: "Espace de travail dédié", icon: User, available: true },
-      ],
-      kitchen: [
-        {
-          name: "Cuisine",
-          icon: UtensilsCrossed,
-          available: true,
-          description: "Espace où les voyageurs peuvent cuisiner",
+      "Un refuge design et raffiné, à deux pas de la plage de Fidjrossé. Inspiré des chalets alpins, l’hôtel combine luxe discret et confort moderne, avec piscine extérieure, salle de sport, parking gratuit, Wi-Fi, salon commun, restaurant aux influences africaines et indiennes, et navette aéroport. Le personnel trilingue (français, anglais, hindi) est réputé pour son hospitalité sans faille et son service attentionné.",
+    options: [
+      {
+        name: "Chambre Standard", 
+        description:
+          "Un espace confortable  pour un séjour reposant au cœur de Cotonou",
+        photo: imgCasaCielo4,
+        price: 54500,
+        amenities: {
+          entertainment: [
+            { name: "Télévision", icon: Tv, available: true },
+            { name: "Mini-bar", icon: UtensilsCrossed, available: true },
+          ],
+          heating: [
+            { name: "Climatisation", icon: Snowflake, available: true },
+            { name: "Chauffage", icon: Thermometer, available: true },
+          ],
+          internet: [
+            { name: "Wifi", icon: Wifi, available: true },
+            { name: "Espace de travail dédié", icon: User, available: false },
+          ],
+          comfort: [
+            { name: "Équipements de base", icon: User, available: true },
+            { name: "Eau chaude", icon: Droplets, available: true },
+          ],
+          safety: [
+            {
+              name: "Coffre fort",
+              icon: Lock,
+              available: false,
+            },
+          ],
+          // kitchen: [
+          //   {
+          //     name: "Cuisine",
+          //     icon: UtensilsCrossed,
+          //     available: true,
+          //     description: "Espace où les voyageurs peuvent cuisiner",
+          //   },
+          // ],
+          // location: [
+          //   {
+          //     name: "Accès plage ou bord de mer",
+          //     icon: MapPin,
+          //     available: true,
+          //     description:
+          //       "Les voyageurs peuvent profiter d'une plage à proximité",
+          //   },
+          // ],
+          // parking: [
+          //   { name: "Parking gratuit sur place", icon: Car, available: true },
+          // ],
+          // laundry: [
+          //   { name: "Lave-linge", icon: Shirt, available: true },
+          //   { name: "Sèche-linge", icon: Wind, available: true },
+          // ],
         },
-      ],
-      location: [
-        {
-          name: "Centre historique",
-          icon: MapPin,
-          available: true,
-          description: "Proche des palais royaux d'Abomey",
+      },
+      {
+        name: "Chambre Prestige avec vue sur Mer",
+        description:
+          "Spacieuse et lumineuse, elle s’ouvre sur  une vue  sur la mer.",
+        photo: imgCasaCielo3,
+        price: 59500,
+        amenities: {
+          entertainment: [
+            { name: "Télévision", icon: Tv, available: true },
+            { name: "Mini-bar", icon: UtensilsCrossed, available: true },
+          ],
+          heating: [
+            { name: "Climatisation", icon: Snowflake, available: true },
+            { name: "Chauffage", icon: Thermometer, available: true },
+          ],
+          internet: [
+            { name: "Wifi", icon: Wifi, available: true },
+            { name: "Espace de travail dédié", icon: User, available: false },
+          ],
+          comfort: [
+            { name: "Équipements de base", icon: User, available: true },
+            { name: "Eau chaude", icon: Droplets, available: true },
+          ],
+          safety: [
+            {
+              name: "Coffre fort",
+              icon: Lock,
+              available: false,
+            },
+          ],
         },
-      ],
-      parking: [
-        { name: "Parking gratuit sur place", icon: Car, available: true },
-      ],
-      safety: [
-        {
-          name: "Caméras de surveillance extérieures",
-          icon: Camera,
-          available: true,
+      },
+      {
+        name: "Chambre Prestige avec vue sur Mer avec balcon  lit 2 places",
+        description:
+          "Spacieuse et lumineuse, elle s’ouvre sur un balcon privé qui dévoile une vue imprenable sur la mer.",
+        photo: imgCasaCielo2,
+        price: 75500,
+        amenities: {
+          entertainment: [
+            { name: "Télévision", icon: Tv, available: true },
+            { name: "Mini-bar", icon: UtensilsCrossed, available: true },
+          ],
+          heating: [
+            { name: "Climatisation", icon: Snowflake, available: true },
+            { name: "Chauffage", icon: Thermometer, available: true },
+          ],
+          internet: [
+            { name: "Wifi", icon: Wifi, available: true },
+            { name: "Espace de travail dédié", icon: User, available: false },
+          ],
+          comfort: [
+            { name: "Équipements de base", icon: User, available: true },
+            { name: "Eau chaude", icon: Droplets, available: true },
+          ],
+          safety: [
+            {
+              name: "Coffre fort",
+              icon: Lock,
+              available: false,
+            },
+          ],
         },
-        {
-          name: "Détecteur de fumée",
-          icon: Flame,
-          available: false,
-          description:
-            "Ce logement n'est peut-être pas équipé d'un détecteur de fumée",
+      },
+      {
+        name: "Chambre Prestige avec vue sur Mer avec balcon  lit 3 places",
+        description:
+          "Spacieuse et lumineuse, elle s’ouvre sur un balcon privé qui dévoile une vue imprenable sur la mer.",
+        photo: imgCasaCielo5,
+        price: 85500,
+        amenities: {
+          entertainment: [
+            { name: "Télévision", icon: Tv, available: true },
+            { name: "Mini-bar", icon: UtensilsCrossed, available: true },
+          ],
+          heating: [
+            { name: "Climatisation", icon: Snowflake, available: true },
+            { name: "Chauffage", icon: Thermometer, available: true },
+          ],
+          internet: [
+            { name: "Wifi", icon: Wifi, available: true },
+            { name: "Espace de travail dédié", icon: User, available: false },
+          ],
+          comfort: [
+            { name: "Équipements de base", icon: User, available: true },
+            { name: "Eau chaude", icon: Droplets, available: true },
+          ],
+          safety: [
+            {
+              name: "Coffre fort",
+              icon: Lock,
+              available: false,
+            },
+          ],
         },
-        {
-          name: "Détecteur de monoxyde de carbone",
-          icon: Shield,
-          available: false,
-          description:
-            "Ce logement n'est peut-être pas équipé d'un détecteur de monoxyde de carbone",
+      },
+      {
+        name: "Chambre Prestige lit 3 places",
+        description:
+          "Spacieuse et décorée avec goût, elle allie confort moderne et charme.",
+        photo: imgCasaCielo7,
+        price: 85500,
+        amenities: {
+          entertainment: [
+            { name: "Télévision", icon: Tv, available: true },
+            { name: "Mini-bar", icon: UtensilsCrossed, available: true },
+          ],
+          heating: [
+            { name: "Climatisation", icon: Snowflake, available: true },
+            { name: "Chauffage", icon: Thermometer, available: true },
+          ],
+          internet: [
+            { name: "Wifi", icon: Wifi, available: true },
+            { name: "Espace de travail dédié", icon: User, available: false },
+          ],
+          comfort: [
+            { name: "Équipements de base", icon: User, available: true },
+            { name: "Eau chaude", icon: Droplets, available: true },
+          ],
+          safety: [
+            {
+              name: "Coffre fort",
+              icon: Lock,
+              available: false,
+            },
+          ],
         },
-      ],
-      laundry: [
-        { name: "Lave-linge", icon: Shirt, available: true },
-        { name: "Sèche-linge", icon: Wind, available: true },
-      ],
-      comfort: [
-        { name: "Équipements de base", icon: User, available: true },
-        { name: "Chauffage", icon: Thermometer, available: true },
-        { name: "Eau chaude", icon: Droplets, available: true },
-      ],
-    },
+      },
+      {
+        name: "Suite Royales Présidentiel vue sur la mer avec balcon",
+        description:
+          "U  n espace d’exception alliant luxe, élégance et confort, offrant une vue splendide sur l’océan.",
+        photo: imgCasaCielo11,
+        price: 120500,
+        amenities: {
+          entertainment: [
+            { name: "Télévision", icon: Tv, available: true },
+            { name: "Mini-bar", icon: UtensilsCrossed, available: true },
+          ],
+          heating: [
+            { name: "Climatisation", icon: Snowflake, available: true },
+            { name: "Chauffage", icon: Thermometer, available: true },
+          ],
+          internet: [
+            { name: "Wifi", icon: Wifi, available: true },
+            { name: "Espace de travail dédié", icon: User, available: false },
+          ],
+          comfort: [
+            { name: "Équipements de base", icon: User, available: true },
+            { name: "Coin salon", icon: Sofa, available: true },
+            { name: "Jacuzzi", icon: Bubbles, available: true },
+            { name: "Baignoire", icon: ShowerHead, available: true },  
+            { name: "Eau chaude", icon: Droplets, available: true },
+          ],
+          safety: [
+            {
+              name: "Coffre fort",
+              icon: Lock,
+              available: false,
+            },
+          ],
+        },
+      },
+    ],
     owner: false,
   },
-  {
-    id: "deef8s7f8s7f8s7f8s7f8s7f8s7f8s7f9",
-    name: "Maison Lacustre - Sur pilotis",
-    price: 95,
-    rating: 4.5,
-    reviewCount: 87,
-    mainImage:
-      "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=400&h=250&fit=crop",
-    ville: "Ganvie",
-    images: [
-      "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=600&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1464983953574-0892a716854b?w=600&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?w=600&h=400&fit=crop",
-    ],
-    description:
-      "Expérience unique dans une maison traditionnelle sur pilotis au cœur de la cité lacustre de Ganvié. Une immersion totale dans la culture locale.",
-    amenities: {
-      entertainment: [{ name: "Télévision", icon: Tv, available: true }],
-      heating: [{ name: "Ventilation naturelle", icon: Wind, available: true }],
-      internet: [{ name: "Wifi", icon: Wifi, available: true }],
-      kitchen: [
-        {
-          name: "Cuisine traditionnelle",
-          icon: UtensilsCrossed,
-          available: true,
-        },
-      ],
-      location: [
-        {
-          name: "Sur l'eau",
-          icon: MapPin,
-          available: true,
-        },
-      ],
-      parking: [{ name: "Embarcadère privé", icon: Car, available: true }],
-      safety: [
-        {
-          name: "Garde traditionnelle",
-          icon: Shield,
-          available: true,
-        },
-      ],
-      laundry: [{ name: "Service de lessive", icon: Shirt, available: true }],
-      comfort: [
-        { name: "Équipements de base", icon: User, available: true },
-        { name: "Eau douce", icon: Droplets, available: true },
-      ],
-    },
-    owner: true,
-  },
-  {
-    id: "possotome123456789",
-    name: "Lodge Écologique - Nature & Sérénité",
-    price: 130,
-    rating: 4.7,
-    reviewCount: 56,
-    mainImage:
-      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=250&fit=crop",
-    ville: "Possotomè",
-    images: [
-      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=600&h=400&fit=crop",
-    ],
-    description:
-      "Lodge écologique au bord du lac Nokoué, offrant une expérience naturelle unique. Parfait pour les amoureux de la nature et les passionnés d'écotourisme.",
-    amenities: {
-      entertainment: [
-        { name: "Observation des oiseaux", icon: Camera, available: true },
-      ],
-      heating: [{ name: "Ventilation naturelle", icon: Wind, available: true }],
-      internet: [{ name: "Wifi", icon: Wifi, available: true }],
-      kitchen: [
-        {
-          name: "Cuisine bio",
-          icon: UtensilsCrossed,
-          available: true,
-        },
-      ],
-      location: [
-        {
-          name: "Bord de lac",
-          icon: MapPin,
-          available: true,
-        },
-      ],
-      parking: [{ name: "Parking écologique", icon: Car, available: true }],
-      safety: [
-        {
-          name: "Surveillance naturelle",
-          icon: Shield,
-          available: true,
-        },
-      ],
-      comfort: [
-        { name: "Équipements éco-responsables", icon: User, available: true },
-        { name: "Eau filtrée", icon: Droplets, available: true },
-      ],
-    },
-    owner: false,
-  },
-  {
-    id: "dassa987654321",
-    name: "Auberge des Collines",
-    price: 75,
-    rating: 4.3,
-    reviewCount: 42,
-    mainImage:
-      "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=400&h=250&fit=crop",
-    ville: "Dassa",
-    images: [
-      "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=600&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1464983953574-0892a716854b?w=600&h=400&fit=crop",
-    ],
-    description:
-      "Auberge chaleureuse nichée dans les collines de Dassa-Zoumè. Point de départ idéal pour découvrir les grottes et la spiritualité locale.",
-    amenities: {
-      entertainment: [{ name: "Télévision", icon: Tv, available: true }],
-      heating: [{ name: "Ventilation", icon: Wind, available: true }],
-      internet: [{ name: "Wifi", icon: Wifi, available: true }],
-      kitchen: [
-        {
-          name: "Cuisine partagée",
-          icon: UtensilsCrossed,
-          available: true,
-        },
-      ],
-      location: [
-        {
-          name: "Collines sacrées",
-          icon: MapPin,
-          available: true,
-        },
-      ],
-      parking: [{ name: "Parking gratuit", icon: Car, available: true }],
-      comfort: [
-        { name: "Équipements simples", icon: User, available: true },
-        { name: "Eau courante", icon: Droplets, available: true },
-      ],
-    },
-    owner: true,
-  },
-  {
-    id: "gogotinkpon123",
-    name: "Résidence Moderne Gogotinkpon",
-    price: 110,
-    rating: 4.6,
-    reviewCount: 73,
-    mainImage:
-      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=250&fit=crop",
-    ville: "Gogotinkpon",
-    images: [
-      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=600&h=400&fit=crop",
-    ],
-    description:
-      "Résidence moderne dans le quartier résidentiel de Gogotinkpon. Idéale pour un séjour confortable proche de Cotonou.",
-    amenities: {
-      entertainment: [{ name: "Télévision", icon: Tv, available: true }],
-      heating: [{ name: "Climatisation", icon: Snowflake, available: true }],
-      internet: [
-        { name: "Wifi", icon: Wifi, available: true },
-        { name: "Espace de travail", icon: User, available: true },
-      ],
-      kitchen: [
-        {
-          name: "Cuisine équipée",
-          icon: UtensilsCrossed,
-          available: true,
-        },
-      ],
-      location: [
-        {
-          name: "Quartier résidentiel",
-          icon: MapPin,
-          available: true,
-        },
-      ],
-      parking: [{ name: "Parking sécurisé", icon: Car, available: true }],
-      safety: [
-        {
-          name: "Sécurité 24h/24",
-          icon: Shield,
-          available: true,
-        },
-      ],
-      laundry: [{ name: "Lave-linge", icon: Shirt, available: true }],
-      comfort: [
-        { name: "Équipements modernes", icon: User, available: true },
-        { name: "Eau chaude", icon: Droplets, available: true },
-      ],
-    },
-    owner: false,
-  },
-  {
-    id: "grandpopo456",
-    name: "Villa Balnéaire Grand-Popo",
-    price: 180,
-    rating: 4.9,
-    reviewCount: 95,
-    mainImage:
-      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=250&fit=crop",
-    ville: "Grand-Popo",
-    images: [
-      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=600&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=400&fit=crop",
-    ],
-    description:
-      "Villa de luxe face à l'océan Atlantique à Grand-Popo. Plage privée, piscine et service de qualité pour des vacances inoubliables.",
-    amenities: {
-      entertainment: [{ name: "Télévision", icon: Tv, available: true }],
-      heating: [{ name: "Climatisation", icon: Snowflake, available: true }],
-      internet: [
-        { name: "Wifi haut débit", icon: Wifi, available: true },
-        { name: "Espace de travail luxueux", icon: User, available: true },
-      ],
-      kitchen: [
-        {
-          name: "Cuisine gastronomique",
-          icon: UtensilsCrossed,
-          available: true,
-        },
-      ],
-      location: [
-        {
-          name: "Plage privée",
-          icon: MapPin,
-          available: true,
-        },
-      ],
-      parking: [{ name: "Parking privé", icon: Car, available: true }],
-      safety: [
-        {
-          name: "Sécurité privée",
-          icon: Shield,
-          available: true,
-        },
-        {
-          name: "Surveillance 24h/24",
-          icon: Camera,
-          available: true,
-        },
-      ],
-      laundry: [
-        { name: "Service de pressing", icon: Shirt, available: true },
-        { name: "Sèche-linge", icon: Wind, available: true },
-      ],
-      comfort: [
-        { name: "Équipements de luxe", icon: User, available: true },
-        { name: "Eau chaude", icon: Droplets, available: true },
-        { name: "Piscine chauffée", icon: Thermometer, available: true },
-      ],
-    },
-    owner: true,
-  },
+  // {
+  //   id: "846567erfsrfdrf",
+  //   name: "Villa Océane - Vue mer exceptionnelle",
+  //   price: 150,
+  //   rating: 4.8,
+  //   reviewCount: 124,
+  //   mainImage:
+  //     "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=250&fit=crop",
+  //   ville: "Ouidah",
+  //   images: [
+  //     "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&h=400&fit=crop",
+  //     "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=600&h=400&fit=crop",
+  //     "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=400&fit=crop",
+  //     "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&h=400&fit=crop",
+  //     "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=400&fit=crop",
+  //   ],
+  //   description:
+  //     "Magnifique villa en bord de mer avec une vue panoramique sur l'océan. Parfaite pour des vacances en famille ou entre amis. Située à proximité de la plage, cette propriété offre tout le confort moderne dans un cadre idyllique.",
+  //   amenities: {
+  //     entertainment: [{ name: "Télévision", icon: Tv, available: true }],
+  //     heating: [{ name: "Climatisation", icon: Snowflake, available: true }],
+  //     internet: [
+  //       { name: "Wifi", icon: Wifi, available: true },
+  //       { name: "Espace de travail dédié", icon: User, available: true },
+  //     ],
+  //     kitchen: [
+  //       {
+  //         name: "Cuisine",
+  //         icon: UtensilsCrossed,
+  //         available: true,
+  //         description: "Espace où les voyageurs peuvent cuisiner",
+  //       },
+  //     ],
+  //     location: [
+  //       {
+  //         name: "Accès plage ou bord de mer",
+  //         icon: MapPin,
+  //         available: true,
+  //         description: "Les voyageurs peuvent profiter d'une plage à proximité",
+  //       },
+  //     ],
+  //     parking: [
+  //       { name: "Parking gratuit sur place", icon: Car, available: true },
+  //     ],
+  //     safety: [
+  //       {
+  //         name: "Caméras de surveillance extérieures",
+  //         icon: Camera,
+  //         available: true,
+  //       },
+  //       {
+  //         name: "Détecteur de fumée",
+  //         icon: Flame,
+  //         available: false,
+  //         description:
+  //           "Ce logement n'est peut-être pas équipé d'un détecteur de fumée",
+  //       },
+  //       {
+  //         name: "Détecteur de monoxyde de carbone",
+  //         icon: Shield,
+  //         available: false,
+  //         description:
+  //           "Ce logement n'est peut-être pas équipé d'un détecteur de monoxyde de carbone",
+  //       },
+  //     ],
+  //     laundry: [
+  //       { name: "Lave-linge", icon: Shirt, available: true },
+  //       { name: "Sèche-linge", icon: Wind, available: true },
+  //     ],
+  //     comfort: [
+  //       { name: "Équipements de base", icon: User, available: true },
+  //       { name: "Chauffage", icon: Thermometer, available: true },
+  //       { name: "Eau chaude", icon: Droplets, available: true },
+  //     ],
+  //   },
+  //   owner: true,
+  // },
 ];
 
 // Interface pour les filtres (modifiée avec ville)
@@ -1207,7 +1192,7 @@ const FilterSection = ({
               </div>
             </div>
             <div className="text-xs text-gray-600">
-              {filters.priceRange[0]}€ - {filters.priceRange[1]}€
+              {filters.priceRange[0]} FCFA - {filters.priceRange[1]} FCFA
             </div>
           </div>
         )}
