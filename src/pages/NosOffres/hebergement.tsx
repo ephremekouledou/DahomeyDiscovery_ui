@@ -1285,7 +1285,7 @@ const FilterSection = ({
 
 const Hebergements = () => {
   const accommodation = createExampleAccommodation();
-  
+
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -1300,7 +1300,7 @@ const Hebergements = () => {
       }
     });
     return prices.length > 0
-      ? [Math.min(...prices), Math.max(...prices)]
+      ? [0, Math.max(...prices)]
       : [0, 500];
   }, [accommodation]);
 
