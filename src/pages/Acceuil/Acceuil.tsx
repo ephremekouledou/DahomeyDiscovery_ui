@@ -460,6 +460,9 @@ const Acceuil = () => {
   const fontLoaded = useFontLoadedRobust();
   const location = useLocation();
 
+  // État pour gérer l'affichage du loader
+  const [showLoader, setShowLoader] = useState(true);
+
   // Memoized style calculations
   const styles = useMemo(() => {
     const logoPosition = isMobile ? "15vh" : isTablet ? "18vh" : "20vh";
@@ -468,13 +471,17 @@ const Acceuil = () => {
       height: "auto" as const,
     };
 
+    // Amélioration du positionnement des pourcentages
     const percentageStyles = {
       position: "absolute" as const,
       color: "#411E1C",
       fontFamily: "DragonAngled",
-      fontSize: isMobile ? "2rem" : isTablet ? "3rem" : "4rem",
-      top: isMobile ? "40vh" : isTablet ? "42vh" : "45vh",
-      zIndex: 10, // Ajouté pour s'assurer qu'ils sont au-dessus
+      fontSize: isMobile ? "1.8rem" : isTablet ? "2.5rem" : "3.5rem",
+      fontWeight: "700",
+      zIndex: 10,
+      // Centrage vertical amélioré
+      top: "50%",
+      transform: "translateY(-50%)",
     };
 
     return {
@@ -482,18 +489,42 @@ const Acceuil = () => {
       logoDimensions,
       percentageLeft: {
         ...percentageStyles,
-        left: isMobile ? "10vw" : isTablet ? "25vw" : "34vw",
+        left: isMobile ? "5vw" : isTablet ? "15vw" : "20vw",
       },
       percentageRight: {
         ...percentageStyles,
-        right: isMobile ? "10vw" : isTablet ? "25vw" : "34vw",
+        right: isMobile ? "5vw" : isTablet ? "15vw" : "20vw",
+      },
+      // Styles pour le loader - positionné entre les pourcentages
+      loaderContainer: {
+        position: "absolute" as const,
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        zIndex: 15,
       },
     };
   }, [isMobile, isTablet]);
 
-  // Memoized animation styles - nettoyé et simplifié
-  const animationStyles = useMemo(
+  // Styles CSS pour le loader et les animations
+  const loaderAndAnimationStyles = useMemo(
     () => `
+    /* Loader styles */
+    .loading-spinner {
+      width: ${isMobile ? "40px" : "50px"};
+      height: ${isMobile ? "40px" : "50px"};
+      border: 3px solid rgba(65, 30, 28, 0.2);
+      border-top: 3px solid #411E1C;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Animations pour les cartes */
     @keyframes floatUp1 {
       0%, 100% { transform: translateY(0px); }
       50% { transform: translateY(${
@@ -534,6 +565,9 @@ const Acceuil = () => {
       .circuit-card-1, .circuit-card-2, .circuit-card-3 {
         animation: none;
       }
+      .loading-spinner {
+        animation: none;
+      }
     }
   `,
     [isMobile, isTablet]
@@ -547,6 +581,17 @@ const Acceuil = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
+
+  // Effet pour gérer l'affichage du loader
+  useEffect(() => {
+    if (isLoaded && fontLoaded) {
+      // Petit délai pour que l'utilisateur voie le loader
+      const timer = setTimeout(() => {
+        setShowLoader(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoaded, fontLoaded]);
 
   // Animation GSAP corrigée
   useGSAP(
@@ -563,6 +608,8 @@ const Acceuil = () => {
 
       // Également cacher le contenu tant que l'anim n'est pas prête
       gsap.set(["#navBar", "#videoContent"], { opacity: 0 });
+
+      // Toujours afficher le logo et les pourcentages
       gsap.set(["#logo-container", "#percentage-left", "#percentage-right"], {
         opacity: 1,
       });
@@ -573,6 +620,7 @@ const Acceuil = () => {
         isFirstLoad &&
         isLoaded &&
         fontLoaded &&
+        !showLoader &&
         container.current
       ) {
         const timeline = gsap.timeline({
@@ -585,6 +633,10 @@ const Acceuil = () => {
         });
 
         timeline
+          // Affichage des éléments
+          .set(["#logo-container", "#percentage-left", "#percentage-right"], {
+            opacity: 1,
+          })
           // Pause pour afficher logo et pourcentages
           .to({}, { duration: 1.5 })
 
@@ -630,12 +682,17 @@ const Acceuil = () => {
         setHasRun(true);
       }
     },
-    { dependencies: [hasRun, location, isLoaded, fontLoaded], scope: container }
+    {
+      dependencies: [hasRun, location, isLoaded, fontLoaded, showLoader],
+      scope: container,
+    }
   );
 
   return (
     <div ref={container} className="h-screen relative bg-white">
-      {/* Logo - avec ID pour l'animation */}
+      <style>{loaderAndAnimationStyles}</style>
+
+      {/* Logo - toujours visible */}
       <div
         id="logo-container"
         style={{
@@ -654,13 +711,20 @@ const Acceuil = () => {
         />
       </div>
 
-      {/* Pourcentages - avec IDs pour l'animation */}
+      {/* Pourcentages - toujours visibles */}
       <div id="percentage-left" style={styles.percentageLeft}>
         100 %
       </div>
       <div id="percentage-right" style={styles.percentageRight}>
         locales
       </div>
+
+      {/* Loader - affiché entre les pourcentages pendant le chargement */}
+      {showLoader && (
+        <div style={styles.loaderContainer}>
+          <div className="loading-spinner"></div>
+        </div>
+      )}
 
       {/* Contenu principal avec masque */}
       <div id="mask-wrapper" className="absolute z-0 inset-0 origin-center">
@@ -771,7 +835,6 @@ const Acceuil = () => {
                   padding: isMobile ? "0 1rem" : "0",
                 }}
               >
-                <style>{animationStyles}</style>
                 <Flex
                   style={{ paddingTop: "0px" }}
                   gap={isMobile ? "30px" : isTablet ? "40px" : "50px"}
