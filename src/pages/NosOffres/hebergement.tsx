@@ -485,7 +485,7 @@ export const createExampleAccommodation = (): AccommodationData[] => [
               icon: Lock,
               available: true,
             },
-          ],  
+          ],
         },
       },
       {
@@ -611,7 +611,7 @@ export const createExampleAccommodation = (): AccommodationData[] => [
       "Un refuge design et raffiné, à deux pas de la plage de Fidjrossé. Inspiré des chalets alpins, l’hôtel combine luxe discret et confort moderne, avec piscine extérieure, salle de sport, parking gratuit, Wi-Fi, salon commun, restaurant aux influences africaines et indiennes, et navette aéroport. Le personnel trilingue (français, anglais, hindi) est réputé pour son hospitalité sans faille et son service attentionné.",
     options: [
       {
-        name: "Chambre Standard", 
+        name: "Chambre Standard",
         description:
           "Un espace confortable  pour un séjour reposant au cœur de Cotonou",
         photo: imgCasaCielo4,
@@ -817,7 +817,7 @@ export const createExampleAccommodation = (): AccommodationData[] => [
             { name: "Équipements de base", icon: User, available: true },
             { name: "Coin salon", icon: Sofa, available: true },
             { name: "Jacuzzi", icon: Bubbles, available: true },
-            { name: "Baignoire", icon: ShowerHead, available: true },  
+            { name: "Baignoire", icon: ShowerHead, available: true },
             { name: "Eau chaude", icon: Droplets, available: true },
           ],
           safety: [
@@ -1284,22 +1284,38 @@ const FilterSection = ({
 };
 
 const Hebergements = () => {
+  const accommodation = createExampleAccommodation();
+  
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  // Calculer la plage de prix réelle des hébergements
+  const realPriceRange = useMemo(() => {
+    const prices: number[] = [];
+    accommodation.forEach((acc) => {
+      if (acc.options && acc.options.length > 0) {
+        acc.options.forEach((option) => prices.push(option.price));
+      } else if (acc.price) {
+        prices.push(acc.price);
+      }
+    });
+    return prices.length > 0
+      ? [Math.min(...prices), Math.max(...prices)]
+      : [0, 500];
+  }, [accommodation]);
+
+  // Initialiser les filtres avec les vraies valeurs
   const [filters, setFilters] = useState<FilterOptions>({
-    priceRange: [0, 300], // Augmenté pour prendre en compte les options
+    priceRange: [realPriceRange[0], realPriceRange[1]], // Utiliser la vraie plage de prix
     minRating: 0,
     selectedAmenities: [],
     accommodationType: "all",
     searchTerm: "",
-    selectedCities: [], // Nouveau filtre initialisé vide
+    selectedCities: [],
   });
   const { pathname } = useLocation();
   const { setTransaction } = useTransaction();
   const navigate = useNavigate();
-
-  const accommodation = createExampleAccommodation();
 
   // Filtrer les hébergements (modifié pour supporter les villes)
   const filteredAccommodations = useMemo(() => {
