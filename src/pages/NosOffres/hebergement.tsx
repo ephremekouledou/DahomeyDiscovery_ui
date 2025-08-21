@@ -992,7 +992,7 @@ const FilterSection = ({
       }
     });
     return prices.length > 0
-      ? [Math.min(...prices), Math.max(...prices)]
+      ? [0, Math.max(...prices)]
       : [0, 500];
   }, [accommodations]);
 
