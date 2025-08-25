@@ -3,20 +3,27 @@ import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import cotonou from "/images/Circuit à la carte/Cotonou.webp";
-import abomey from "/images/Circuit à la carte/abomey.webp";
-import dassa from "/images/Circuit à la carte/dassa.webp";
-import ganvie from "/images/Circuit à la carte/Ganvié.webp";
-import gogotinkpon from "/images/Circuit à la carte/Gogotinkpon.webp";
-import popo from "/images/Circuit à la carte/Grand-Popo.webp";
-import ouidah from "/images/Circuit à la carte/Ouidah.webp";
-import porto from "/images/Circuit à la carte/Porto.webp";
-import possotome from "/images/Circuit à la carte/Possotomè.webp";
+// import cotonou from "/images/Circuit à la carte/Cotonou.webp";
+// import abomey from "/images/Circuit à la carte/abomey.webp";
+// import dassa from "/images/Circuit à la carte/dassa.webp";
+// import ganvie from "/images/Circuit à la carte/Ganvié.webp";
+// import gogotinkpon from "/images/Circuit à la carte/Gogotinkpon.webp";
+// import popo from "/images/Circuit à la carte/Grand-Popo.webp";
+// import ouidah from "/images/Circuit à la carte/Ouidah.webp";
+// import porto from "/images/Circuit à la carte/Porto.webp";
+// import possotome from "/images/Circuit à la carte/Possotomè.webp";
 import video from "/videos/usagevid1.mp4";
 import debut from "/images/Circuit signature/Début.webp";
 import BeginningButton from "../../components/dededed/BeginingButton";
 import img1 from "/images/Circuit signature/1_5.webp";
 import img3 from "/images/Circuit signature/3_5.jpeg";
+import { VillesAPI } from "../../sdk/api/villes";
+import { IVille } from "../../sdk/models/villes";
+import { FileAPI } from "../../sdk/api/file";
+
+const handleGetFileLink = (id: string) => {
+  return FileAPI.Download("villes", id);
+};
 
 // Types
 interface Circuit {
@@ -29,9 +36,9 @@ interface Circuit {
 }
 
 interface CityCardProps {
-  ville?: string;
-  description?: string | string[];
-  image?: string;
+  ville: string;
+  description: string | string[];
+  image: string;
 }
 
 const CityCard: React.FC<CityCardProps> = ({
@@ -111,21 +118,12 @@ const CityCard: React.FC<CityCardProps> = ({
   );
 };
 
-interface City {
-  ville: string;
-  description: string;
-  image: string;
-}
-
 interface StaggeredGridProps {
-  cities?: City[];
+  cities: IVille[];
   minItemWidth?: number;
 }
 
-const StaggeredGrid = ({
-  cities = [],
-  minItemWidth = 280,
-}: StaggeredGridProps) => {
+const StaggeredGrid = ({ cities, minItemWidth = 280 }: StaggeredGridProps) => {
   // Hook pour détecter la largeur du container
   const [itemsPerRow, setItemsPerRow] = useState(3);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -164,48 +162,8 @@ const StaggeredGrid = ({
     };
   }, [minItemWidth]);
 
-  // Données par défaut si aucune n'est fournie
-  const defaultCities = [
-    {
-      ville: "Cotonou",
-      description: "Marchés, Arts et Culture Urbaine",
-      image:
-        "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
-    },
-    {
-      ville: "Paris",
-      description: "Monuments,\nmusées, cuisine\nraffrinée & mode",
-      image:
-        "https://images.unsplash.com/photo-1502602898536-47ad22581b52?w=400&h=300&fit=crop",
-    },
-    {
-      ville: "Tokyo",
-      description: "Tradition,\ntechnologie,\nculture pop &\narchitecture",
-      image:
-        "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&h=300&fit=crop",
-    },
-    {
-      ville: "New York",
-      description: "Gratte-ciels,\nBroadway, diversité\n& énergie urbaine",
-      image:
-        "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=400&h=300&fit=crop",
-    },
-    {
-      ville: "Londres",
-      description: "Histoire,\nthéâtres, pubs\n& architecture\nvictorienne",
-      image:
-        "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=300&fit=crop",
-    },
-    {
-      ville: "Barcelona",
-      description: "Gaudí,\narchitecture,\ntapas & vie\nnocturne",
-      image:
-        "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=400&h=300&fit=crop",
-    },
-  ];
-
   // Utiliser les données fournies ou les données par défaut
-  const displayCities = cities.length > 0 ? cities : defaultCities;
+  const displayCities = cities;
 
   return (
     <div className="w-full min-h-screen">
@@ -242,7 +200,7 @@ const StaggeredGrid = ({
 
           return (
             <div
-              key={`${city.ville}-${index}`}
+              key={`${city.name}-${index}`}
               className="absolute group cursor-pointer"
               style={{
                 left: `${leftOffset + col * (itemWidth + 30)}px`,
@@ -254,9 +212,9 @@ const StaggeredGrid = ({
             >
               <CityCard
                 key={`city-${index}`}
-                ville={city.ville}
+                ville={city.name}
                 description={city.description}
-                image={city.image}
+                image={handleGetFileLink(city.image[0].file as string)}
               />
             </div>
           );
@@ -269,23 +227,7 @@ const StaggeredGrid = ({
 const CircuitsCartes = () => {
   const [isMobile, setIsMobile] = useState(false);
   const { pathname } = useLocation();
-
-  useEffect(() => {
-    document.title = "Circuits";
-  }, []);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+  const [villes, setVilles] = useState<IVille[]>([]);
 
   // Configuration centralisée des circuits
   const circuits: Circuit[] = [
@@ -318,7 +260,7 @@ const CircuitsCartes = () => {
     },
   ];
 
-  const cities = [
+  /* const cities = [
     {
       ville: "Cotonou",
       description: "Ville Dynamique et Créative",
@@ -364,7 +306,7 @@ const CircuitsCartes = () => {
       description: "Destination Paisible et Naturelle",
       image: possotome,
     },
-  ];
+  ]; */
 
   // État local pour le circuit sélectionné
   const [selectedCircuitId, setSelectedCircuitId] =
@@ -373,6 +315,34 @@ const CircuitsCartes = () => {
   // Effet pour définir le titre de la page
   useEffect(() => {
     document.title = "Circuits à la carte";
+  }, []);
+
+  useEffect(() => {
+    document.title = "Circuits";
+  }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // On recupere les villes
+  useEffect(() => {
+    VillesAPI.List()
+      .then((data) => {
+        setVilles(data);
+      })
+      .catch((err) => {
+        console.error("Error fetching villes:", err);
+      });
   }, []);
 
   // Gestionnaire de survol
@@ -492,7 +462,7 @@ const CircuitsCartes = () => {
           paddingBottom: "60px",
         }}
       >
-        <StaggeredGrid cities={cities} /* minItemWidth={4} */ />
+        <StaggeredGrid cities={villes} /* minItemWidth={4} */ />
       </Flex>
 
       {/* Section autres circuits - Responsive */}

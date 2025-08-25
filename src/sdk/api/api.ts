@@ -1,0 +1,41 @@
+import axios from "axios";
+
+export const axiosSiteData = axios.create();
+export const apiBaseURL = "https://api.dahomeydiscovery.com/api/v1";
+axiosSiteData.defaults.baseURL = apiBaseURL;
+
+export const lsUserTokenKey = "Authorization";
+export const lsUserKey = "user";
+
+const token = localStorage.getItem(lsUserTokenKey);
+
+export let axiosSiteDataConfig = {
+  headers: { "Authorization": token ? "bearer " + token : "", lang: "fr", "user-token": token ? token : "" },
+};
+
+export function setLang(lang: string) {
+  axiosSiteDataConfig.headers.lang = lang;
+}
+
+export class ErrorResponse {
+  status: number = 500;
+  message: string = "";
+
+  constructor(status: number, message: string) {
+    this.status = status;
+    this.message = message;
+  }
+}
+
+export function handleErr(err: any): ErrorResponse {
+  if (!err || !err.response) {
+    return new ErrorResponse(
+      500,
+      "Unable to reach the server. Please check your internet connection or contact the support."
+    );
+  }
+  return new ErrorResponse(
+    err.response.status, 
+    err.response.data.result
+  );
+}
