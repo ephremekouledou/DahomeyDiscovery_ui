@@ -36,12 +36,14 @@ interface Circuit {
 }
 
 interface CityCardProps {
+  id: string;
   ville: string;
   description: string | string[];
   image: string;
 }
 
 const CityCard: React.FC<CityCardProps> = ({
+  id,
   ville,
   description,
   image,
@@ -57,7 +59,7 @@ const CityCard: React.FC<CityCardProps> = ({
   return (
     <div
       className="relative w-64 h-80 rounded-lg overflow-hidden shadow-lg cursor-pointer group"
-      onClick={() => navigate(`/circuits-a-la-carte/${ville}`)}
+      onClick={() => navigate(`/circuits-a-la-carte/${id}`)}
     >
       {/* Image de fond */}
       <div className="absolute inset-0 bg-cover bg-center group-hover:opacity-0 transition-opacity duration-500">
@@ -212,6 +214,7 @@ const StaggeredGrid = ({ cities, minItemWidth = 280 }: StaggeredGridProps) => {
             >
               <CityCard
                 key={`city-${index}`}
+                id={city._id}
                 ville={city.name}
                 description={city.description}
                 image={handleGetFileLink(city.image[0].file as string)}

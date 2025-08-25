@@ -9,15 +9,20 @@ import debut from "/images/Circuit signature/Début.webp";
 import img1 from "/images/Accueil/1_5.webp";
 import img2 from "/images/Accueil/2_5.webp";
 import img3 from "/images/Accueil/3_5.webp";
-import img4 from "/images/4.jpg";
-import img5 from "/images/5.jpg";
 import { ThematicCircuitCard } from "./Card";
 import { useScreenSizeResponsive } from "./Timeline";
 import ImageCarousel from "../ImageGallery/ImageCarousel";
+import { VillesAPI } from "../../sdk/api/villes";
+import { IVille } from "../../sdk/models/villes";
+import { FileAPI } from "../../sdk/api/file";
 
 const IMAGES = [img1, img2, img3];
 
-const CIRCUIT_CARDS = [
+const handleGetFileLink = (id: string) => {
+  return FileAPI.Download("villes", id);
+};
+
+/* const CIRCUIT_CARDS = [
   {
     id: "Cotonou",
     activity: [
@@ -45,7 +50,8 @@ const CIRCUIT_CARDS = [
       {
         imageUrl: img4,
         title: "Plage de Fidjrossè",
-        description: "Moment de détente au bord de l’eau et air marin vivifiant.",
+        description:
+          "Moment de détente au bord de l’eau et air marin vivifiant.",
         alt: "Circuit à la carte",
       },
     ],
@@ -287,8 +293,7 @@ const CIRCUIT_CARDS = [
       {
         imageUrl: img3,
         title: "Route des Esclaves",
-        description:
-          "Promenez vous sur ce chemin historique jusqu’à la mer.",
+        description: "Promenez vous sur ce chemin historique jusqu’à la mer.",
         alt: "Circuit à la carte",
       },
       {
@@ -354,13 +359,13 @@ const CIRCUIT_CARDS = [
       },
     ],
   },
-] as const;
-
+] as const; */
 
 export const CircuitCarteView = () => {
   const { id } = useParams();
   const [isMobile, setIsMobile] = useState(false);
   const { pathname } = useLocation();
+  const [ville, setVille] = useState<IVille | null>(null);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -376,6 +381,17 @@ export const CircuitCarteView = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
+
+  useEffect(() => {
+    VillesAPI.GetByID(id || "")
+      .then((data) => {
+        console.log("Fetched ville:", data);
+        setVille(data);
+      })
+      .catch((err) => {
+        console.error("Error fetching ville:", err);
+      })
+  }, []);
 
   return (
     <Flex justify="center" vertical>
@@ -503,22 +519,24 @@ export const CircuitCarteView = () => {
             textTransform: "uppercase",
           }}
         >
-          {id} vous propose...
+          {ville?.name} vous propose...
         </Typography.Title>
         <Flex gap={30} wrap justify="center">
-          {CIRCUIT_CARDS.find(card => card.id === id)?.activity.map((card, index) => (
-            <Flex key={card.alt}>
-              <div className={`circuit-card-${index + 1}`}>
-                <ThematicCircuitCard
-                  imageUrl={card.imageUrl}
-                  title={card.title}
-                  description={card.description}
-                  alt={card.alt}
-                  screenSize={screenSize}
-                />
-              </div>
-            </Flex>
-          ))}
+          {ville?.activities.map(
+            (card, index) => (
+              <Flex key={card.name}>
+                <div className={`circuit-card-${index + 1}`}>
+                  <ThematicCircuitCard
+                    imageUrl={handleGetFileLink(card.image[0].file as string)}
+                    title={card.name}
+                    description={card.description}
+                    alt={card.name}
+                    screenSize={screenSize}
+                  />
+                </div>
+              </Flex>
+            )
+          )}
         </Flex>
       </Flex>
 
