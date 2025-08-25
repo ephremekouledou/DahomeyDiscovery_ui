@@ -1,5 +1,4 @@
-import { MultiAppFile } from "../../components/DataForm/DataMultiFile";
-import { IDefault, WhoTypes } from "./models";
+import { IDefault, MultiAppFile, WhoTypes } from "./models";
 
 export interface IActivite {
     _id: string;
