@@ -21,7 +21,7 @@ import { VillesAPI } from "../../sdk/api/villes";
 import { IVille } from "../../sdk/models/villes";
 import { FileAPI } from "../../sdk/api/file";
 
-const handleGetFileLink = (id: string) => {
+export const HandleGetFileLink = (id: string) => {
   return FileAPI.Download("villes", id);
 };
 
@@ -217,7 +217,7 @@ const StaggeredGrid = ({ cities, minItemWidth = 280 }: StaggeredGridProps) => {
                 id={city._id}
                 ville={city.name}
                 description={city.description}
-                image={handleGetFileLink(city.image[0].file as string)}
+                image={HandleGetFileLink(city.image[0].file as string)}
               />
             </div>
           );

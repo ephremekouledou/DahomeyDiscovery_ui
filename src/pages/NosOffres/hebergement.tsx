@@ -61,6 +61,11 @@ import imgCasaCielo8 from "/images/Hebergements/CasaCielo/prestige lit deux plac
 import imgCasaCielo9 from "/images/Hebergements/CasaCielo/restaurant.jpg";
 import imgCasaCielo10 from "/images/Hebergements/CasaCielo/sale de réunion.jpg";
 import imgCasaCielo11 from "/images/Hebergements/CasaCielo/Suite Ryal Présidentiel.jpg";
+import { IAccommodationData } from "../../sdk/models/hebergements";
+import { HebergementsAPI } from "../../sdk/api/hebergements";
+import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
+import { VillesAPI } from "../../sdk/api/villes";
+import { IVille } from "../../sdk/models/villes";
 
 const images = [
   // img1,
@@ -194,7 +199,7 @@ export interface AccommodationData {
 
 // Interface pour les props du composant
 interface AccommodationCardProps {
-  accommodation: AccommodationData;
+  accommodation: IAccommodationData;
   onBook?: () => void;
   className?: string;
 }
@@ -261,7 +266,7 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({
       >
         <div className="relative">
           <img
-            src={accommodation.mainImage}
+            src={HandleGetFileLink(accommodation.main_image[0].file as string)}
             alt={accommodation.name}
             className={`w-full object-cover ${isMobile ? "h-40" : "h-48"}`}
           />
@@ -293,7 +298,7 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({
                       isMobile ? "text-xs" : "text-sm"
                     }`}
                   >
-                    ({accommodation.reviewCount} avis)
+                    ({accommodation.review_count} avis)
                   </span>
                 </div>
               </div>
@@ -333,7 +338,7 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({
                 onMouseLeave={() => setIsHovered(false)}
                 onClick={() => {
                   // we redirect to the payment page
-                  navigate("/hebergements/" + accommodation.id);
+                  navigate("/hebergements/" + accommodation._id);
                 }}
               >
                 Détails
@@ -929,7 +934,7 @@ const FilterSection = ({
 }: {
   filters: FilterOptions;
   setFilters: (filters: FilterOptions) => void;
-  accommodations: AccommodationData[];
+  accommodations: IAccommodationData[];
   isMobile: boolean;
 }) => {
   const [openSections, setOpenSections] = useState({
@@ -949,35 +954,35 @@ const FilterSection = ({
   };
 
   // Extraire toutes les commodités disponibles (modifié pour supporter les options)
-  const allAmenities = useMemo(() => {
-    const amenitiesSet = new Set<string>();
-    accommodations.forEach((acc) => {
-      // Commodités de l'hébergement principal
-      if (acc.amenities) {
-        Object.values(acc.amenities).forEach((categoryAmenities) => {
-          categoryAmenities.forEach((amenity) => {
-            if (amenity.available) {
-              amenitiesSet.add(amenity.name);
-            }
-          });
-        });
-      }
+  // const allAmenities = useMemo(() => {
+  //   const amenitiesSet = new Set<string>();
+  //   accommodations.forEach((acc) => {
+  //     // Commodités de l'hébergement principal
+  //     if (acc.amenities) {
+  //       Object.values(acc.amenities).forEach((categoryAmenities) => {
+  //         categoryAmenities.forEach((amenity) => {
+  //           if (amenity.available) {
+  //             amenitiesSet.add(amenity.name);
+  //           }
+  //         });
+  //       });
+  //     }
 
-      // Commodités des options
-      if (acc.options) {
-        acc.options.forEach((option) => {
-          Object.values(option.amenities).forEach((categoryAmenities) => {
-            categoryAmenities.forEach((amenity) => {
-              if (amenity.available) {
-                amenitiesSet.add(amenity.name);
-              }
-            });
-          });
-        });
-      }
-    });
-    return Array.from(amenitiesSet).sort();
-  }, [accommodations]);
+  //     // Commodités des options
+  //     if (acc.options) {
+  //       acc.options.forEach((option) => {
+  //         Object.values(option.amenities).forEach((categoryAmenities) => {
+  //           categoryAmenities.forEach((amenity) => {
+  //             if (amenity.available) {
+  //               amenitiesSet.add(amenity.name);
+  //             }
+  //           });
+  //         });
+  //       });
+  //     }
+  //   });
+  //   return Array.from(amenitiesSet).sort();
+  // }, [accommodations]);
 
   // Obtenir les prix min et max (modifié pour supporter les options)
   const priceRange = useMemo(() => {
@@ -991,9 +996,7 @@ const FilterSection = ({
         prices.push(acc.price);
       }
     });
-    return prices.length > 0
-      ? [0, Math.max(...prices)]
-      : [0, 500];
+    return prices.length > 0 ? [0, Math.max(...prices)] : [0, 500];
   }, [accommodations]);
 
   const handlePriceChange = (index: number, value: number) => {
@@ -1002,12 +1005,12 @@ const FilterSection = ({
     setFilters({ ...filters, priceRange: newPriceRange });
   };
 
-  const handleAmenityToggle = (amenity: string) => {
-    const newAmenities = filters.selectedAmenities.includes(amenity)
-      ? filters.selectedAmenities.filter((a) => a !== amenity)
-      : [...filters.selectedAmenities, amenity];
-    setFilters({ ...filters, selectedAmenities: newAmenities });
-  };
+  // const handleAmenityToggle = (amenity: string) => {
+  //   const newAmenities = filters.selectedAmenities.includes(amenity)
+  //     ? filters.selectedAmenities.filter((a) => a !== amenity)
+  //     : [...filters.selectedAmenities, amenity];
+  //   setFilters({ ...filters, selectedAmenities: newAmenities });
+  // };
 
   // Nouvelle fonction pour gérer les villes
   const handleCityToggle = (city: City) => {
@@ -1251,7 +1254,7 @@ const FilterSection = ({
       </div>
 
       {/* Équipements */}
-      <div className="mb-6">
+      {/* <div className="mb-6">
         <button
           onClick={() => toggleSection("amenities")}
           className="flex items-center justify-between w-full text-left font-semibold text-gray-700 mb-3"
@@ -1278,31 +1281,31 @@ const FilterSection = ({
             ))}
           </div>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };
 
 const Hebergements = () => {
-  const accommodation = createExampleAccommodation();
+  // const accommodation = createExampleAccommodation();
 
+  const [hebergements, setHebergements] = useState<IAccommodationData[]>([]);
+  const [villes, setVilles] = useState<IVille[]>([]);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   // Calculer la plage de prix réelle des hébergements
   const realPriceRange = useMemo(() => {
     const prices: number[] = [];
-    accommodation.forEach((acc) => {
+    hebergements.forEach((acc) => {
       if (acc.options && acc.options.length > 0) {
         acc.options.forEach((option) => prices.push(option.price));
       } else if (acc.price) {
         prices.push(acc.price);
       }
     });
-    return prices.length > 0
-      ? [0, Math.max(...prices)]
-      : [0, 500];
-  }, [accommodation]);
+    return prices.length > 0 ? [0, Math.max(...prices)] : [0, 500];
+  }, [hebergements]);
 
   // Initialiser les filtres avec les vraies valeurs
   const [filters, setFilters] = useState<FilterOptions>({
@@ -1319,7 +1322,7 @@ const Hebergements = () => {
 
   // Filtrer les hébergements (modifié pour supporter les villes)
   const filteredAccommodations = useMemo(() => {
-    return accommodation.filter((accommodation) => {
+    return hebergements.filter((accommodation) => {
       // Filtre par recherche textuelle
       if (
         filters.searchTerm &&
@@ -1332,7 +1335,7 @@ const Hebergements = () => {
 
       // Filtre par ville - nouveau filtre
       if (filters.selectedCities.length > 0) {
-        if (!filters.selectedCities.includes(accommodation.ville)) {
+        if (!filters.selectedCities.includes(accommodation.ville as City)) {
           return false;
         }
       }
@@ -1366,44 +1369,44 @@ const Hebergements = () => {
       }
 
       // Filtre par équipements (modifié pour supporter les options)
-      if (filters.selectedAmenities.length > 0) {
-        let accommodationAmenities: string[] = [];
+      // if (filters.selectedAmenities.length > 0) {
+      //   let accommodationAmenities: string[] = [];
 
-        // Commodités de l'hébergement principal
-        if (accommodation.amenities) {
-          accommodationAmenities = Object.values(accommodation.amenities)
-            .flat()
-            .filter((amenity) => amenity.available)
-            .map((amenity) => amenity.name);
-        }
+      //   // Commodités de l'hébergement principal
+      //   if (accommodation.amenities) {
+      //     accommodationAmenities = Object.values(accommodation.amenities)
+      //       .flat()
+      //       .filter((amenity) => amenity.available)
+      //       .map((amenity) => amenity.name);
+      //   }
 
-        // Commodités des options
-        if (accommodation.options) {
-          accommodation.options.forEach((option) => {
-            const optionAmenities = Object.values(option.amenities)
-              .flat()
-              .filter((amenity) => amenity.available)
-              .map((amenity) => amenity.name);
-            accommodationAmenities = [
-              ...accommodationAmenities,
-              ...optionAmenities,
-            ];
-          });
-        }
+      //   // Commodités des options
+      //   if (accommodation.options) {
+      //     accommodation.options.forEach((option) => {
+      //       const optionAmenities = Object.values(option.amenities)
+      //         .flat()
+      //         .filter((amenity) => amenity.available)
+      //         .map((amenity) => amenity.name);
+      //       accommodationAmenities = [
+      //         ...accommodationAmenities,
+      //         ...optionAmenities,
+      //       ];
+      //     });
+      //   }
 
-        // Supprimer les doublons
-        accommodationAmenities = [...new Set(accommodationAmenities)];
+      //   // Supprimer les doublons
+      //   accommodationAmenities = [...new Set(accommodationAmenities)];
 
-        const hasAllSelectedAmenities = filters.selectedAmenities.every(
-          (selectedAmenity) => accommodationAmenities.includes(selectedAmenity)
-        );
+      //   const hasAllSelectedAmenities = filters.selectedAmenities.every(
+      //     (selectedAmenity) => accommodationAmenities.includes(selectedAmenity)
+      //   );
 
-        if (!hasAllSelectedAmenities) return false;
-      }
+      //   if (!hasAllSelectedAmenities) return false;
+      // }
 
       return true;
     });
-  }, [accommodation, filters]);
+  }, [hebergements, filters]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -1424,6 +1427,38 @@ const Hebergements = () => {
   useEffect(() => {
     document.title = "Nos Offres - Hébergements";
   }, []);
+
+  useEffect(() => {
+    VillesAPI.List()
+      .then((data) => {
+        setVilles(data);
+        console.log("Villes fetched successfully:", data);
+      })
+      .catch((err) => {
+        console.error("Error fetching villes:", err);
+      });
+  }, []);
+
+  useEffect(() => {
+    HebergementsAPI.List()
+      .then((data) => {
+        // we replace the id of the ville by the name before setting
+        // Remplacer l'id de la ville par son nom
+        const mappedData = data.map((hebergement: any) => {
+          const villeObj = villes.find((ville) => ville._id === hebergement.ville);
+          return {
+            ...hebergement,
+            ville: villeObj ? villeObj.name : hebergement.ville,
+          };
+        });
+        setHebergements(mappedData);
+        console.log("Hébergements fetched successfully:", data);
+
+      })
+      .catch((err) => {
+        console.error("Error fetching hébergements:", err);
+      });
+  }, [villes]);
 
   const getGridColumns = () => {
     if (isMobile) return 1;
@@ -1548,7 +1583,7 @@ const Hebergements = () => {
               <FilterSection
                 filters={filters}
                 setFilters={setFilters}
-                accommodations={accommodation}
+                accommodations={hebergements}
                 isMobile={false}
               />
             </div>
@@ -1567,7 +1602,7 @@ const Hebergements = () => {
           <FilterSection
             filters={filters}
             setFilters={setFilters}
-            accommodations={accommodation}
+            accommodations={hebergements}
             isMobile={true}
           />
         </Drawer>

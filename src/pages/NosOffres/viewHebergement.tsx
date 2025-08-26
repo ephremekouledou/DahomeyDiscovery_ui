@@ -2,28 +2,30 @@ import { Button, Flex, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import NavBar from "../../components/navBar/navBar";
-import {
-  AccommodationData,
-  AccommodationOption,
-  Amenity,
-  BalancedAmenities,
-  createExampleAccommodation,
-} from "./hebergement";
-import { Star, Check, MapPin } from "lucide-react";
+import { Star, Check } from "lucide-react";
 import { useTransaction } from "../../context/transactionContext";
 import Footer from "../../components/footer/footer";
 import BeginningButton from "../../components/dededed/BeginingButton";
+import {
+  IAccommodationData,
+  IAccommodationOption,
+} from "../../sdk/models/hebergements";
+import { HebergementsAPI } from "../../sdk/api/hebergements";
+import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
+import { VillesAPI } from "../../sdk/api/villes";
+import { IVille } from "../../sdk/models/villes";
 
-const ViewHebergementContent: React.FC<AccommodationData> = ({
-  id,
+const ViewHebergementContent: React.FC<IAccommodationData> = ({
+  _id,
   name,
   price,
   rating,
-  reviewCount,
-  ville,
+  review_count,
+  // ville,
   images,
   description,
   amenities,
+  has_options,
   options,
 }) => {
   const { setTransaction } = useTransaction();
@@ -31,11 +33,11 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
   const [isHovered, setIsHovered] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [selectedOption, setSelectedOption] =
-    useState<AccommodationOption | null>(null);
+    useState<IAccommodationOption | null>(null);
 
   // Si il y a des options, on sélectionne la première par défaut
   useEffect(() => {
-    if (options && options.length > 0) {
+    if (has_options && options && options.length > 0) {
       setSelectedOption(null); // Ne pas sélectionner par défaut, forcer l'utilisateur à choisir
     }
   }, [options]);
@@ -62,86 +64,87 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
     ));
   };
 
-  const getBalancedAmenities = (amenitiesToUse: any): BalancedAmenities => {
-    const amenityEntries = Object.entries(amenitiesToUse) as [
-      string,
-      Amenity[]
-    ][];
-    const totalSections = amenityEntries.length;
-    const midPoint = Math.ceil(totalSections / 2);
+  // const getBalancedAmenities = (amenitiesToUse: any): BalancedAmenities => {
+  //   const amenityEntries = Object.entries(amenitiesToUse) as [
+  //     string,
+  //     Amenity[]
+  //   ][];
+  //   const totalSections = amenityEntries.length;
+  //   const midPoint = Math.ceil(totalSections / 2);
 
-    return {
-      leftColumn: amenityEntries.slice(0, midPoint),
-      rightColumn: amenityEntries.slice(midPoint),
-    };
-  };
+  //   return {
+  //     leftColumn: amenityEntries.slice(0, midPoint),
+  //     rightColumn: amenityEntries.slice(midPoint),
+  //   };
+  // };
 
-  // Mapping des clés vers des titres en français
-  const amenityTitles: Record<string, string> = {
-    entertainment: "Divertissement",
-    heating: "Chauffage et climatisation",
-    internet: "Internet et bureau",
-    kitchen: "Cuisine et salle à manger",
-    location: "Caractéristiques de l'emplacement",
-    parking: "Parking et installations",
-    safety: "Sécurité",
-    comfort: "Équipements de base",
-    laundry: "Lave-linge et sèche-linge",
-  };
+  // // Mapping des clés vers des titres en français
+  // const amenityTitles: Record<string, string> = {
+  //   entertainment: "Divertissement",
+  //   heating: "Chauffage et climatisation",
+  //   internet: "Internet et bureau",
+  //   kitchen: "Cuisine et salle à manger",
+  //   location: "Caractéristiques de l'emplacement",
+  //   parking: "Parking et installations",
+  //   safety: "Sécurité",
+  //   comfort: "Équipements de base",
+  //   laundry: "Lave-linge et sèche-linge",
+  // };
 
-  const renderAmenitySection = (
-    title: string,
-    amenities: Amenity[]
-  ): React.ReactNode | null => {
-    if (!amenities || amenities.length === 0) return null;
+  // const renderAmenitySection = (
+  //   title: string,
+  //   amenities: string
+  // ): React.ReactNode | null => {
+  //   if (!amenities || amenities.length === 0) return null;
 
-    return (
-      <div className="mb-6">
-        <h4 className="font-semibold text-gray-800 mb-3 text-base">{title}</h4>
-        <div className="space-y-3">
-          {amenities.map((amenity, index) => {
-            const IconComponent = amenity.icon;
-            return (
-              <div
-                key={index}
-                className={`flex items-start space-x-3 ${
-                  !amenity.available ? "opacity-60" : ""
-                }`}
-              >
-                <div className="flex-shrink-0 mt-0.5">
-                  <IconComponent
-                    size={18}
-                    className={
-                      amenity.available ? "text-green-600" : "text-red-500"
-                    }
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <span
-                    className={`block ${
-                      !amenity.available
-                        ? "line-through text-gray-500"
-                        : "text-gray-700"
-                    } text-sm font-medium`}
-                  >
-                    {amenity.name}
-                  </span>
-                  {amenity.description && (
-                    <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                      {amenity.description}
-                    </p>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
+  //   return (
+  //     <div className="mb-6">
+  //       <h4 className="font-semibold text-gray-800 mb-3 text-base">{title}</h4>
+  //       <div className="space-y-3">
+  //         {/* {amenities.map((amenity, index) => {
+  //           const IconComponent = amenity.icon;
+  //           return (
+  //             <div
+  //               key={index}
+  //               className={`flex items-start space-x-3 ${
+  //                 !amenity.available ? "opacity-60" : ""
+  //               }`}
+  //             >
+  //               <div className="flex-shrink-0 mt-0.5">
+  //                 <IconComponent
+  //                   size={18}
+  //                   className={
+  //                     amenity.available ? "text-green-600" : "text-red-500"
+  //                   }
+  //                 />
+  //               </div>
+  //               <div className="flex-1 min-w-0">
+  //                 <span
+  //                   className={`block ${
+  //                     !amenity.available
+  //                       ? "line-through text-gray-500"
+  //                       : "text-gray-700"
+  //                   } text-sm font-medium`}
+  //                 >
+  //                   {amenity.name}
+  //                 </span>
+  //                 {amenity.description && (
+  //                   <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+  //                     {amenity.description}
+  //                   </p>
+  //                 )}
+  //               </div>
+  //             </div>
+  //           );
+  //         })} */}
+  //         {amenities}
+  //       </div>
+  //     </div>
+  //   );
+  // };
 
   const renderOptionCard = (
-    option: AccommodationOption,
+    option: IAccommodationOption,
     index: number
   ): React.ReactNode => {
     const isSelected = selectedOption === option;
@@ -170,7 +173,7 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
         {/* Image */}
         <div className="aspect-video w-full overflow-hidden">
           <img
-            src={option.photo}
+            src={HandleGetFileLink(option.photo[0].file as string)}
             alt={option.name}
             className="w-full h-full object-cover"
           />
@@ -202,9 +205,6 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
     ? selectedOption.amenities
     : amenities;
   const currentPrice = selectedOption ? selectedOption.price : price;
-  const { leftColumn, rightColumn } = amenitiesToDisplay
-    ? getBalancedAmenities(amenitiesToDisplay)
-    : { leftColumn: [], rightColumn: [] };
 
   // Déterminer si le bouton de réservation doit être actif
   const isReservationEnabled = options ? selectedOption !== null : true;
@@ -220,7 +220,7 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
       {/* Galerie d'images */}
       <div className="relative bg-gray-100">
         <img
-          src={images[currentImageIndex]}
+          src={HandleGetFileLink(images[currentImageIndex].file as string)}
           alt={`${name} - Image ${currentImageIndex + 1}`}
           className="w-full h-150 object-cover"
         />
@@ -262,7 +262,7 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
               aria-label={`Aller à l'image ${index + 1}`}
             >
               <img
-                src={image}
+                src={HandleGetFileLink(image.file as string)}
                 alt={`Miniature ${index + 1}`}
                 className="w-full h-full object-cover"
               />
@@ -277,11 +277,11 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
           <div className="flex items-center space-x-1">
             {renderStars(rating)}
             <span className="font-semibold ml-2 text-lg">{rating}</span>
-            <span className="text-gray-600">({reviewCount} avis)</span>
-            <span className="text-lg font-semibold text-gray-700 flex items-center gap-1">
+            <span className="text-gray-600">({review_count} avis)</span>
+            {/* <span className="text-lg font-semibold text-gray-700 flex items-center gap-1">
               <MapPin size={15} />
               {ville}
-            </span>
+            </span> */}
           </div>
           {currentPrice && (
             <div className="text-left md:text-right">
@@ -331,19 +331,7 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
             </h3>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Colonne de gauche */}
-              <div className="space-y-6">
-                {leftColumn.map(([key, amenities]) =>
-                  renderAmenitySection(amenityTitles[key] || key, amenities)
-                )}
-              </div>
-
-              {/* Colonne de droite */}
-              <div className="space-y-6">
-                {rightColumn.map(([key, amenities]) =>
-                  renderAmenitySection(amenityTitles[key] || key, amenities)
-                )}
-              </div>
+              {amenities}
             </div>
           </div>
         )}
@@ -381,7 +369,7 @@ const ViewHebergementContent: React.FC<AccommodationData> = ({
             onClick={() => {
               if (isReservationEnabled && currentPrice) {
                 setTransaction({
-                  id: id,
+                  id: _id,
                   title: selectedOption
                     ? `${name} - ${selectedOption.name}`
                     : name,
@@ -406,19 +394,32 @@ const ViewHebergement = () => {
   const [isMobile, setIsMobile] = useState(false);
   const { pathname } = useLocation();
 
-  const [accommodation, setAccommodation] = useState<AccommodationData | null>(
-    null
-  );
-
-  // Simulate fetching accommodation data based on the ID
-  const accommodations = createExampleAccommodation();
+  const [villes, setVilles] = useState<IVille[]>([]);
+  const [accommodation, setAccommodation] = useState<IAccommodationData>();
 
   useEffect(() => {
-    const foundAccommodation = accommodations.find((acc) => acc.id === id);
-    if (foundAccommodation) {
-      console.log("Found accommodation:", foundAccommodation);
-      setAccommodation(foundAccommodation);
-    }
+    HebergementsAPI.GetByID(id as string)
+      .then((data) => {
+        // console.log("Les villes", villes)
+        // console.log("La ville est", villes.find((ville) => ville._id === accommodation?.ville)?.name)
+        // // data.ville = villes.find((ville) => ville._id === accommodation?.ville)?.name ?? ""
+        setAccommodation(data);
+        console.log("Hebergement fetched successfully:", data);
+      })
+      .catch((err) => {
+        console.error("Error fetching villes:", err);
+      });
+  }, [villes]);
+
+  useEffect(() => {
+    VillesAPI.List()
+      .then((data) => {
+        setVilles(data);
+        console.log("Villes fetched successfully:", data);
+      })
+      .catch((err) => {
+        console.error("Error fetching villes:", err);
+      });
   }, []);
 
   useEffect(() => {
@@ -452,7 +453,9 @@ const ViewHebergement = () => {
         vertical
         className="relative w-full overflow-hidden"
         style={{
-          backgroundImage: `url(${accommodation?.mainImage})`,
+          backgroundImage: `url(${HandleGetFileLink(
+            accommodation?.main_image[0].file as string
+          )})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           padding: isMobile ? "4vh 6vw" : "8vh 8vw",
@@ -545,14 +548,12 @@ const ViewHebergement = () => {
             paddingBottom: isMobile ? "1vw" : "2vw",
           }}
         >
-          {accommodations
-            .filter((accommodation) => accommodation.id === id)
-            .map((accommodation) => (
-              <ViewHebergementContent
-                {...accommodation}
-                key={accommodation.id}
-              />
-            ))}
+          {accommodation && (
+            <ViewHebergementContent
+              {...accommodation}
+              key={accommodation._id}
+            />
+          )}
         </Flex>
       </Flex>
 
