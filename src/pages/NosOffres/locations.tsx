@@ -44,6 +44,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import NavBar from "../../components/navBar/navBar";
 import { useTransaction } from "../../context/transactionContext";
 import BeginningButton from "../../components/dededed/BeginingButton";
+import { VehiculesAPI } from "../../sdk/api/vehicules";
+import { ICarRentalData } from "../../sdk/models/vehicules";
+import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
 /* import img11 from "/images/11.jpg";
 import img12 from "/images/12.jpg";
 import img13 from "/images/13.jpg";
@@ -239,7 +242,7 @@ export interface CarRentalData {
 
 // Interface pour les props du composant
 export interface CarRentalCardProps {
-  car: CarRentalData;
+  car: ICarRentalData;
   onRent?: () => void;
   onViewDetails?: () => void;
   className?: string;
@@ -306,7 +309,7 @@ const CarRentalCard: React.FC<CarRentalCardProps> = ({
       >
         <div className="relative">
           <img
-            src={car.mainImage}
+            src={HandleGetFileLink(car.main_image[0].file as string)}
             alt={`${car.brand} ${car.model}`}
             className="w-full h-48 object-cover"
           />
@@ -360,21 +363,21 @@ const CarRentalCard: React.FC<CarRentalCardProps> = ({
           <div className="flex items-center justify-between mb-3 text-sm text-gray-600">
             <div className="flex items-center space-x-1">
               <Users size={16} />
-              <span>{car.specs.passengers}</span>
+              <span>{car.passengers}</span>
             </div>
             <div className="flex items-center space-x-1">
               <Luggage size={16} />
-              <span>{car.specs.luggage}</span>
+              <span>{car.luggage}</span>
             </div>
             <div className="flex items-center space-x-1">
               <Settings size={16} />
-              <span>{car.specs.transmission === "Manuel" ? "M" : "A"}</span>
+              <span>{car.transmission === "Manuel" ? "M" : "A"}</span>
             </div>
             <div className="flex items-center space-x-1">
-              {React.createElement(getFuelIcon(car.specs.fuelType), {
+              {React.createElement(getFuelIcon(car.fuel_type), {
                 size: 16,
               })}
-              <span className="text-xs">{car.specs.fuelType}</span>
+              <span className="text-xs">{car.fuel_type}</span>
             </div>
           </div>
 
@@ -382,7 +385,7 @@ const CarRentalCard: React.FC<CarRentalCardProps> = ({
           <div className="flex items-center mb-3">
             {renderStars(car.rating)}
             <span className="text-sm text-gray-600 ml-2">
-              ({car.reviewCount} avis)
+              ({car.review_count} avis)
             </span>
           </div>
 
@@ -396,7 +399,7 @@ const CarRentalCard: React.FC<CarRentalCardProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <span className="text-2xl font-bold text-gray-800">
-                {car.pricePerDay}€
+                {car.price_per_day}€
               </span>
               <span className="text-gray-600 text-sm"> / jour</span>
             </div>
@@ -432,7 +435,7 @@ const CarRentalCard: React.FC<CarRentalCardProps> = ({
               onMouseLeave={() => setIsHovered(false)}
               onClick={() => {
                 // we redirect to the payment page
-                navigate("/locations/" + car.id);
+                navigate("/locations/" + car._id);
               }}
             >
               Détails
@@ -797,7 +800,7 @@ const VehicleCategoryCard = ({ imageUrl, title, description, link }: any) => {
     scroller.scrollTo(link, {
       duration: 500,
       delay: 0,
-      smooth: 'easeInOutQuart',
+      smooth: "easeInOutQuart",
     });
   };
 
@@ -819,10 +822,10 @@ const VehicleCategoryCard = ({ imageUrl, title, description, link }: any) => {
       </div>
     </div>
   );
-
 };
 
 const Locations = () => {
+  const [cars, setCars] = useState<ICarRentalData[]>([])
   const [isMobile, setIsMobile] = useState(false);
   const { pathname } = useLocation();
   const { setTransaction } = useTransaction();
@@ -845,7 +848,18 @@ const Locations = () => {
   useEffect(() => {
     document.title = "Nos Offres - Locations de véhicules";
   }, []);
-  const cars = createExampleCars();
+  // const cars = createExampleCars();
+
+  useEffect(() => {
+    VehiculesAPI.List()
+      .then((data) => {
+        setCars(data);
+        console.log("Cars fetched successfully:", data);
+      })
+      .catch((err) => {
+        console.error("Error fetching cars:", err);
+      });
+  }, []);
 
   const steps = [
     {
@@ -971,17 +985,17 @@ const Locations = () => {
               left: "100px",
             }}
           ></div>
-            <div
-              style={{
+          <div
+            style={{
               width: "23vw",
               height: "21vw",
               minWidth: "305px",
               minHeight: "278px",
               backgroundColor: "#FF3100",
               overflow: "visible",
-              }}
-            >
-              <img
+            }}
+          >
+            <img
               src={voitureFront}
               alt="Location de véhicules"
               style={{
@@ -995,13 +1009,13 @@ const Locations = () => {
                 top: "60px",
                 right: "100px",
                 transition:
-                "transform 1.8s cubic-bezier(0.22, 0.61, 0.36, 1), width 1.8s cubic-bezier(0.22, 0.61, 0.36, 1), height 1.8s cubic-bezier(0.22, 0.61, 0.36, 1)",
+                  "transform 1.8s cubic-bezier(0.22, 0.61, 0.36, 1), width 1.8s cubic-bezier(0.22, 0.61, 0.36, 1), height 1.8s cubic-bezier(0.22, 0.61, 0.36, 1)",
               }}
               className="hover:scale-[1.15] hover:w-[24vw] hover:h-[24vw]"
-              />
-            </div>
-            <style>
-              {`
+            />
+          </div>
+          <style>
+            {`
               @media (hover: hover) {
               div[style*="background-color: #FF3100"] img:hover {
                 width: 24vw !important;
@@ -1010,7 +1024,7 @@ const Locations = () => {
               }
               }
               `}
-            </style>
+          </style>
         </Flex>
         <Flex
           style={{

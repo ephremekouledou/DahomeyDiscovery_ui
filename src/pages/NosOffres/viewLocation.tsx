@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import {
-  BalancedFeatures,
-  CarFeature,
-  CarRentalCardProps,
-  CarRentalData,
-  createExampleCars,
-} from "./locations";
+import { CarRentalCardProps } from "./locations";
 import Footer from "../../components/footer/footer";
 import { Button, Flex, Typography } from "antd";
 import NavBar from "../../components/navBar/navBar";
@@ -14,7 +8,6 @@ import {
   Fuel,
   LucideIcon,
   Luggage,
-  MapPin,
   Settings,
   Star,
   Users,
@@ -22,6 +15,9 @@ import {
 } from "lucide-react";
 import { useTransaction } from "../../context/transactionContext";
 import BeginningButton from "../../components/dededed/BeginingButton";
+import { ICarRentalData } from "../../sdk/models/vehicules";
+import { VehiculesAPI } from "../../sdk/api/vehicules";
+import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
 
 const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
   const { setTransaction } = useTransaction();
@@ -53,19 +49,7 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
     ));
   };
 
-  // Fonction pour équilibrer la distribution des caractéristiques
-  const getBalancedFeatures = (): BalancedFeatures => {
-    const featureEntries = Object.entries(car.features);
-    const totalSections = featureEntries.length;
-    const midPoint = Math.ceil(totalSections / 2);
-
-    return {
-      leftColumn: featureEntries.slice(0, midPoint),
-      rightColumn: featureEntries.slice(midPoint),
-    };
-  };
-
-  const renderFeatureSection = (
+  /* const renderFeatureSection = (
     title: string,
     features: CarFeature[]
   ): React.ReactNode | null => {
@@ -125,7 +109,7 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
     connectivity: "Connectivité",
     climate: "Climatisation",
     extras: "Équipements supplémentaires",
-  };
+  }; */
 
   const getFuelIcon = (fuelType: string): LucideIcon => {
     switch (fuelType) {
@@ -138,10 +122,8 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
     }
   };
 
-  const { leftColumn, rightColumn } = getBalancedFeatures();
-
   return (
-    <div className="flex-1 w-fit">
+    <div className="flex-1">
       <div>
         {/* En-tête avec le nom du véhicule */}
         <div className="bg-white shadow-md p-6">
@@ -153,7 +135,7 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
       {/* Galerie d'images */}
       <div className="relative bg-gray-100">
         <img
-          src={car.images[currentImageIndex]}
+          src={HandleGetFileLink(car.images[currentImageIndex].file as string)}
           alt={`${car.brand} ${car.model} - Image ${currentImageIndex + 1}`}
           className="w-full h-80 object-cover"
         />
@@ -195,7 +177,7 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
               aria-label={`Aller à l'image ${index + 1}`}
             >
               <img
-                src={image}
+                src={HandleGetFileLink(image.file as string)}
                 alt={`Miniature ${index + 1}`}
                 className="w-full h-full object-cover"
               />
@@ -211,16 +193,16 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
             <div className="flex items-center space-x-1">
               {renderStars(car.rating)}
               <span className="font-semibold ml-2 text-lg">{car.rating}</span>
-              <span className="text-gray-600">({car.reviewCount} avis)</span>
+              <span className="text-gray-600">({car.review_count} avis)</span>
             </div>
-            <div className="flex items-center text-gray-600">
+            {/* <div className="flex items-center text-gray-600">
               <MapPin size={16} className="mr-1" />
               <span>{car.location}</span>
-            </div>
+            </div> */}
           </div>
           <div className="text-left md:text-right">
             <div className="text-3xl font-bold text-blue-600">
-              {car.pricePerDay}€
+              {car.price_per_day}€
             </div>
             <div className="text-gray-600">par jour</div>
           </div>
@@ -235,38 +217,38 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-gray-50 p-4 rounded-lg text-center">
               <Users size={24} className="mx-auto mb-2 text-blue-600" />
-              <div className="font-semibold">{car.specs.passengers}</div>
+              <div className="font-semibold">{car.passengers}</div>
               <div className="text-sm text-gray-600">Passagers</div>
             </div>
 
             <div className="bg-gray-50 p-4 rounded-lg text-center">
               <Luggage size={24} className="mx-auto mb-2 text-blue-600" />
-              <div className="font-semibold">{car.specs.luggage}</div>
+              <div className="font-semibold">{car.luggage}</div>
               <div className="text-sm text-gray-600">Bagages</div>
             </div>
 
             <div className="bg-gray-50 p-4 rounded-lg text-center">
               <Settings size={24} className="mx-auto mb-2 text-blue-600" />
-              <div className="font-semibold">{car.specs.transmission}</div>
+              <div className="font-semibold">{car.transmission}</div>
               <div className="text-sm text-gray-600">Transmission</div>
             </div>
 
             <div className="bg-gray-50 p-4 rounded-lg text-center">
-              {React.createElement(getFuelIcon(car.specs.fuelType), {
+              {React.createElement(getFuelIcon(car.fuel_type), {
                 size: 24,
                 className: "mx-auto mb-2 text-blue-600",
               })}
-              <div className="font-semibold">{car.specs.fuelType}</div>
+              <div className="font-semibold">{car.fuel_type}</div>
               <div className="text-sm text-gray-600">Carburant</div>
             </div>
           </div>
 
-          {car.specs.fuelConsumption && (
+          {car.fuel_consumption && (
             <div className="mt-4 p-3 bg-green-50 rounded-lg">
               <div className="flex items-center text-green-700">
                 <Fuel size={16} className="mr-2" />
                 <span className="font-medium">
-                  Consommation: {car.specs.fuelConsumption}
+                  Consommation: {car.fuel_consumption}
                 </span>
               </div>
             </div>
@@ -290,19 +272,7 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
           </h3>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Colonne de gauche */}
-            <div className="space-y-6">
-              {leftColumn.map(([key, features]) =>
-                renderFeatureSection(featureTitles[key] || key, features)
-              )}
-            </div>
-
-            {/* Colonne de droite */}
-            <div className="space-y-6">
-              {rightColumn.map(([key, features]) =>
-                renderFeatureSection(featureTitles[key] || key, features)
-              )}
-            </div>
+            {car.features}
           </div>
         </div>
 
@@ -329,9 +299,9 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
             onMouseLeave={() => setIsHovered(false)}
             onClick={() => {
               setTransaction({
-                id: car.id,
+                id: car._id,
                 title: car.name,
-                amount: car.pricePerDay,
+                amount: car.price_per_day,
               });
               // we redirect to the payment page
               navigate("/reservations-locations");
@@ -352,17 +322,20 @@ const ViewLocation = () => {
   const [isMobile, setIsMobile] = useState(false);
   const { pathname } = useLocation();
 
-  const [car, setCar] = useState<CarRentalData | null>(null);
+  const [car, setCar] = useState<ICarRentalData | null>(null);
 
   // Simulate fetching car data based on the ID
-  const cars = createExampleCars();
+  // const cars = createExampleCars();
 
   useEffect(() => {
-    const foundCar = cars.find((car) => car.id === id);
-    if (foundCar) {
-      console.log("Found car:", foundCar);
-      setCar(foundCar);
-    }
+    VehiculesAPI.GetByID(id as string)
+      .then((data) => {
+        setCar(data);
+        console.log("Vehicule fetched successfully:", data);
+      })
+      .catch((err) => {
+        console.error("Error fetching vehicule:", err);
+      });
   }, []);
 
   useEffect(() => {
@@ -396,7 +369,9 @@ const ViewLocation = () => {
         vertical
         className="relative w-full overflow-hidden"
         style={{
-          backgroundImage: `url(${car?.mainImage})`,
+          backgroundImage: `url(${HandleGetFileLink(
+            car?.main_image[0].file as string
+          )})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           padding: isMobile ? "4vh 6vw" : "8vh 8vw",
@@ -481,20 +456,22 @@ const ViewLocation = () => {
         gap={0}
       >
         {/* Section des circuits - Responsive */}
-        <Flex
-          vertical
-          gap="20px"
-          style={{
-            width: "100%",
-            paddingBottom: isMobile ? "1vw" : "2vw",
-          }}
-        >
-          {cars
-            .filter((car) => car.id === id)
-            .map((car) => (
-              <ViewLocationContent car={car} {...car} key={car.id} />
-            ))}
-        </Flex>
+        {car !== null && (
+          <Flex
+            vertical
+            gap="20px"
+            style={{
+              width: "100%",
+              paddingBottom: isMobile ? "1vw" : "2vw",
+            }}
+          >
+            <ViewLocationContent car={car} {...car} key={car._id} />
+
+            {/* {car !== null && (
+            
+          )} */}
+          </Flex>
+        )}
       </Flex>
 
       {/* Footer */}
