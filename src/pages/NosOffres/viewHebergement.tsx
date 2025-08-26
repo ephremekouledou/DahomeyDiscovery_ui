@@ -204,6 +204,7 @@ const ViewHebergementContent: React.FC<IAccommodationData> = ({
   const amenitiesToDisplay = selectedOption
     ? selectedOption.amenities
     : amenities;
+
   const currentPrice = selectedOption ? selectedOption.price : price;
 
   // Déterminer si le bouton de réservation doit être actif
@@ -331,7 +332,7 @@ const ViewHebergementContent: React.FC<IAccommodationData> = ({
             </h3>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {amenities}
+              {selectedOption?.amenities}
             </div>
           </div>
         )}
