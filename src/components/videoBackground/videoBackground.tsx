@@ -1,17 +1,21 @@
 import { Button, Flex, Typography } from "antd";
 import { useEffect, useState } from "react";
-import bgVideo from "/videos/banniereAccueil.mp4";
 import vector from "../../assets/icons/homeVector.png";
 import NavBar from "../navBar/navBar";
 import "../../assets/Fonts/font.css";
 import { FlipWords } from "../ui/flip-words";
 import { useAnimation } from "../../context/animationContext";
+import { IPageMedia } from "../../sdk/models/pagesMedias";
+import { PageSettings } from "../../sdk/api/pageMedias";
+import { HandleGetFileLink } from "../../pages/Circuits/CircuitsCartes";
 
 const VideoBackground = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const [isSmallMobile, setIsSmallMobile] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [param, setParam] = useState<IPageMedia>();
+  const [paramLoading, setParamLoading] = useState<boolean>(true);
   const { setIsLoaded } = useAnimation();
   const [_, setScreenHeight] = useState(0);
 
@@ -29,6 +33,17 @@ const VideoBackground = () => {
     checkResponsive();
     window.addEventListener("resize", checkResponsive);
     return () => window.removeEventListener("resize", checkResponsive);
+  }, []);
+
+  useEffect(() => {
+    PageSettings.List()
+      .then((data) => {
+        setParam(data);
+        setParamLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching circuits:", err);
+      });
   }, []);
 
   // Fonction pour gérer le chargement de la vidéo
@@ -201,29 +216,34 @@ const VideoBackground = () => {
         overflow: "hidden",
       }}
     >
-      {/* Video Background */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="background-video"
-        onLoadedData={handleVideoLoad}
-        onError={handleVideoError}
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          transform: "translate(-50%, -50%)",
-          zIndex: 1,
-        }}
-      >
-        <source src={bgVideo} type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
+      {!paramLoading && param && (
+        // Video Background
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="background-video"
+          onLoadedData={handleVideoLoad}
+          onError={handleVideoError}
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            transform: "translate(-50%, -50%)",
+            zIndex: 1,
+          }}
+        >
+          <source
+            src={HandleGetFileLink(param?.banniere[0].file as string)}
+            type="video/mp4"
+          />
+          Your browser does not support the video tag.
+        </video>
+      )}
 
       {/* Overlay d'assombrissement */}
       <div
