@@ -1,8 +1,7 @@
 import { Flex, Typography } from "antd";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
-import { useEffect, useState, useCallback, useMemo } from "react";
-import img from "/images/13.jpg";
+import { useEffect, useState, useCallback } from "react";
 import video from "/videos/usagevid1.mp4";
 import { useLocation, useNavigate } from "react-router-dom";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
@@ -12,38 +11,42 @@ import img6 from "/images/6.jpg";
 import img8 from "/images/8.jpg";
 import img10 from "/images/10.jpg";
 import BeginningButton from "../../components/dededed/BeginingButton";
+import { ICircuitPresenter } from "../../sdk/models/circuits";
+import { CircuitsAPI } from "../../sdk/api/circuits";
+import { MultiAppFile } from "../../sdk/models/models";
+import { HandleGetFileLink } from "./CircuitsCartes";
 
 // Optimisation des images en les mémorisant
 const images = [img2, img4, img6, img8, img10];
 
 interface TravelCardProps {
-  id: string;
-  image: string;
-  video: string;
+  _id: string;
+  image: MultiAppFile[];
+  video: MultiAppFile[];
   title: string;
   description: string;
-  days: number;
-  nights: number;
+  day: number;
+  night: number;
   price: string | number;
 }
 
 // Composant TravelCard optimisé et responsive
 const TravelCard = ({
-  id,
+  _id,
   image,
   video,
   title,
   description,
-  days,
-  nights,
+  day,
+  night,
   price,
 }: TravelCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
 
   const handleCardClick = useCallback(() => {
-    navigate(`/circuits-thematiques/${id}`);
-  }, [navigate, id]);
+    navigate(`/circuits-thematiques/${_id}`);
+  }, [navigate, _id]);
 
   const handleMouseEnter = useCallback(() => {
     setIsHovered(true);
@@ -72,16 +75,16 @@ const TravelCard = ({
       {/* Section Media - Responsive */}
       <div className="relative h-[45%] sm:h-1/2 overflow-hidden">
         <img
-          src={image}
+          src={HandleGetFileLink(image[0].file as string)}
           alt={title}
           loading="lazy"
           className={`absolute inset-0 w-full h-full object-cover 
                      transition-opacity duration-500 
-                     ${isHovered ? "opacity-0" : "opacity-100"}`}
+                     ${isHovered && video.length ? "opacity-0" : "opacity-100"}`}
         />
-        {isHovered && (
+        {isHovered && video.length > 0 && (
           <video
-            src={video}
+            src={HandleGetFileLink(video[0].file as string)}
             autoPlay
             loop
             muted
@@ -113,7 +116,7 @@ const TravelCard = ({
               <path d="M10 2L13.09 8.26L20 9.27L15 14.14L16.18 21.02L10 17.77L3.82 21.02L5 14.14L0 9.27L6.91 8.26L10 2Z" />
             </svg>
             <span className="text-xs xs:text-xs sm:text-sm font-semibold text-gray-700">
-              {days}J
+              {day}J
             </span>
           </div>
           <div className="w-px h-2.5 xs:h-3 sm:h-4 bg-gray-300"></div>
@@ -126,7 +129,7 @@ const TravelCard = ({
               <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
             </svg>
             <span className="text-xs xs:text-xs sm:text-sm font-semibold text-gray-700">
-              {nights}N
+              {night}N
             </span>
           </div>
         </div>
@@ -165,7 +168,7 @@ const TravelCard = ({
                          font-bold text-[#411E1C] 
                          leading-tight truncate"
             >
-              {price}
+              {price} FCFA
             </p>
           </div>
           <button
@@ -234,9 +237,21 @@ const useResponsive = () => {
 const Circuits = () => {
   const { pathname } = useLocation();
   const { isMobile, isTablet } = useResponsive();
+  const [circuits, setCircuits] = useState<ICircuitPresenter[]>([]);
+
+  // On recupere les villes
+  useEffect(() => {
+    CircuitsAPI.List()
+      .then((data) => {
+        setCircuits(data);
+      })
+      .catch((err) => {
+        console.error("Error fetching circuits:", err);
+      });
+  }, []);
 
   // Données des voyages mémorisées
-  const voyages = useMemo(
+  /* const voyages = useMemo(
     () => [
       {
         id: "de774e84ds8e45s75fs",
@@ -273,7 +288,7 @@ const Circuits = () => {
       },
     ],
     []
-  );
+  ); */
 
   useEffect(() => {
     document.title = "Circuits Thématiques";
@@ -379,8 +394,8 @@ const Circuits = () => {
                          gap-4 sm:gap-6 lg:gap-8
                          justify-items-center"
           >
-            {voyages.map((voyage) => (
-              <TravelCard key={voyage.id} {...voyage} />
+            {circuits.map((voyage) => (
+              <TravelCard key={voyage._id} {...voyage} />
             ))}
           </div>
         </div>

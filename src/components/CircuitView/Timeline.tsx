@@ -1,5 +1,7 @@
 import { Typography } from "antd";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { InclusList, ITimeline } from "../../sdk/models/circuits";
+import { HandleGetFileLink } from "../../pages/Circuits/CircuitsCartes";
 
 const BREAKPOINTS = {
   MOBILE: 768,
@@ -34,15 +36,10 @@ const useScreenSize = () => {
 };
 // Optimisation: Types TypeScript
 type TimelineItemProps = {
-  title: string;
-  subtitle: string;
-  times?: string[];
-  details?: string[];
-  position: "left" | "right" | string;
+  timeline: ITimeline;
   index: number;
   isActive: boolean;
   screenSize: ReturnType<typeof useScreenSize>;
-  image?: string;
 };
 
 // Composant Timeline optimisé
@@ -50,7 +47,7 @@ const DetailedTimeline = ({
   timelineData,
   screenSize,
 }: {
-  timelineData: any;
+  timelineData: ITimeline[];
   screenSize: ReturnType<typeof useScreenSize>;
 }) => {
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -127,14 +124,14 @@ const DetailedTimeline = ({
         )}
 
         {/* Items de la timeline */}
-        {timelineData.map((item: any, index: any) => {
+        {timelineData.map((item: ITimeline, index: any) => {
           const itemProgress = (index + 1) / (timelineData.length + 1);
           const isActive = scrollProgress >= itemProgress * 0.7;
 
           return (
             <TimelineItem
               key={index}
-              {...item}
+              timeline={item}
               index={index + 1}
               isActive={isActive}
               screenSize={screenSize}
@@ -154,17 +151,12 @@ const DetailedTimeline = ({
 
 // Composant TimelineItem responsive avec images
 const TimelineItem = ({
-  title,
-  subtitle,
-  times,
-  // details,
-  position,
+  timeline,
   index,
   isActive,
   screenSize,
-  image,
 }: TimelineItemProps) => {
-  const isLeft = position === "left";
+  const isLeft = timeline.position === "left";
 
   // Responsive: Styles adaptatifs
   const getResponsiveStyles = useMemo(() => {
@@ -238,9 +230,9 @@ const TimelineItem = ({
                 letterSpacing: "0.13rem",
               }}
             >
-              {title}
+              {timeline.title}
             </h3>
-            <p
+            {/* <p
               className={`mb-3 transition-colors duration-500 ${
                 isActive ? "text-white/90" : "text-gray-500"
               }`}
@@ -249,9 +241,9 @@ const TimelineItem = ({
                 fontSize: getResponsiveStyles.subtitleFontSize,
               }}
             >
-              {subtitle}
-            </p>
-            {times?.map((time, i) => (
+              {timeline.subtitle}
+            </p> */}
+            {timeline.times?.map((time, i) => (
               <p
                 key={i}
                 className={`mb-1 transition-colors duration-500 ${
@@ -262,7 +254,7 @@ const TimelineItem = ({
                   fontSize: getResponsiveStyles.textFontSize,
                 }}
               >
-                {time}
+                {time.hour} - {time.activity}
               </p>
             ))}
           </div>
@@ -278,7 +270,7 @@ const TimelineItem = ({
       style={{ marginBottom: getResponsiveStyles.marginBottom }}
     >
       {/* Image à l'extrême gauche (seulement si content à droite) */}
-      {!isLeft && !screenSize.isMobile && image && (
+      {!isLeft && !screenSize.isMobile && timeline.image.length > 0 && (
         <div className="absolute left-0 z-10">
           <div
             className={`rounded-lg overflow-hidden shadow-lg transition-all duration-500 ${
@@ -287,7 +279,7 @@ const TimelineItem = ({
             style={getResponsiveStyles.imageSize}
           >
             <img
-              src={image}
+              src={HandleGetFileLink(timeline.image[0].file as string)}
               alt={`Timeline ${index}`}
               className="w-full h-full object-cover"
             />
@@ -329,9 +321,9 @@ const TimelineItem = ({
                 letterSpacing: "0.13rem",
               }}
             >
-              {title}
+              {timeline.title}
             </h3>
-            <p
+            {/* <p
               className={`mb-3 transition-colors duration-500 ${
                 isActive ? "text-white/90" : "text-gray-500"
               }`}
@@ -341,8 +333,8 @@ const TimelineItem = ({
               }}
             >
               {subtitle}
-            </p>
-            {times?.map((time, i) => (
+            </p> */}
+            {timeline.times?.map((time, i) => (
               <p
                 key={i}
                 className={`mb-1 transition-colors duration-500 ${
@@ -353,7 +345,7 @@ const TimelineItem = ({
                   fontSize: getResponsiveStyles.textFontSize,
                 }}
               >
-                {time}
+                {time.hour} - {time.activity}
               </p>
             ))}
           </div>
@@ -408,9 +400,9 @@ const TimelineItem = ({
                 letterSpacing: "0.13rem",
               }}
             >
-              {title}
+              {timeline.title}
             </h3>
-            <p
+            {/* <p
               className={`mb-3 transition-colors duration-500 ${
                 isActive ? "text-white/90" : "text-gray-500"
               }`}
@@ -420,8 +412,8 @@ const TimelineItem = ({
               }}
             >
               {subtitle}
-            </p>
-            {times?.map((time, i) => (
+            </p> */}
+            {timeline.times?.map((time, i) => (
               <p
                 key={i}
                 className={`mb-1 transition-colors duration-500 ${
@@ -432,7 +424,7 @@ const TimelineItem = ({
                   fontSize: getResponsiveStyles.textFontSize,
                 }}
               >
-                {time}
+                {time.hour} - {time.activity}
               </p>
             ))}
           </div>
@@ -440,7 +432,7 @@ const TimelineItem = ({
       </div>
 
       {/* Image à l'extrême droite (seulement si content à gauche) */}
-      {isLeft && !screenSize.isMobile && image && (
+      {isLeft && !screenSize.isMobile && timeline.image.length > 0 && (
         <div className="absolute right-0 z-10">
           <div
             className={`rounded-lg overflow-hidden shadow-lg transition-all duration-500 ${
@@ -449,7 +441,7 @@ const TimelineItem = ({
             style={getResponsiveStyles.imageSize}
           >
             <img
-              src={image}
+              src={HandleGetFileLink(timeline.image[0].file as string)}
               alt={`Timeline ${index}`}
               className="w-full h-full object-cover"
             />
@@ -644,8 +636,8 @@ const InclusNonInclusComponent = ({
   nonInclus,
   screenSize,
 }: {
-  inclus: any[];
-  nonInclus: any[];
+  inclus: InclusList[];
+  nonInclus: InclusList[];
   screenSize: ReturnType<typeof useScreenSize>;
 }) => {
   const getResponsiveStyles = useMemo(() => {
@@ -724,7 +716,7 @@ const InclusNonInclusComponent = ({
                     lineHeight: "1.4",
                   }}
                 >
-                  {item}
+                  {item.title}
                 </Typography.Text>
               </li>
             ))}
@@ -775,7 +767,7 @@ const InclusNonInclusComponent = ({
                     lineHeight: "1.4",
                   }}
                 >
-                  {item}
+                  {item.title}
                 </Typography.Text>
               </li>
             ))}
@@ -840,26 +832,29 @@ const useFontLoadedRobust = () => {
 
     const checkFontLoaded = () => {
       // Créer un élément de test
-      const testElement = document.createElement('div');
+      const testElement = document.createElement("div");
       testElement.style.fontFamily = fontFamily;
-      testElement.style.fontSize = '100px';
-      testElement.style.position = 'absolute';
-      testElement.style.left = '-9999px';
-      testElement.style.visibility = 'hidden';
-      testElement.innerHTML = 'Test';
-      
+      testElement.style.fontSize = "100px";
+      testElement.style.position = "absolute";
+      testElement.style.left = "-9999px";
+      testElement.style.visibility = "hidden";
+      testElement.innerHTML = "Test";
+
       document.body.appendChild(testElement);
-      
+
       const initialWidth = testElement.offsetWidth;
-      
+
       // Fallback font pour comparaison
       testElement.style.fontFamily = `${fontFamily}, Arial, sans-serif`;
       const fallbackWidth = testElement.offsetWidth;
-      
+
       document.body.removeChild(testElement);
-      
+
       // Si les largeurs sont différentes, la police est chargée
-      if (initialWidth !== fallbackWidth || document.fonts?.check?.(`12px ${fontFamily}`)) {
+      if (
+        initialWidth !== fallbackWidth ||
+        document.fonts?.check?.(`12px ${fontFamily}`)
+      ) {
         setIsFontLoaded(true);
       } else {
         timeoutId = setTimeout(checkFontLoaded, 100);
@@ -892,7 +887,6 @@ const useFontLoadedRobust = () => {
 
   return isFontLoaded;
 };
-
 
 export {
   DetailedTimeline,

@@ -3,11 +3,6 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import NavBar from "../navBar/navBar";
 import Footer from "../footer/footer";
 import React, { useState, useEffect, useMemo } from "react";
-import img1 from "/images/Circuit signature/1_5.webp";
-import img2 from "/images/Circuit signature/2_5.webp";
-import img3 from "/images/Circuit signature/3_5.jpeg";
-import img4 from "/images/Circuit signature/4_5.webp";
-import img5 from "/images/Circuit signature/5_5.webp";
 import video from "/videos/usagevid1.mp4";
 import {
   DetailedTimeline,
@@ -15,19 +10,12 @@ import {
   useScreenSize,
 } from "./Timeline";
 import BeginningButton from "../dededed/BeginingButton";
-
-// Types
-interface Circuit {
-  id: string;
-  image: string;
-  title: string;
-  description: string;
-  days: number;
-  nights: number;
-}
+import { emptyICircuit, ICircuit, ICircuitPresenter } from "../../sdk/models/circuits";
+import { CircuitsAPI } from "../../sdk/api/circuits";
+import { HandleGetFileLink } from "../../pages/Circuits/CircuitsCartes";
 
 interface CircuitCardOtherProps {
-  circuit: Circuit;
+  circuit: ICircuitPresenter;
   isSelected: boolean;
   onHover: (circuitId: string) => void;
   showDivider: boolean;
@@ -47,8 +35,8 @@ const CircuitOtherCard: React.FC<CircuitCardOtherProps> = ({
     <Flex
       vertical
       style={{ backgroundColor: "white" }}
-      onClick={() => navigate(`/circuits-thematiques/${circuit.id}`)}
-      onMouseEnter={() => onHover(circuit.id)}
+      onClick={() => navigate(`/circuits-thematiques/${circuit._id}`)}
+      onMouseEnter={() => onHover(circuit._id)}
       onMouseLeave={() => onHover("")}
     >
       {/* Badge de durée - affiché uniquement pour le circuit sélectionné */}
@@ -69,7 +57,7 @@ const CircuitOtherCard: React.FC<CircuitCardOtherProps> = ({
             fontFamily: "GeneralSans",
           }}
         >
-          {circuit.days} jours / {circuit.nights} nuits
+          {circuit.day} jours / {circuit.night} nuits
         </Typography>
       </Flex>
 
@@ -85,7 +73,7 @@ const CircuitOtherCard: React.FC<CircuitCardOtherProps> = ({
           cursor: "pointer",
           height: isSelected ? "100%" : isMobile ? "80px" : "120px",
         }}
-        onMouseEnter={() => onHover(circuit.id)}
+        onMouseEnter={() => onHover(circuit._id)}
       >
         <Flex vertical>
           <Typography.Title
@@ -121,7 +109,7 @@ const CircuitOtherCard: React.FC<CircuitCardOtherProps> = ({
         {/* Image affichée uniquement pour le circuit sélectionné */}
         {isSelected && (
           <img
-            src={circuit.image}
+            src={HandleGetFileLink(circuit.image[0].file as string)}
             style={{
               height: isMobile ? "5rem" : "15rem",
               width: "auto",
@@ -129,7 +117,7 @@ const CircuitOtherCard: React.FC<CircuitCardOtherProps> = ({
               maxWidth: isMobile ? "40vw" : "30vw",
               position: "relative",
               bottom:
-                circuit.id === "circuit-signature"
+                circuit._id === "circuit-signature"
                   ? isMobile
                     ? "2vh"
                     : "4vh"
@@ -147,34 +135,7 @@ const CircuitOtherCard: React.FC<CircuitCardOtherProps> = ({
   );
 };
 
-interface TimelineItem {
-  title: string;
-  subtitle: string;
-  times: string[];
-  position: "left" | "right";
-  image: string;
-}
-
-interface Inclusion {
-  inclus: string[];
-  nonInclus: string[];
-}
-
-interface BaseInfo {
-  day: number;
-  night: number;
-  title: string;
-  description: string;
-}
-
-interface TravelPackage {
-  id: string;
-  baseInfo: BaseInfo;
-  timeline: TimelineItem[];
-  inclusion: Inclusion;
-}
-
-const AllPackages: TravelPackage[] = [
+/* const AllPackages: TravelPackage[] = [
   {
     id: "de774e84ds8e45s75fs",
     baseInfo: {
@@ -562,7 +523,7 @@ const AllPackages: TravelPackage[] = [
       ],
     },
   },
-];
+]; */
 
 export const CircuitView = () => {
   const { id } = useParams();
@@ -571,7 +532,9 @@ export const CircuitView = () => {
   const { pathname } = useLocation();
   const screenSize = useScreenSize();
   const [isHovered, setIsHovered] = useState(false);
-  const [circuitInfos, setCircuitInfos] = useState<TravelPackage | null>(null);
+  const [circuitInfos, setCircuitInfos] = useState<ICircuit>(emptyICircuit());
+  const [circuits, setCircuits] = useState<ICircuitPresenter[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const circuitCardStyles = useMemo(() => {
     if (screenSize.isMobile) {
@@ -614,13 +577,25 @@ export const CircuitView = () => {
   }, [screenSize]);
 
   useEffect(() => {
-    if (id) {
-      const circuit = AllPackages.find((circuit) => circuit.id === id);
-      if (circuit) {
-        setCircuitInfos(circuit);
-      }
-    }
-  }, [id]);
+    CircuitsAPI.GetByID(id as string)
+      .then((data) => {
+        setCircuitInfos(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching circuit:", err);
+      });
+  }, []);
+
+  useEffect(() => {
+    CircuitsAPI.List()
+      .then((data) => {
+        setCircuits(data);
+      })
+      .catch((err) => {
+        console.error("Error fetching circuits:", err);
+      });
+  }, []);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -636,7 +611,7 @@ export const CircuitView = () => {
   };
 
   // Configuration centralisée des circuits
-  const circuits: Circuit[] = [
+  /* const circuits: Circuit[] = [
     {
       id: "de774e84ds8e45s75fs",
       image: img1,
@@ -664,7 +639,7 @@ export const CircuitView = () => {
       days: 8,
       nights: 7,
     },
-  ];
+  ]; */
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -755,157 +730,160 @@ export const CircuitView = () => {
       </Flex>
 
       {/* Contenu principal - Responsive */}
-      <Flex
-        style={{
-          width: "100%",
-          paddingBottom: "0vh",
-          maxWidth: screenSize.isMobile ? "100%" : "1100px",
-          margin: "0 auto",
-          padding: screenSize.isMobile ? "0 16px" : "0",
-        }}
-        vertical
-        gap={screenSize.isMobile ? 20 : screenSize.isTablet ? 35 : 50}
-      >
-        {/* Section des circuits - Responsive */}
+      {!loading && (
         <Flex
-          className="bg-white rounded-lg shadow-md border border-gray-200"
-          vertical
-          gap="20px"
           style={{
             width: "100%",
-            position: "relative",
-            bottom: screenSize.isMobile ? "2vw" : "3vw",
-            margin: screenSize.isMobile ? "16px 0" : "0",
+            paddingBottom: "0vh",
+            maxWidth: screenSize.isMobile ? "100%" : "1100px",
+            margin: "0 auto",
+            padding: screenSize.isMobile ? "0 16px" : "0",
           }}
+          vertical
+          gap={screenSize.isMobile ? 20 : screenSize.isTablet ? 35 : 50}
         >
+          {/* Section des circuits - Responsive */}
           <Flex
+            className="bg-white rounded-lg shadow-md border border-gray-200"
             vertical
-            style={{ backgroundColor: "white" }}
-            className="bg-white rounded-lg shadow-md border border-gray-200 p-6"
+            gap="20px"
+            style={{
+              width: "100%",
+              position: "relative",
+              bottom: screenSize.isMobile ? "2vw" : "3vw",
+              margin: screenSize.isMobile ? "16px 0" : "0",
+            }}
           >
-            {/* Badge de durée */}
             <Flex
-              style={{
-                backgroundColor: "#FFE0D9",
-                margin: circuitCardStyles.badgeMargin,
-                padding: circuitCardStyles.badgePadding,
-                border: "1px solid #999791",
-                borderRadius: "46px",
-                width: "fit-content",
-                transition: "all 0.6s ease",
-              }}
+              vertical
+              style={{ backgroundColor: "white" }}
+              className="bg-white rounded-lg shadow-md border border-gray-200 p-6"
             >
-              <Typography
+              {/* Badge de durée */}
+              <Flex
                 style={{
-                  fontSize: circuitCardStyles.badgeFontSize,
-                  fontFamily: "GeneralSans",
+                  backgroundColor: "#FFE0D9",
+                  margin: circuitCardStyles.badgeMargin,
+                  padding: circuitCardStyles.badgePadding,
+                  border: "1px solid #999791",
+                  borderRadius: "46px",
+                  width: "fit-content",
+                  transition: "all 0.6s ease",
                 }}
               >
-                {circuitInfos?.baseInfo.day} jours /{" "}
-                {circuitInfos?.baseInfo.night} nuits
-              </Typography>
-            </Flex>
-
-            {/* Contenu principal du circuit */}
-            <Flex
-              justify="space-between"
-              align="center"
-              vertical={screenSize.isMobile}
-              style={{
-                width: "100%",
-                height: screenSize.isMobile ? "auto" : circuitCardStyles.height,
-                backgroundColor: "white",
-                padding: circuitCardStyles.padding,
-                borderRadius: "0.3rem",
-                cursor: "pointer",
-              }}
-            >
-              <Flex
-                vertical
-                style={{ width: screenSize.isMobile ? "100%" : "auto" }}
-              >
-                <Typography.Title
-                  level={2}
-                  style={{
-                    color: "#BF2500",
-                    fontSize: circuitCardStyles.titleFontSize,
-                    fontFamily: "DragonAngled",
-                    fontWeight: "300",
-                    paddingLeft: circuitCardStyles.titlePadding,
-                    margin: "0",
-                    lineHeight: screenSize.isMobile ? "1.2" : "1.4",
-                    transition: "all 0.5s ease",
-                  }}
-                >
-                  <span style={{ color: "black" }}>
-                    {circuitInfos?.baseInfo.title}
-                  </span>{" "}
-                  {screenSize.isMobile ? <br /> : ""}
-                </Typography.Title>
                 <Typography
                   style={{
-                    color: "#311715",
-                    fontSize: circuitCardStyles.subtitleFontSize,
-                    paddingLeft: circuitCardStyles.subtitlePadding,
+                    fontSize: circuitCardStyles.badgeFontSize,
                     fontFamily: "GeneralSans",
-                    fontWeight: "300",
-                    marginTop: screenSize.isMobile ? "8px" : "0",
-                    lineHeight: "1.4",
                   }}
                 >
-                  {circuitInfos?.baseInfo.description}
+                  {circuitInfos.day} jours / {circuitInfos.night} nuits
                 </Typography>
+              </Flex>
+
+              {/* Contenu principal du circuit */}
+              <Flex
+                justify="space-between"
+                align="center"
+                vertical={screenSize.isMobile}
+                style={{
+                  width: "100%",
+                  height: screenSize.isMobile
+                    ? "auto"
+                    : circuitCardStyles.height,
+                  backgroundColor: "white",
+                  padding: circuitCardStyles.padding,
+                  borderRadius: "0.3rem",
+                  cursor: "pointer",
+                }}
+              >
+                <Flex
+                  vertical
+                  style={{ width: screenSize.isMobile ? "100%" : "auto" }}
+                >
+                  <Typography.Title
+                    level={2}
+                    style={{
+                      color: "#BF2500",
+                      fontSize: circuitCardStyles.titleFontSize,
+                      fontFamily: "DragonAngled",
+                      fontWeight: "300",
+                      paddingLeft: circuitCardStyles.titlePadding,
+                      margin: "0",
+                      lineHeight: screenSize.isMobile ? "1.2" : "1.4",
+                      transition: "all 0.5s ease",
+                    }}
+                  >
+                    <span style={{ color: "black" }}>
+                      {circuitInfos.title}
+                    </span>{" "}
+                    {screenSize.isMobile ? <br /> : ""}
+                  </Typography.Title>
+                  <Typography
+                    style={{
+                      color: "#311715",
+                      fontSize: circuitCardStyles.subtitleFontSize,
+                      paddingLeft: circuitCardStyles.subtitlePadding,
+                      fontFamily: "GeneralSans",
+                      fontWeight: "300",
+                      marginTop: screenSize.isMobile ? "8px" : "0",
+                      lineHeight: "1.4",
+                    }}
+                  >
+                    {circuitInfos.description}
+                  </Typography>
+                </Flex>
               </Flex>
             </Flex>
           </Flex>
-        </Flex>
 
-        {/* Timeline */}
-        <Flex style={{ width: "100%" }}>
-          <DetailedTimeline
-            timelineData={circuitInfos?.timeline || []}
-            screenSize={screenSize}
-          />
-        </Flex>
+          {/* Timeline */}
+          <Flex style={{ width: "100%" }}>
+            <DetailedTimeline
+              timelineData={circuitInfos.timeline}
+              screenSize={screenSize}
+            />
+          </Flex>
 
-        {/* Bouton de réservation */}
-        <Flex
-          justify="center"
-          style={{ padding: screenSize.isMobile ? "20px 0" : "0" }}
-        >
-          <Link to="/reserver">
-            <Button
-              type="primary"
-              size="large"
-              style={{
-                backgroundColor: isHovered ? "#ff3100" : "#F59F00",
-                color: isHovered ? "white" : "black",
-                borderRadius: "25px",
-                border: "none",
-                fontFamily: "GeneralSans",
-                transition: "all 0.3s ease",
-                fontSize: screenSize.isMobile ? "16px" : "17px",
-                fontWeight: "200",
-                padding: screenSize.isMobile ? "8px 24px" : "12px 32px",
-                height: "auto",
-              }}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-            >
-              RÉSERVER
-            </Button>
-          </Link>
-        </Flex>
+          {/* Bouton de réservation */}
+          <Flex
+            justify="center"
+            style={{ padding: screenSize.isMobile ? "20px 0" : "0" }}
+          >
+            <Link to="/reserver">
+              <Button
+                type="primary"
+                size="large"
+                style={{
+                  backgroundColor: isHovered ? "#ff3100" : "#F59F00",
+                  color: isHovered ? "white" : "black",
+                  borderRadius: "25px",
+                  border: "none",
+                  fontFamily: "GeneralSans",
+                  transition: "all 0.3s ease",
+                  fontSize: screenSize.isMobile ? "16px" : "17px",
+                  fontWeight: "200",
+                  padding: screenSize.isMobile ? "8px 24px" : "12px 32px",
+                  height: "auto",
+                }}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              >
+                RÉSERVER
+              </Button>
+            </Link>
+          </Flex>
 
-        {/* Section Inclus/Non Inclus */}
-        <Flex style={{ width: "100%", paddingBottom: "60px" }}>
-          <InclusNonInclusComponent
-            inclus={circuitInfos?.inclusion.inclus || []}
-            nonInclus={circuitInfos?.inclusion.nonInclus || []}
-            screenSize={screenSize}
-          />
+          {/* Section Inclus/Non Inclus */}
+          <Flex style={{ width: "100%", paddingBottom: "60px" }}>
+            <InclusNonInclusComponent
+              inclus={circuitInfos.inclus}
+              nonInclus={circuitInfos.exclus}
+              screenSize={screenSize}
+            />
+          </Flex>
         </Flex>
-      </Flex>
+      )}
 
       {/* Section autres circuits - Responsive */}
       <Flex style={{ backgroundColor: "#411E1C" }}>
@@ -936,14 +914,14 @@ export const CircuitView = () => {
             }}
           >
             {circuits
-              .filter((circuit) => circuit.id !== id)
+              .filter((circuit) => circuit._id !== id)
               .map((circuit, index) => (
                 <CircuitOtherCard
-                  key={circuit.id}
+                  key={circuit._id}
                   circuit={circuit}
                   // clicked={false}
                   // onClick={() => navigate(`/circuits/${circuit.id}`)}
-                  isSelected={selectedCircuitId === circuit.id}
+                  isSelected={selectedCircuitId === circuit._id}
                   onHover={handleCircuitHover}
                   showDivider={index < circuits.length - 1}
                   isMobile={isMobile}
