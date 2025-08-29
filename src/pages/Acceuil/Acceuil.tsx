@@ -17,21 +17,15 @@ import signature from "/images/Accueil/Signature du circuit.jpg";
 import thematic from "/images/Accueil/Circuits thématiques.jpg";
 import alacarte from "/images/Accueil/Circuit à la carte.jpg";
 import img15 from "/images/15.jpg";
-import img1 from "/images/Accueil/1_5.webp";
-import img2 from "/images/Accueil/2_5.webp";
-import img3 from "/images/Accueil/3_5.webp";
-import img4 from "/images/Accueil/4_5.webp";
-import img5 from "/images/Accueil/5_5.webp";
-import fin from "/images/Accueil/fin.webp";
 import BeginningButton from "../../components/dededed/BeginingButton";
 import { ThematicCircuitCard } from "../../components/CircuitView/Card";
 import {
   useFontLoadedRobust,
   useScreenSizeResponsive,
 } from "../../components/CircuitView/Timeline";
-
-// Constants moved outside component to prevent recreations
-const IMAGES = [img1, img2, img3, img4, img5];
+import { PageSettings } from "../../sdk/api/pageMedias";
+import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
+import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
 
 const TESTIMONIALS = [
   {
@@ -445,6 +439,7 @@ const Acceuil = () => {
   const { isLoaded, hasRun, setHasRun } = useAnimation();
   const fontLoaded = useFontLoadedRobust();
   const location = useLocation();
+  const [settings, SetSettings] = useState<IPageMedia>(emptyIPageMedia());
 
   // État pour gérer l'affichage du loader
   const [showLoader, setShowLoader] = useState(true);
@@ -579,6 +574,17 @@ const Acceuil = () => {
     }
   }, [isLoaded, fontLoaded]);
 
+  useEffect(() => {
+    PageSettings.List()
+      .then((data) => {
+        console.log("the settings are:", data);
+        SetSettings(data);
+      })
+      .catch((err) => {
+        console.error("Error fetching circuits:", err);
+      });
+  }, []);
+
   // Animation GSAP corrigée
   useGSAP(
     () => {
@@ -706,11 +712,12 @@ const Acceuil = () => {
       </div>
 
       {/* Loader - affiché entre les pourcentages pendant le chargement */}
-      {showLoader && (
-        <div style={styles.loaderContainer}>
-          <div className="loading-spinner"></div>
-        </div>
-      )}
+      {showLoader ||
+        (settings._id === "" && (
+          <div style={styles.loaderContainer}>
+            <div className="loading-spinner"></div>
+          </div>
+        ))}
 
       {/* Contenu principal avec masque */}
       <div id="mask-wrapper" className="absolute z-0 inset-0 origin-center">
@@ -831,7 +838,7 @@ const Acceuil = () => {
                 >
                   {CIRCUIT_CARDS.map((card, index) => (
                     <Flex
-                      key={card.alt}
+                      key={card.title}
                       style={{
                         marginTop:
                           index === 1 && !isMobile
@@ -841,13 +848,13 @@ const Acceuil = () => {
                             : "0px",
                       }}
                     >
-                      <Link to={card.link}>
+                      <Link to={card.title}>
                         <div className={`circuit-card-${index + 1}`}>
                           <ThematicCircuitCard
                             imageUrl={card.imageUrl}
                             title={card.title}
                             description={card.description}
-                            alt={card.alt}
+                            alt={card.title}
                             screenSize={screenSize}
                           />
                         </div>
@@ -904,22 +911,34 @@ const Acceuil = () => {
               minHeight: "300px",
             }}
           >
-            <ImageCarousel images={IMAGES} />
+            {settings.acceuil_carrousel.length > 0 &&
+              settings.acceuil_carrousel[0].file !== null && (
+                <ImageCarousel
+                  images={settings.acceuil_carrousel.map((item) =>
+                    HandleGetFileLink(item.file as string)
+                  )}
+                />
+              )}
           </section>
 
           {/* Section finale */}
           <section className="four">
-            <img
-              src={fin}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-              }}
-              alt="Image 4"
-              loading="lazy"
-              decoding="async"
-            />
+            {settings.acceuil_image_fin.length > 0 &&
+              settings.acceuil_image_fin[0].file !== null && (
+                <img
+                  src={HandleGetFileLink(
+                    settings.acceuil_image_fin[0].file as string
+                  )}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                  alt="Image 4"
+                  loading="lazy"
+                  decoding="async"
+                />
+              )}
           </section>
 
           <Footer />
