@@ -4,15 +4,7 @@ import "./Actualites.css";
 import { useEffect, useState } from "react";
 import Footer from "../../components/footer/footer";
 import { useLocation } from "react-router-dom";
-import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
-import img2 from "/images/2.jpg";
-import img4 from "/images/4.jpg";
-import img6 from "/images/6.jpg";
-import img8 from "/images/8.jpg";
-import img10 from "/images/10.jpg";
 import BeginningButton from "../../components/dededed/BeginingButton";
-
-const images = [img2, img4, img6, img8, img10];
 
 function Actualites() {
   const { pathname } = useLocation();
@@ -66,17 +58,6 @@ function Actualites() {
           <NewsLayout />
         </Flex>
       </Flex>
-
-      {/* Section Carrousel responsive */}
-      <section
-        style={{
-          height: "clamp(200px, 45vw, 600px)",
-          minHeight: "200px",
-          maxHeight: "600px",
-        }}
-      >
-        <ImageCarousel images={images} />
-      </section>
 
       <Footer />
     </Flex>
