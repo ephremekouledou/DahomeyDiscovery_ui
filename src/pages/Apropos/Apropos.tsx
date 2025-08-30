@@ -5,26 +5,39 @@ import vector from "../../assets../../assets/icons/aproposVector.svg";
 import mmeDerby from "/images/mmeDerby.png";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import img2 from "/images/2.jpg";
-import img4 from "/images/4.jpg";
-import img6 from "/images/6.jpg";
-import img8 from "/images/8.jpg";
-import img10 from "/images/10.jpg";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
 import BeginningButton from "../../components/dededed/BeginingButton";
+import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
+import { useScreenSizeResponsive } from "../../components/CircuitView/Timeline";
+import { PageSettings } from "../../sdk/api/pageMedias";
+import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
 
-const images = [img2, img4, img6, img8, img10];
 const { Content } = Layout;
 const { Title, Paragraph } = Typography;
 
 const Apropos = () => {
   const { pathname } = useLocation();
   const [isHovered, setIsHovered] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
+  const screenSize = useScreenSizeResponsive();
 
   useEffect(() => {
     document.title = "A Propos";
     window.scrollTo(0, 0);
   }, [pathname]);
+
+  useEffect(() => {
+    PageSettings.List()
+      .then((data) => {
+        console.log("the settings are:", data);
+        setSettings(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching circuits:", err);
+      });
+  }, []);
 
   return (
     <Flex justify="center" vertical>
@@ -298,15 +311,27 @@ const Apropos = () => {
       </Flex>
 
       {/* Section Carrousel - Hauteur responsive */}
-      <section
-        style={{
-          height: "clamp(200px, 45vw, 600px)",
-          minHeight: "200px",
-          maxHeight: "600px",
-        }}
-      >
-        <ImageCarousel images={images} />
-      </section>
+      {!loading && (
+        <section
+          style={{
+            height: screenSize.isMobile
+              ? "60vw"
+              : screenSize.isTablet
+              ? "50vw"
+              : "45vw",
+            width: "100%",
+          }}
+        >
+          {settings.locations_carrousel.length > 0 &&
+            settings.locations_carrousel[0].file !== null && (
+              <ImageCarousel
+                images={settings.locations_carrousel.map((item) =>
+                  HandleGetFileLink(item.file as string)
+                )}
+              />
+            )}
+        </section>
+      )}
 
       <Footer />
     </Flex>

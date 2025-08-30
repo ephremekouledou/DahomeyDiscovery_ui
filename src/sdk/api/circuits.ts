@@ -49,6 +49,21 @@ export class CircuitsAPI {
     });
   }
 
+  static GetSignature(): Promise<ICircuit> {
+    var url = this.getBaseURL() + "/signature";
+    return new Promise((resolve, reject) => {
+      axiosSiteData
+        .get(url, axiosSiteDataConfig)
+        .then((response: any) => {
+          const data: ICircuit = response.data;
+          resolve(data);
+        })
+        .catch((err: any) => {
+          reject(handleErr(err));
+        });
+    });
+  }
+
   /**
    * Add adds a new category
    */

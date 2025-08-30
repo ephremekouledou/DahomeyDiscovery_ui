@@ -2,22 +2,15 @@ import { Flex, Typography } from "antd";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
 import { useEffect, useState, useCallback } from "react";
-import video from "/videos/usagevid1.mp4";
 import { useLocation, useNavigate } from "react-router-dom";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
-import img2 from "/images/2.jpg";
-import img4 from "/images/4.jpg";
-import img6 from "/images/6.jpg";
-import img8 from "/images/8.jpg";
-import img10 from "/images/10.jpg";
 import BeginningButton from "../../components/dededed/BeginingButton";
 import { ICircuitPresenter } from "../../sdk/models/circuits";
 import { CircuitsAPI } from "../../sdk/api/circuits";
 import { MultiAppFile } from "../../sdk/models/models";
 import { HandleGetFileLink } from "./CircuitsCartes";
-
-// Optimisation des images en les mémorisant
-const images = [img2, img4, img6, img8, img10];
+import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
+import { PageSettings } from "../../sdk/api/pageMedias";
 
 interface TravelCardProps {
   _id: string;
@@ -80,7 +73,9 @@ const TravelCard = ({
           loading="lazy"
           className={`absolute inset-0 w-full h-full object-cover 
                      transition-opacity duration-500 
-                     ${isHovered && video.length ? "opacity-0" : "opacity-100"}`}
+                     ${
+                       isHovered && video.length ? "opacity-0" : "opacity-100"
+                     }`}
         />
         {isHovered && video.length > 0 && (
           <video
@@ -237,13 +232,30 @@ const useResponsive = () => {
 const Circuits = () => {
   const { pathname } = useLocation();
   const { isMobile, isTablet } = useResponsive();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
+  const [loadingCircuits, setLoadingCircuits] = useState<boolean>(true);
   const [circuits, setCircuits] = useState<ICircuitPresenter[]>([]);
+
+  useEffect(() => {
+    PageSettings.List()
+      .then((data) => {
+        console.log("the settings are:", data);
+        setSettings(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching circuits:", err);
+      });
+  }, []);
 
   // On recupere les villes
   useEffect(() => {
     CircuitsAPI.List()
       .then((data) => {
+        console.log("the circuits are:", data);
         setCircuits(data);
+        setLoadingCircuits(false);
       })
       .catch((err) => {
         console.error("Error fetching circuits:", err);
@@ -307,99 +319,121 @@ const Circuits = () => {
       </div>
 
       {/* Section héros - Responsive */}
-      <Flex
-        vertical
-        style={{
-          position: "relative",
-          overflow: "hidden",
-          padding: isMobile ? "4vh 6vw" : "8vh 8vw",
-          paddingBottom: isMobile ? "10vh" : "20vh",
-          backgroundColor: "#FEF1D9", // Fallback background
-        }}
-      >
-        {/* Optimized Video Background */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="auto" // Ensures early loading
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            zIndex: 0,
-          }}
-          onError={(e) => {
-            console.error("Video error:", e);
-          }}
-        >
-          <source src={video} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-
-        {/* Content Layer */}
+      {!loading && (
         <Flex
+          vertical
           style={{
-            maxWidth: "1050px",
-            width: "100%",
-            margin: "0 auto",
-            zIndex: 1,
+            position: "relative",
+            overflow: "hidden",
+            padding: isMobile ? "4vh 6vw" : "8vh 8vw",
+            paddingBottom: isMobile ? "10vh" : "20vh",
+            backgroundColor: "#FEF1D9", // Fallback background
           }}
         >
-          <Flex vertical>
-            <Typography.Text
-              style={{
-                color: "white",
-                fontSize: isMobile ? "12px" : "16px",
-                lineHeight: "1.1",
-                margin: "0",
-                textTransform: "uppercase",
-                fontFamily: "GeneralSans",
-                letterSpacing: "0.3em",
-              }}
-            >
-              CIRCUITS THÉMATIQUES
-            </Typography.Text>
-            <Typography.Title
-              level={1}
-              style={{
-                color: "#FF3100",
-                fontSize: isMobile ? "44px" : "85px",
-                fontWeight: "900",
-                lineHeight: "1.1",
-                letterSpacing: "0.03em",
-                margin: "0",
-                fontFamily: "DragonAngled",
-              }}
-            >
-              DESTINATIONS CULTURELLES <br /> ET HISTORIQUES
-            </Typography.Title>
+          {/* Optimized Video Background */}
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto" // Ensures early loading
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              zIndex: 0,
+            }}
+            onError={(e) => {
+              console.error("Video error:", e);
+            }}
+          >
+            <source
+              src={HandleGetFileLink(
+                settings.thematique_reel[0].file as string
+              )}
+              type="video/mp4"
+            />
+            Your browser does not support the video tag.
+          </video>
+
+          {/* Content Layer */}
+          <Flex
+            style={{
+              maxWidth: "1050px",
+              width: "100%",
+              margin: "0 auto",
+              zIndex: 1,
+            }}
+          >
+            <Flex vertical>
+              <Typography.Text
+                style={{
+                  color: "white",
+                  fontSize: isMobile ? "12px" : "16px",
+                  lineHeight: "1.1",
+                  margin: "0",
+                  textTransform: "uppercase",
+                  fontFamily: "GeneralSans",
+                  letterSpacing: "0.3em",
+                }}
+              >
+                CIRCUITS THÉMATIQUES
+              </Typography.Text>
+              <Typography.Title
+                level={1}
+                style={{
+                  color: "#FF3100",
+                  fontSize: isMobile ? "44px" : "85px",
+                  fontWeight: "900",
+                  lineHeight: "1.1",
+                  letterSpacing: "0.03em",
+                  margin: "0",
+                  fontFamily: "DragonAngled",
+                }}
+              >
+                {settings.thematique_title}
+              </Typography.Title>
+              <Typography.Text
+                style={{
+                  color: "#FFFFFF",
+                  fontSize: isMobile ? "44px" : "44px",
+                  lineHeight: isMobile ? "1.3" : "1",
+                  marginTop: "0",
+                  fontFamily: "DragonAngled",
+                }}
+              >
+                {settings.thematique_subtitle}
+              </Typography.Text>
+            </Flex>
           </Flex>
         </Flex>
-      </Flex>
+      )}
 
       {/* Grille des cartes - Responsive */}
-      <div className="w-full bg-gray-50 py-8 sm:py-12 lg:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div
-            className="grid grid-cols-1 
+      {!loadingCircuits && (
+        <div className="w-full bg-gray-50 py-8 sm:py-12 lg:py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div
+              className="grid grid-cols-1 
                          xs:grid-cols-1 
                          sm:grid-cols-2 
                          lg:grid-cols-3 
                          xl:grid-cols-3 
                          gap-4 sm:gap-6 lg:gap-8
                          justify-items-center"
-          >
-            {circuits.map((voyage) => (
-              <TravelCard key={voyage._id} {...voyage} />
-            ))}
+            >
+              {circuits
+                .filter((circuit) => circuit.type === "Thematique")
+                .map((voyage) => (
+                  <TravelCard key={voyage._id} {...voyage} />
+                ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Carrousel d'images - Responsive */}
       <section className="w-full">
@@ -409,7 +443,14 @@ const Circuits = () => {
             minHeight: isMobile ? "250px" : "300px",
           }}
         >
-          <ImageCarousel images={images} />
+          {settings.thematique_carrousel.length > 0 &&
+            settings.thematique_carrousel[0].file !== null && (
+              <ImageCarousel
+                images={settings.thematique_carrousel.map((item) =>
+                  HandleGetFileLink(item.file as string)
+                )}
+              />
+            )}
         </div>
       </section>
 

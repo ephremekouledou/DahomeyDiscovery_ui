@@ -6,17 +6,11 @@ import { useState, useEffect } from "react";
 import BeginningButton from "../dededed/BeginingButton";
 import video from "/videos/usagevid1.mp4";
 import debut from "/images/Circuit signature/Début.webp";
-import img1 from "/images/Accueil/1_5.webp";
-import img2 from "/images/Accueil/2_5.webp";
-import img3 from "/images/Accueil/3_5.webp";
 import { ThematicCircuitCard } from "./Card";
 import { useScreenSizeResponsive } from "./Timeline";
-import ImageCarousel from "../ImageGallery/ImageCarousel";
 import { VillesAPI } from "../../sdk/api/villes";
 import { IVille } from "../../sdk/models/villes";
 import { FileAPI } from "../../sdk/api/file";
-
-const IMAGES = [img1, img2, img3];
 
 const handleGetFileLink = (id: string) => {
   return FileAPI.Download("villes", id);
@@ -376,7 +370,7 @@ export const CircuitCarteView = () => {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const { screenSize, isTablet } = useScreenSizeResponsive();
+  const { screenSize } = useScreenSizeResponsive();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -390,7 +384,7 @@ export const CircuitCarteView = () => {
       })
       .catch((err) => {
         console.error("Error fetching ville:", err);
-      })
+      });
   }, []);
 
   return (
@@ -522,25 +516,23 @@ export const CircuitCarteView = () => {
           {ville?.name} vous propose...
         </Typography.Title>
         <Flex gap={30} wrap justify="center">
-          {ville?.activities.map(
-            (card, index) => (
-              <Flex key={card.name}>
-                <div className={`circuit-card-${index + 1}`}>
-                  <ThematicCircuitCard
-                    imageUrl={handleGetFileLink(card.image[0].file as string)}
-                    title={card.name}
-                    description={card.description}
-                    alt={card.name}
-                    screenSize={screenSize}
-                  />
-                </div>
-              </Flex>
-            )
-          )}
+          {ville?.activities.map((card, index) => (
+            <Flex key={card.name}>
+              <div className={`circuit-card-${index + 1}`}>
+                <ThematicCircuitCard
+                  imageUrl={handleGetFileLink(card.image[0].file as string)}
+                  title={card.name}
+                  description={card.description}
+                  alt={card.name}
+                  screenSize={screenSize}
+                />
+              </div>
+            </Flex>
+          ))}
         </Flex>
       </Flex>
 
-      <section
+      {/* <section
         style={{
           marginTop: "60px",
           height: isMobile ? "60vw" : isTablet ? "50vw" : "45vw",
@@ -548,7 +540,7 @@ export const CircuitCarteView = () => {
         }}
       >
         <ImageCarousel images={IMAGES} />
-      </section>
+      </section> */}
 
       {/* Footer */}
       <Footer />

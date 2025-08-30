@@ -24,18 +24,6 @@ import {
   Droplets,
 } from "lucide-react";
 import { Element, scroller } from "react-scroll";
-// import img1 from "/images/1.jpg";
-import img2 from "/images/2.jpg";
-import locationBg from "/images/Location/locationBgR.jpg";
-// import locationBg from "/images/Location/locationBg.webp";
-// import img3 from "/images/3.jpg";
-import img4 from "/images/4.jpg";
-// import img5 from "/images/5.jpg";
-import img6 from "/images/6.jpg";
-// import img7 from "/images/7.jpg";
-import img8 from "/images/8.jpg";
-// import img9 from "/images/9.jpg";
-import img10 from "/images/10.jpg";
 import voitureFront from "/images/voitureFront.webp";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
 import Footer from "../../components/footer/footer";
@@ -47,27 +35,11 @@ import BeginningButton from "../../components/dededed/BeginingButton";
 import { VehiculesAPI } from "../../sdk/api/vehicules";
 import { ICarRentalData } from "../../sdk/models/vehicules";
 import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
-/* import img11 from "/images/11.jpg";
-import img12 from "/images/12.jpg";
-import img13 from "/images/13.jpg";
-import img14 from "/images/14.png"; */
+import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
+import { PageSettings } from "../../sdk/api/pageMedias";
+import { useScreenSizeResponsive } from "../../components/CircuitView/Timeline";
 
-const images = [
-  // img1,
-  img2,
-  // img3,
-  img4,
-  // img5,
-  img6,
-  // img7,
-  img8,
-  // img9,
-  img10,
-  // img11,
-  // img12,
-  // img13,
-  // img14,
-];
+
 
 const ServicesSection = () => {
   const services = [
@@ -825,11 +797,14 @@ const VehicleCategoryCard = ({ imageUrl, title, description, link }: any) => {
 };
 
 const Locations = () => {
-  const [cars, setCars] = useState<ICarRentalData[]>([])
+  const [cars, setCars] = useState<ICarRentalData[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
   const [isMobile, setIsMobile] = useState(false);
   const { pathname } = useLocation();
   const { setTransaction } = useTransaction();
   const navigate = useNavigate();
+  const screenSize = useScreenSizeResponsive();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -848,7 +823,18 @@ const Locations = () => {
   useEffect(() => {
     document.title = "Nos Offres - Locations de véhicules";
   }, []);
-  // const cars = createExampleCars();
+
+  useEffect(() => {
+    PageSettings.List()
+      .then((data) => {
+        console.log("the settings are:", data);
+        setSettings(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching circuits:", err);
+      });
+  }, []);
 
   useEffect(() => {
     VehiculesAPI.List()
@@ -901,121 +887,129 @@ const Locations = () => {
       </div>
 
       {/* Section héros - Responsive */}
-      <Flex
-        vertical
-        className="relative w-full overflow-hidden"
-        style={{
-          backgroundImage: `url(${locationBg})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          padding: isMobile ? "4vh 6vw" : "8vh 8vw",
-          paddingBottom: isMobile ? "10vw" : "8vw",
-          minHeight: isMobile ? "60vh" : "500px",
-        }}
-      >
-        {/* Gradient overlay - de la couleur beige/crème vers transparent */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.3)", // Ajuste l'opacité ici
-            zIndex: 1,
-          }}
-        />
-      </Flex>
-
-      {/* Section Step */}
-      <Flex
-        style={{
-          width: "100%",
-          position: "relative",
-          bottom: "35px",
-          zIndex: 1,
-        }}
-        justify="center"
-        gap={"10vw"}
-      >
-        {steps.map((step, _) => {
-          const IconComponent = step.icon;
-
-          return (
-            <div key={step.number} className="text-center">
-              {/* Icon Circle */}
-              <div
-                className={`${step.bgColor} rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4`}
-              >
-                <IconComponent className="w-8 h-8 text-white" />
-              </div>
-
-              {/* Step Content */}
-              <div className="space-y-2">
-                <h3 className="text-lg font-bold text-gray-800">
-                  {step.number}. {step.title}
-                </h3>
-                <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
-                  {step.description}
-                </p>
-              </div>
-            </div>
-          );
-        })}
-      </Flex>
-
-      {/* Section Presentation - Responsive */}
-      <Flex vertical>
-        <Flex
-          style={{ width: "100%", height: "70px", backgroundColor: "#FF3100" }}
-        >
-          <div></div>
-        </Flex>
-        <Flex justify="flex-end">
-          <div
+      {!loading && (
+        <>
+          <Flex
+            vertical
+            className="relative w-full overflow-hidden"
             style={{
-              width: "20vw",
-              height: "20vw",
-              minWidth: "265px",
-              minHeight: "265px",
-              backgroundColor: "#FF3100",
-              borderBottomLeftRadius: "300px",
-              position: "relative",
-              top: "180px",
-              left: "100px",
-            }}
-          ></div>
-          <div
-            style={{
-              width: "23vw",
-              height: "21vw",
-              minWidth: "305px",
-              minHeight: "278px",
-              backgroundColor: "#FF3100",
-              overflow: "visible",
+              backgroundImage: `url(${HandleGetFileLink(
+                settings.locations_background[0].file as string
+              )})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              padding: isMobile ? "4vh 6vw" : "8vh 8vw",
+              paddingBottom: isMobile ? "10vw" : "8vw",
+              minHeight: isMobile ? "60vh" : "500px",
             }}
           >
-            <img
-              src={voitureFront}
-              alt="Location de véhicules"
+            {/* Gradient overlay - de la couleur beige/crème vers transparent */}
+            <div
               style={{
-                minWidth: "281px",
-                minHeight: "281px",
-                width: "22vw",
-                height: "22vw",
-                borderRadius: "50px",
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                backgroundColor: "rgba(0, 0, 0, 0.3)", // Ajuste l'opacité ici
                 zIndex: 1,
-                position: "relative",
-                top: "60px",
-                right: "100px",
-                transition:
-                  "transform 1.8s cubic-bezier(0.22, 0.61, 0.36, 1), width 1.8s cubic-bezier(0.22, 0.61, 0.36, 1), height 1.8s cubic-bezier(0.22, 0.61, 0.36, 1)",
               }}
-              className="hover:scale-[1.15] hover:w-[24vw] hover:h-[24vw]"
             />
-          </div>
-          <style>
-            {`
+          </Flex>
+
+          {/* Section Step */}
+          <Flex
+            style={{
+              width: "100%",
+              position: "relative",
+              bottom: "35px",
+              zIndex: 1,
+            }}
+            justify="center"
+            gap={"10vw"}
+          >
+            {steps.map((step, _) => {
+              const IconComponent = step.icon;
+
+              return (
+                <div key={step.number} className="text-center">
+                  {/* Icon Circle */}
+                  <div
+                    className={`${step.bgColor} rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4`}
+                  >
+                    <IconComponent className="w-8 h-8 text-white" />
+                  </div>
+
+                  {/* Step Content */}
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-bold text-gray-800">
+                      {step.number}. {step.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+                      {step.description}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </Flex>
+
+          {/* Section Presentation - Responsive */}
+          <Flex vertical>
+            <Flex
+              style={{
+                width: "100%",
+                height: "70px",
+                backgroundColor: "#FF3100",
+              }}
+            >
+              <div></div>
+            </Flex>
+            <Flex justify="flex-end">
+              <div
+                style={{
+                  width: "20vw",
+                  height: "20vw",
+                  minWidth: "265px",
+                  minHeight: "265px",
+                  backgroundColor: "#FF3100",
+                  borderBottomLeftRadius: "300px",
+                  position: "relative",
+                  top: "180px",
+                  left: "100px",
+                }}
+              ></div>
+              <div
+                style={{
+                  width: "23vw",
+                  height: "21vw",
+                  minWidth: "305px",
+                  minHeight: "278px",
+                  backgroundColor: "#FF3100",
+                  overflow: "visible",
+                }}
+              >
+                <img
+                  src={voitureFront}
+                  alt="Location de véhicules"
+                  style={{
+                    minWidth: "281px",
+                    minHeight: "281px",
+                    width: "22vw",
+                    height: "22vw",
+                    borderRadius: "50px",
+                    zIndex: 1,
+                    position: "relative",
+                    top: "60px",
+                    right: "100px",
+                    transition:
+                      "transform 1.8s cubic-bezier(0.22, 0.61, 0.36, 1), width 1.8s cubic-bezier(0.22, 0.61, 0.36, 1), height 1.8s cubic-bezier(0.22, 0.61, 0.36, 1)",
+                  }}
+                  className="hover:scale-[1.15] hover:w-[24vw] hover:h-[24vw]"
+                />
+              </div>
+              <style>
+                {`
               @media (hover: hover) {
               div[style*="background-color: #FF3100"] img:hover {
                 width: 24vw !important;
@@ -1024,19 +1018,77 @@ const Locations = () => {
               }
               }
               `}
-          </style>
-        </Flex>
-        <Flex
-          style={{
-            maxWidth: "1050px",
-            width: "100%",
-            margin: "0 auto",
-            zIndex: 1,
-          }}
-        >
+              </style>
+            </Flex>
+            <Flex
+              style={{
+                maxWidth: "1050px",
+                width: "100%",
+                margin: "0 auto",
+                zIndex: 1,
+              }}
+            >
+              <Flex
+                vertical
+                style={{ width: "50%", position: "relative", bottom: "200px" }}
+              >
+                <Typography.Title
+                  level={1}
+                  style={{
+                    color: "#FF3100",
+                    fontSize: isMobile ? "44px" : "85px",
+                    fontWeight: "bold",
+                    lineHeight: "1",
+                    letterSpacing: "0.03em",
+                    marginTop: "20px",
+                    marginBottom: "15px",
+                    fontFamily: "DragonAngled",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Une flotte pensée
+                  <br />
+                  <span style={{ color: "#3b1b19" }}>
+                    pour tous vos trajets
+                  </span>
+                </Typography.Title>
+                <Typography.Text
+                  style={{
+                    color: "#563800",
+                    fontSize: isMobile ? "24px" : "22px",
+                    lineHeight: "1",
+                    marginTop: "0",
+                    fontFamily: "GeneralSans",
+                  }}
+                >
+                  Que vous partiez en solo, en famille ou en groupe. Ici chaque
+                  route a son véhicule. Notre flotte variée est conçue pour
+                  répondre à tous vos besoins de transport, que ce soit pour une
+                  escapade citadine, un voyage d'affaires ou une aventure en
+                  pleine nature.
+                </Typography.Text>
+              </Flex>
+            </Flex>
+          </Flex>
+
+          {/* Section Separator */}
+          <div
+            style={{
+              height: "80px",
+              backgroundColor: "#D9D9D938",
+              margin: "40px 0",
+            }}
+          ></div>
+
+          {/* Section Titre */}
           <Flex
-            vertical
-            style={{ width: "50%", position: "relative", bottom: "200px" }}
+            style={{
+              maxWidth: "1200px",
+              width: "100%",
+              margin: "0 auto",
+              zIndex: 1,
+              justifyContent: "center",
+            }}
           >
             <Typography.Title
               level={1}
@@ -1052,312 +1104,271 @@ const Locations = () => {
                 textTransform: "uppercase",
               }}
             >
-              Une flotte pensée
-              <br />
-              <span style={{ color: "#3b1b19" }}>pour tous vos trajets</span>
+              Notre flotte de véhicules
             </Typography.Title>
-            <Typography.Text
+          </Flex>
+
+          {/* Section categories */}
+          <Flex
+            style={{
+              width: "100%",
+              // padding: "3vh 0",
+              paddingBottom: "50px",
+              maxWidth: "1200px",
+              margin: "0 auto",
+            }}
+          >
+            <div
               style={{
-                color: "#563800",
-                fontSize: isMobile ? "24px" : "22px",
-                lineHeight: "1",
-                marginTop: "0",
-                fontFamily: "GeneralSans",
+                display: "flex",
+                justifyContent: "center",
+                // alignItems: "center",
+                gap: "20px",
+                flexWrap: "wrap",
+                // marginTop: "40px",
               }}
             >
-              Que vous partiez en solo, en famille ou en groupe. Ici chaque
-              route a son véhicule. Notre flotte variée est conçue pour répondre
-              à tous vos besoins de transport, que ce soit pour une escapade
-              citadine, un voyage d'affaires ou une aventure en pleine nature.
-            </Typography.Text>
+              <VehicleCategoryCard
+                imageUrl={HandleGetFileLink(
+                  settings.locations_background_tourisme[0].file as string
+                )}
+                title="Véhicules de tourisme"
+                description="Confort et praticité au quotidiens"
+                link="tourisme"
+              />
+              <VehicleCategoryCard
+                imageUrl={HandleGetFileLink(
+                  settings.locations_background_suv[0].file as string
+                )}
+                title="SUV & 4x4"
+                description="Pour explorer les pistes sans compromis"
+                link="suv"
+              />
+              <VehicleCategoryCard
+                imageUrl={HandleGetFileLink(
+                  settings.locations_background_van[0].file as string
+                )}
+                title="Mini Bus & Vans"
+                description="Pour partager l'aventure à plusieurs"
+                link="minibus"
+              />
+            </div>
           </Flex>
-        </Flex>
-      </Flex>
 
-      {/* Section Separator */}
-      <div
-        style={{
-          height: "80px",
-          backgroundColor: "#D9D9D938",
-          margin: "40px 0",
-        }}
-      ></div>
+          {/* Section Titre de tourisme*/}
+          <Element name="tourisme">
+            <Flex
+              style={{
+                maxWidth: "1200px",
+                width: "100%",
+                margin: "0 auto",
+                zIndex: 1,
+                justifyContent: "center",
+              }}
+            >
+              <Typography.Title
+                level={1}
+                style={{
+                  color: "#FF3100",
+                  fontSize: isMobile ? "44px" : "85px",
+                  fontWeight: "bold",
+                  lineHeight: "1",
+                  letterSpacing: "0.03em",
+                  marginTop: "20px",
+                  marginBottom: "15px",
+                  fontFamily: "DragonAngled",
+                  textTransform: "uppercase",
+                }}
+              >
+                NOS VÉHICULES De Tourisme
+              </Typography.Title>
+            </Flex>
+          </Element>
 
-      {/* Section Titre */}
-      <Flex
-        style={{
-          maxWidth: "1200px",
-          width: "100%",
-          margin: "0 auto",
-          zIndex: 1,
-          justifyContent: "center",
-        }}
-      >
-        <Typography.Title
-          level={1}
-          style={{
-            color: "#FF3100",
-            fontSize: isMobile ? "44px" : "85px",
-            fontWeight: "bold",
-            lineHeight: "1",
-            letterSpacing: "0.03em",
-            marginTop: "20px",
-            marginBottom: "15px",
-            fontFamily: "DragonAngled",
-            textTransform: "uppercase",
-          }}
-        >
-          Notre flotte de véhicules
-        </Typography.Title>
-      </Flex>
-
-      {/* Section categories */}
-      <Flex
-        style={{
-          width: "100%",
-          // padding: "3vh 0",
-          paddingBottom: "50px",
-          maxWidth: "1200px",
-          margin: "0 auto",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            // alignItems: "center",
-            gap: "20px",
-            flexWrap: "wrap",
-            // marginTop: "40px",
-          }}
-        >
-          <VehicleCategoryCard
-            imageUrl={img4}
-            title="Véhicules de tourisme"
-            description="Confort et praticité au quotidiens"
-            link="tourisme"
-          />
-          <VehicleCategoryCard
-            imageUrl={img10}
-            title="SUV & 4x4"
-            description="Pour explorer les pistes sans compromis"
-            link="suv"
-          />
-          <VehicleCategoryCard
-            imageUrl={img10}
-            title="Mini Bus & Vans"
-            description="Pour partager l'aventure à plusieurs"
-            link="minibus"
-          />
-        </div>
-      </Flex>
-
-      {/* Section Titre de tourisme*/}
-      <Element name="tourisme">
-        <Flex
-          style={{
-            maxWidth: "1200px",
-            width: "100%",
-            margin: "0 auto",
-            zIndex: 1,
-            justifyContent: "center",
-          }}
-        >
-          <Typography.Title
-            level={1}
+          {/* Liste des véhicules */}
+          <Flex
             style={{
-              color: "#FF3100",
-              fontSize: isMobile ? "44px" : "85px",
-              fontWeight: "bold",
-              lineHeight: "1",
-              letterSpacing: "0.03em",
-              marginTop: "20px",
-              marginBottom: "15px",
-              fontFamily: "DragonAngled",
-              textTransform: "uppercase",
+              width: "100%",
+              // padding: "3vh 0",
+              paddingBottom: "50px",
+              maxWidth: "1200px",
+              margin: "0 auto",
             }}
+            vertical
+            gap={isMobile ? 30 : 50}
           >
-            NOS VÉHICULES De Tourisme
-          </Typography.Title>
-        </Flex>
-      </Element>
-
-      {/* Liste des véhicules */}
-      <Flex
-        style={{
-          width: "100%",
-          // padding: "3vh 0",
-          paddingBottom: "50px",
-          maxWidth: "1200px",
-          margin: "0 auto",
-        }}
-        vertical
-        gap={isMobile ? 30 : 50}
-      >
-        <div
-          className="grid grid-cols-1 
+            <div
+              className="grid grid-cols-1 
                          xs:grid-cols-1 
                          sm:grid-cols-2 
                          lg:grid-cols-3 
                          xl:grid-cols-3 
                          gap-4 sm:gap-6 lg:gap-8
                          justify-items-center"
-        >
-          {cars.map((car: any, index: any) => (
-            <CarRentalCard
-              key={index}
-              car={car}
-              onRent={() => {
-                setTransaction({
-                  id: car.id,
-                  title: car.name,
-                  amount: car.pricePerDay,
-                });
-                // we redirect to the payment page
-                navigate("/reservations-locations");
+            >
+              {cars
+                .filter((car) => car.category === "Berline")
+                .map((car: any, index: any) => (
+                  <CarRentalCard
+                    key={index}
+                    car={car}
+                    onRent={() => {
+                      setTransaction({
+                        id: car.id,
+                        title: car.name,
+                        amount: car.pricePerDay,
+                      });
+                      // we redirect to the payment page
+                      navigate("/reservations-locations");
+                    }}
+                  />
+                ))}
+            </div>
+          </Flex>
+
+          {/* Section Titre de SUV & 4x4*/}
+          <Element name="suv">
+            <Flex
+              style={{
+                maxWidth: "1200px",
+                width: "100%",
+                margin: "0 auto",
+                zIndex: 1,
+                justifyContent: "center",
               }}
-            />
-          ))}
-        </div>
-      </Flex>
+            >
+              <Typography.Title
+                level={1}
+                style={{
+                  color: "#FF3100",
+                  fontSize: isMobile ? "44px" : "85px",
+                  fontWeight: "bold",
+                  lineHeight: "1",
+                  letterSpacing: "0.03em",
+                  marginTop: "20px",
+                  marginBottom: "15px",
+                  fontFamily: "DragonAngled",
+                  textTransform: "uppercase",
+                }}
+              >
+                NOS suv & 4x4
+              </Typography.Title>
+            </Flex>
+          </Element>
 
-      {/* Section Titre de SUV & 4x4*/}
-      <Element name="suv">
-        <Flex
-          style={{
-            maxWidth: "1200px",
-            width: "100%",
-            margin: "0 auto",
-            zIndex: 1,
-            justifyContent: "center",
-          }}
-        >
-          <Typography.Title
-            level={1}
+          {/* Liste des véhicules */}
+          <Flex
             style={{
-              color: "#FF3100",
-              fontSize: isMobile ? "44px" : "85px",
-              fontWeight: "bold",
-              lineHeight: "1",
-              letterSpacing: "0.03em",
-              marginTop: "20px",
-              marginBottom: "15px",
-              fontFamily: "DragonAngled",
-              textTransform: "uppercase",
+              width: "100%",
+              // padding: "3vh 0",
+              paddingBottom: "50px",
+              maxWidth: "1200px",
+              margin: "0 auto",
             }}
+            vertical
+            gap={isMobile ? 30 : 50}
           >
-            NOS suv & 4x4
-          </Typography.Title>
-        </Flex>
-      </Element>
-
-      {/* Liste des véhicules */}
-      <Flex
-        style={{
-          width: "100%",
-          // padding: "3vh 0",
-          paddingBottom: "50px",
-          maxWidth: "1200px",
-          margin: "0 auto",
-        }}
-        vertical
-        gap={isMobile ? 30 : 50}
-      >
-        <div
-          className="grid grid-cols-1 
+            <div
+              className="grid grid-cols-1 
                          xs:grid-cols-1 
                          sm:grid-cols-2 
                          lg:grid-cols-3 
                          xl:grid-cols-3 
                          gap-4 sm:gap-6 lg:gap-8
                          justify-items-center"
-        >
-          {cars.map((car: any, index: any) => (
-            <CarRentalCard
-              key={index}
-              car={car}
-              onRent={() => {
-                setTransaction({
-                  id: car.id,
-                  title: car.name,
-                  amount: car.pricePerDay,
-                });
-                // we redirect to the payment page
-                navigate("/reservations-locations");
+            >
+              {cars
+                .filter((car) => car.category === "SUV")
+                .map((car: any, index: any) => (
+                  <CarRentalCard
+                    key={index}
+                    car={car}
+                    onRent={() => {
+                      setTransaction({
+                        id: car.id,
+                        title: car.name,
+                        amount: car.pricePerDay,
+                      });
+                      // we redirect to the payment page
+                      navigate("/reservations-locations");
+                    }}
+                  />
+                ))}
+            </div>
+          </Flex>
+
+          {/* Section Titre de Mini Bus & Vans */}
+          <Element name="minibus">
+            <Flex
+              style={{
+                maxWidth: "1200px",
+                width: "100%",
+                margin: "0 auto",
+                zIndex: 1,
+                justifyContent: "center",
               }}
-            />
-          ))}
-        </div>
-      </Flex>
+            >
+              <Typography.Title
+                level={1}
+                style={{
+                  color: "#FF3100",
+                  fontSize: isMobile ? "44px" : "85px",
+                  fontWeight: "bold",
+                  lineHeight: "1",
+                  letterSpacing: "0.03em",
+                  marginTop: "20px",
+                  marginBottom: "15px",
+                  fontFamily: "DragonAngled",
+                  textTransform: "uppercase",
+                }}
+              >
+                NOS mini Bus & Vans
+              </Typography.Title>
+            </Flex>
+          </Element>
 
-      {/* Section Titre de Mini Bus & Vans */}
-      <Element name="minibus">
-        <Flex
-          style={{
-            maxWidth: "1200px",
-            width: "100%",
-            margin: "0 auto",
-            zIndex: 1,
-            justifyContent: "center",
-          }}
-        >
-          <Typography.Title
-            level={1}
+          {/* Liste des véhicules */}
+          <Flex
             style={{
-              color: "#FF3100",
-              fontSize: isMobile ? "44px" : "85px",
-              fontWeight: "bold",
-              lineHeight: "1",
-              letterSpacing: "0.03em",
-              marginTop: "20px",
-              marginBottom: "15px",
-              fontFamily: "DragonAngled",
-              textTransform: "uppercase",
+              width: "100%",
+              // padding: "3vh 0",
+              paddingBottom: "50px",
+              maxWidth: "1200px",
+              margin: "0 auto",
             }}
+            vertical
+            gap={isMobile ? 30 : 50}
           >
-            NOS mini Bus & Vans
-          </Typography.Title>
-        </Flex>
-      </Element>
-
-      {/* Liste des véhicules */}
-      <Flex
-        style={{
-          width: "100%",
-          // padding: "3vh 0",
-          paddingBottom: "50px",
-          maxWidth: "1200px",
-          margin: "0 auto",
-        }}
-        vertical
-        gap={isMobile ? 30 : 50}
-      >
-        <div
-          className="grid grid-cols-1 
+            <div
+              className="grid grid-cols-1 
                          xs:grid-cols-1 
                          sm:grid-cols-2 
                          lg:grid-cols-3 
                          xl:grid-cols-3 
                          gap-4 sm:gap-6 lg:gap-8
                          justify-items-center"
-        >
-          {cars.map((car: any, index: any) => (
-            <CarRentalCard
-              key={index}
-              car={car}
-              onRent={() => {
-                setTransaction({
-                  id: car.id,
-                  title: car.name,
-                  amount: car.pricePerDay,
-                });
-                // we redirect to the payment page
-                navigate("/reservations-locations");
-              }}
-            />
-          ))}
-        </div>
-      </Flex>
+            >
+              {cars
+                .filter((car) => car.category === "Mini-bus")
+                .map((car: any, index: any) => (
+                  <CarRentalCard
+                    key={index}
+                    car={car}
+                    onRent={() => {
+                      setTransaction({
+                        id: car.id,
+                        title: car.name,
+                        amount: car.pricePerDay,
+                      });
+                      // we redirect to the payment page
+                      navigate("/reservations-locations");
+                    }}
+                  />
+                ))}
+            </div>
+          </Flex>
+        </>
+      )}
 
       {/* Section Devis sur mesure */}
       <Flex
@@ -1456,9 +1467,28 @@ const Locations = () => {
         </Flex>
       </Flex>
 
-      <section style={{ height: "25vw", padding: "5px 0" }}>
-        <ImageCarousel images={images} />
-      </section>
+      {/* Galerie d'images - Responsive */}
+      {!loading && (
+        <section
+          style={{
+            height: screenSize.isMobile
+              ? "60vw"
+              : screenSize.isTablet
+              ? "50vw"
+              : "45vw",
+            width: "100%",
+          }}
+        >
+          {settings.locations_carrousel.length > 0 &&
+            settings.locations_carrousel[0].file !== null && (
+              <ImageCarousel
+                images={settings.locations_carrousel.map((item) =>
+                  HandleGetFileLink(item.file as string)
+                )}
+              />
+            )}
+        </section>
+      )}
 
       {/* Footer */}
       <Footer />
