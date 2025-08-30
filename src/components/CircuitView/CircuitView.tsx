@@ -3,16 +3,22 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import NavBar from "../navBar/navBar";
 import Footer from "../footer/footer";
 import React, { useState, useEffect, useMemo } from "react";
-import video from "/videos/usagevid1.mp4";
+// import video from "/videos/usagevid1.mp4";
 import {
   DetailedTimeline,
   InclusNonInclusComponent,
   useScreenSize,
 } from "./Timeline";
 import BeginningButton from "../dededed/BeginingButton";
-import { emptyICircuit, ICircuit, ICircuitPresenter } from "../../sdk/models/circuits";
+import {
+  emptyICircuit,
+  ICircuit,
+  ICircuitPresenter,
+} from "../../sdk/models/circuits";
 import { CircuitsAPI } from "../../sdk/api/circuits";
 import { HandleGetFileLink } from "../../pages/Circuits/CircuitsCartes";
+import { PageSettings } from "../../sdk/api/pageMedias";
+import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 
 interface CircuitCardOtherProps {
   circuit: ICircuitPresenter;
@@ -535,6 +541,8 @@ export const CircuitView = () => {
   const [circuitInfos, setCircuitInfos] = useState<ICircuit>(emptyICircuit());
   const [circuits, setCircuits] = useState<ICircuitPresenter[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadingSettgins, setLoadingSettgins] = useState<boolean>(true);
+  const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
 
   const circuitCardStyles = useMemo(() => {
     if (screenSize.isMobile) {
@@ -575,6 +583,18 @@ export const CircuitView = () => {
       };
     }
   }, [screenSize]);
+
+  useEffect(() => {
+    PageSettings.List()
+      .then((data) => {
+        console.log("the settings are:", data);
+        setSettings(data);
+        setLoadingSettgins(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching circuits:", err);
+      });
+  }, []);
 
   useEffect(() => {
     CircuitsAPI.GetByID(id as string)
@@ -654,80 +674,98 @@ export const CircuitView = () => {
       </div>
 
       {/* Section héros - Responsive */}
-      <Flex
-        vertical
-        style={{
-          position: "relative",
-          overflow: "hidden",
-          padding: isMobile ? "4vh 6vw" : "8vh 8vw",
-          paddingBottom: isMobile ? "10vh" : "20vh",
-          backgroundColor: "#FEF1D9", // Fallback background
-        }}
-      >
-        {/* Optimized Video Background */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="auto" // Ensures early loading
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            zIndex: 0,
-          }}
-          onError={(e) => {
-            console.error("Video error:", e);
-          }}
-        >
-          <source src={video} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-
-        {/* Content Layer */}
+      {!loadingSettgins && (
         <Flex
+          vertical
           style={{
-            maxWidth: "1050px",
-            width: "100%",
-            margin: "0 auto",
-            zIndex: 1,
+            position: "relative",
+            overflow: "hidden",
+            padding: isMobile ? "4vh 6vw" : "8vh 8vw",
+            paddingBottom: isMobile ? "10vh" : "20vh",
+            backgroundColor: "#FEF1D9", // Fallback background
           }}
         >
-          <Flex vertical>
-            <Typography.Text
-              style={{
-                color: "white",
-                fontSize: isMobile ? "12px" : "16px",
-                lineHeight: "1.1",
-                margin: "0",
-                textTransform: "uppercase",
-                fontFamily: "GeneralSans",
-                letterSpacing: "0.3em",
-              }}
-            >
-              CIRCUITS THÉMATIQUES
-            </Typography.Text>
-            <Typography.Title
-              level={1}
-              style={{
-                color: "#FF3100",
-                fontSize: isMobile ? "44px" : "85px",
-                fontWeight: "900",
-                lineHeight: "1.1",
-                letterSpacing: "0.03em",
-                margin: "0",
-                fontFamily: "DragonAngled",
-              }}
-            >
-              DESTINATIONS CULTURELLES <br /> ET HISTORIQUES
-            </Typography.Title>
+          {/* Optimized Video Background */}
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto" // Ensures early loading
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              zIndex: 0,
+            }}
+            onError={(e) => {
+              console.error("Video error:", e);
+            }}
+          >
+            <source
+              src={HandleGetFileLink(
+                settings.thematique_reel[0].file as string
+              )}
+              type="video/mp4"
+            />
+            Your browser does not support the video tag.
+          </video>
+
+          {/* Content Layer */}
+          <Flex
+            style={{
+              maxWidth: "1050px",
+              width: "100%",
+              margin: "0 auto",
+              zIndex: 1,
+            }}
+          >
+            <Flex vertical>
+              <Typography.Text
+                style={{
+                  color: "white",
+                  fontSize: isMobile ? "12px" : "16px",
+                  lineHeight: "1.1",
+                  margin: "0",
+                  textTransform: "uppercase",
+                  fontFamily: "GeneralSans",
+                  letterSpacing: "0.3em",
+                }}
+              >
+                CIRCUITS THÉMATIQUES
+              </Typography.Text>
+              <Typography.Title
+                level={1}
+                style={{
+                  color: "#FF3100",
+                  fontSize: isMobile ? "44px" : "85px",
+                  fontWeight: "900",
+                  lineHeight: "1.1",
+                  letterSpacing: "0.03em",
+                  margin: "0",
+                  fontFamily: "DragonAngled",
+                }}
+              >
+                {settings.thematique_title}
+              </Typography.Title>
+              <Typography.Text
+                style={{
+                  color: "#FFFFFF",
+                  fontSize: isMobile ? "44px" : "44px",
+                  lineHeight: isMobile ? "1.3" : "1",
+                  marginTop: "0",
+                  fontFamily: "DragonAngled",
+                }}
+              >
+                {settings.thematique_subtitle}
+              </Typography.Text>
+            </Flex>
           </Flex>
         </Flex>
-      </Flex>
+      )}
 
       {/* Contenu principal - Responsive */}
       {!loading && (
@@ -814,9 +852,7 @@ export const CircuitView = () => {
                       transition: "all 0.5s ease",
                     }}
                   >
-                    <span style={{ color: "black" }}>
-                      {circuitInfos.title}
-                    </span>{" "}
+                    <span style={{ color: "black" }}>{circuitInfos.title}</span>{" "}
                     {screenSize.isMobile ? <br /> : ""}
                   </Typography.Title>
                   <Typography
