@@ -328,37 +328,6 @@ const FilterSection = ({
     }));
   };
 
-  // Extraire toutes les commodités disponibles (modifié pour supporter les options)
-  // const allAmenities = useMemo(() => {
-  //   const amenitiesSet = new Set<string>();
-  //   accommodations.forEach((acc) => {
-  //     // Commodités de l'hébergement principal
-  //     if (acc.amenities) {
-  //       Object.values(acc.amenities).forEach((categoryAmenities) => {
-  //         categoryAmenities.forEach((amenity) => {
-  //           if (amenity.available) {
-  //             amenitiesSet.add(amenity.name);
-  //           }
-  //         });
-  //       });
-  //     }
-
-  //     // Commodités des options
-  //     if (acc.options) {
-  //       acc.options.forEach((option) => {
-  //         Object.values(option.amenities).forEach((categoryAmenities) => {
-  //           categoryAmenities.forEach((amenity) => {
-  //             if (amenity.available) {
-  //               amenitiesSet.add(amenity.name);
-  //             }
-  //           });
-  //         });
-  //       });
-  //     }
-  //   });
-  //   return Array.from(amenitiesSet).sort();
-  // }, [accommodations]);
-
   // Obtenir les prix min et max (modifié pour supporter les options)
   const priceRange = useMemo(() => {
     const prices: number[] = [];
@@ -402,7 +371,7 @@ const FilterSection = ({
       selectedAmenities: [],
       accommodationType: "all",
       searchTerm: "",
-      selectedCities: [], // Reset des villes
+      selectedCities: [],
     });
   };
 
@@ -671,8 +640,11 @@ const Hebergements = () => {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
+
   // Calculer la plage de prix réelle des hébergements
   const realPriceRange = useMemo(() => {
+    if (hebergements.length === 0) return [0, 1000000]; // Valeur par défaut très large
+
     const prices: number[] = [];
     hebergements.forEach((acc) => {
       if (acc.options && acc.options.length > 0) {
@@ -681,24 +653,38 @@ const Hebergements = () => {
         prices.push(acc.price);
       }
     });
-    return prices.length > 0 ? [0, Math.max(...prices)] : [0, 500];
+    return prices.length > 0 ? [0, Math.max(...prices)] : [0, 1000000];
   }, [hebergements]);
 
-  // Initialiser les filtres avec les vraies valeurs
+  // Initialiser les filtres avec des valeurs "neutres"
   const [filters, setFilters] = useState<FilterOptions>({
-    priceRange: [realPriceRange[0], realPriceRange[1]], // Utiliser la vraie plage de prix
+    priceRange: [0, 1000000], // Plage très large pour ne pas filtrer au début
     minRating: 0,
     selectedAmenities: [],
     accommodationType: "all",
     searchTerm: "",
     selectedCities: [],
   });
+
   const { pathname } = useLocation();
   const { setTransaction } = useTransaction();
   const navigate = useNavigate();
 
   // Filtrer les hébergements (modifié pour supporter les villes)
+  useEffect(() => {
+    if (hebergements.length > 0 && filters.priceRange[1] === 1000000) {
+      // Seulement si on a encore les valeurs par défaut
+      setFilters((prev) => ({
+        ...prev,
+        priceRange: [realPriceRange[0], realPriceRange[1]],
+      }));
+    }
+  }, [hebergements, realPriceRange, filters.priceRange]);
+
+  // Filtrer les hébergements
   const filteredAccommodations = useMemo(() => {
+    if (hebergements.length === 0) return []; // Pas d'hébergements = pas de résultats
+
     return hebergements.filter((accommodation) => {
       // Filtre par recherche textuelle
       if (
@@ -710,7 +696,7 @@ const Hebergements = () => {
         return false;
       }
 
-      // Filtre par ville - nouveau filtre
+      // Filtre par ville
       if (filters.selectedCities.length > 0) {
         if (!filters.selectedCities.includes(accommodation.ville as City)) {
           return false;
@@ -723,67 +709,42 @@ const Hebergements = () => {
         if (accommodation.owner !== isOwner) return false;
       }
 
-      // Filtre par prix (modifié pour les options)
-      let priceMatches = false;
-      if (accommodation.options && accommodation.options.length > 0) {
-        // Vérifier si au moins une option est dans la fourchette de prix
-        priceMatches = accommodation.options.some(
-          (option) =>
-            option.price >= filters.priceRange[0] &&
-            option.price <= filters.priceRange[1]
-        );
-      } else if (accommodation.price) {
-        // Vérifier le prix principal
-        priceMatches =
-          accommodation.price >= filters.priceRange[0] &&
-          accommodation.price <= filters.priceRange[1];
+      // Filtre par prix - seulement si la plage n'est pas à sa valeur par défaut
+      if (filters.priceRange[1] !== 1000000) {
+        let priceMatches = false;
+        if (accommodation.options && accommodation.options.length > 0) {
+          priceMatches = accommodation.options.some(
+            (option) =>
+              option.price >= filters.priceRange[0] &&
+              option.price <= filters.priceRange[1]
+          );
+        } else if (accommodation.price) {
+          priceMatches =
+            accommodation.price >= filters.priceRange[0] &&
+            accommodation.price <= filters.priceRange[1];
+        }
+        if (!priceMatches) return false;
       }
-      if (!priceMatches) return false;
 
       // Filtre par note
-      if (accommodation.rating < filters.minRating) {
+      if (filters.minRating > 0 && accommodation.rating < filters.minRating) {
         return false;
       }
-
-      // Filtre par équipements (modifié pour supporter les options)
-      // if (filters.selectedAmenities.length > 0) {
-      //   let accommodationAmenities: string[] = [];
-
-      //   // Commodités de l'hébergement principal
-      //   if (accommodation.amenities) {
-      //     accommodationAmenities = Object.values(accommodation.amenities)
-      //       .flat()
-      //       .filter((amenity) => amenity.available)
-      //       .map((amenity) => amenity.name);
-      //   }
-
-      //   // Commodités des options
-      //   if (accommodation.options) {
-      //     accommodation.options.forEach((option) => {
-      //       const optionAmenities = Object.values(option.amenities)
-      //         .flat()
-      //         .filter((amenity) => amenity.available)
-      //         .map((amenity) => amenity.name);
-      //       accommodationAmenities = [
-      //         ...accommodationAmenities,
-      //         ...optionAmenities,
-      //       ];
-      //     });
-      //   }
-
-      //   // Supprimer les doublons
-      //   accommodationAmenities = [...new Set(accommodationAmenities)];
-
-      //   const hasAllSelectedAmenities = filters.selectedAmenities.every(
-      //     (selectedAmenity) => accommodationAmenities.includes(selectedAmenity)
-      //   );
-
-      //   if (!hasAllSelectedAmenities) return false;
-      // }
 
       return true;
     });
   }, [hebergements, filters]);
+
+  // Mettre à jour la plage de prix des filtres une fois les hébergements chargés
+  useEffect(() => {
+    if (hebergements.length > 0 && filters.priceRange[1] === 1000000) {
+      // Seulement si on a encore les valeurs par défaut
+      setFilters((prev) => ({
+        ...prev,
+        priceRange: [realPriceRange[0], realPriceRange[1]],
+      }));
+    }
+  }, [hebergements, realPriceRange, filters.priceRange]);
 
   useEffect(() => {
     window.scrollTo(0, 0);

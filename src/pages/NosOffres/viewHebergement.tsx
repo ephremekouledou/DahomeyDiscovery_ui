@@ -251,7 +251,7 @@ const ViewHebergementContent: React.FC<IAccommodationData> = ({
 
         {/* Miniatures */}
         <div className="absolute bottom-4 left-4 flex space-x-2">
-          {images.slice(0, 5).map((image, index) => (
+          {images.map((image, index) => (
             <button
               key={index}
               onClick={() => setCurrentImageIndex(index)}
@@ -284,7 +284,7 @@ const ViewHebergementContent: React.FC<IAccommodationData> = ({
               {ville}
             </span> */}
           </div>
-          {currentPrice && (
+          {currentPrice && !has_options && (
             <div className="text-left md:text-right">
               <div className="text-3xl font-bold text-blue-600">
                 {currentPrice} FCFA
