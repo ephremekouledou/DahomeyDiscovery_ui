@@ -2,7 +2,7 @@ import { Button, Flex, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import NavBar from "../../components/navBar/navBar";
-import { Star, Check,  Building2 } from "lucide-react";
+import { Star, Check, Building2 } from "lucide-react";
 import { useTransaction } from "../../context/transactionContext";
 import Footer from "../../components/footer/footer";
 import BeginningButton from "../../components/dededed/BeginingButton";
@@ -30,7 +30,10 @@ const ViewHebergementContent: React.FC<ViewHebergementContentProps> = ({
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [selectedOption, setSelectedOption] =
     useState<IAccommodationOption | null>(null);
-  const [isOpenOption, setIsOpenOption] = useState(false);
+
+  // Changement : une option spécifique pour le modal des détails
+  const [optionDetailModal, setOptionDetailModal] =
+    useState<IAccommodationOption | null>(null);
 
   // Si il y a des options, on ne sélectionne pas par défaut
   useEffect(() => {
@@ -78,7 +81,7 @@ const ViewHebergementContent: React.FC<ViewHebergementContentProps> = ({
       <div
         key={index}
         onClick={() => setSelectedOption(option)}
-        className={`relative cursor-pointer rounded-lg border-2 transition-all duration-300 overflow-hidden ${
+        className={`relative cursor-pointer rounded-lg border-2 transition-all duration-300 overflow-hidden flex flex-col ${
           isSelected
             ? "border-blue-500 shadow-lg bg-blue-50"
             : "border-gray-200 hover:border-gray-300 hover:shadow-md"
@@ -108,7 +111,7 @@ const ViewHebergementContent: React.FC<ViewHebergementContentProps> = ({
         </div>
 
         {/* Content */}
-        <div className="p-4">
+        <div className="p-4 flex flex-col flex-grow">
           <div className="flex justify-between items-start mb-2">
             <h4 className="font-semibold text-lg text-gray-800 flex-1 mr-4">
               {option.name}
@@ -125,8 +128,8 @@ const ViewHebergementContent: React.FC<ViewHebergementContentProps> = ({
             {option.description}
           </p>
 
-          {/* Détails supplémentaires */}
-          <div className="space-y-2 text-sm text-gray-600">
+          {/* Détails supplémentaires - qui poussent le bouton vers le bas */}
+          <div className="space-y-2 text-sm text-gray-600 mb-4 flex-grow">
             {option.size && (
               <div className="flex justify-between">
                 <span>Superficie:</span>
@@ -148,6 +151,19 @@ const ViewHebergementContent: React.FC<ViewHebergementContentProps> = ({
               </div>
             )}
           </div>
+
+          {/* Bouton Details - toujours en bas */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              // Changement : on définit l'option spécifique pour le modal
+              setOptionDetailModal(option);
+            }}
+            className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2 font-medium w-fit mt-auto"
+          >
+            <Building2 className="w-5 h-5" />
+            Details
+          </button>
         </div>
       </div>
     );
@@ -175,7 +191,7 @@ const ViewHebergementContent: React.FC<ViewHebergementContentProps> = ({
           src={HandleGetFileLink(
             accommodation.images[currentImageIndex]?.file as string
           )}
-          alt={`${name} - Image ${currentImageIndex + 1}`}
+          alt={`${accommodation.name} - Image ${currentImageIndex + 1}`}
           className="w-full h-96 object-cover"
           onError={(e) => {
             e.currentTarget.src = "/placeholder-hotel.jpg";
@@ -299,51 +315,6 @@ const ViewHebergementContent: React.FC<ViewHebergementContentProps> = ({
             </div>
           )}
 
-        {/* Informations sur l'option sélectionnée */}
-        {selectedOption && (
-          <div className="mb-8 p-6 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="text-lg font-semibold text-blue-800 mb-4">
-              Option sélectionnée : {selectedOption.name}
-            </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              {selectedOption.vue_sur && (
-                <div>
-                  <span className="font-medium">Vue sur:</span>{" "}
-                  {selectedOption.vue_sur}
-                </div>
-              )}
-              {selectedOption.childPolicy && (
-                <div>
-                  <span className="font-medium">Politique enfants:</span>{" "}
-                  {selectedOption.childPolicy}
-                </div>
-              )}
-              {selectedOption.additionalBeds && (
-                <div>
-                  <span className="font-medium">Lits supplémentaires:</span>{" "}
-                  {selectedOption.additionalBeds}
-                </div>
-              )}
-              <div className="text-xl font-bold text-blue-600">
-                Prix: {selectedOption.price?.toLocaleString()} FCFA / nuit
-              </div>
-              <button
-                onClick={() => setIsOpenOption(true)}
-                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2 font-medium"
-              >
-                <Building2 className="w-5 h-5" />
-                Voir tous les services et équipements
-              </button>
-              <AccommodationOptionModal
-                isOpen={isOpenOption}
-                onClose={() => setIsOpenOption(false)}
-                optionData={selectedOption}
-                getFileLink={HandleGetFileLink}
-              />
-            </div>
-          </div>
-        )}
-
         {/* Bouton de réservation */}
         <div className="mt-8 pt-6 border-t">
           <Button
@@ -393,6 +364,16 @@ const ViewHebergementContent: React.FC<ViewHebergementContentProps> = ({
           </Button>
         </div>
       </div>
+
+      {/* Modal des détails d'option - Changement : placé ici et contrôlé par optionDetailModal */}
+      {optionDetailModal && (
+        <AccommodationOptionModal
+          isOpen={true}
+          onClose={() => setOptionDetailModal(null)}
+          optionData={optionDetailModal}
+          getFileLink={HandleGetFileLink}
+        />
+      )}
     </div>
   );
 };
