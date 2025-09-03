@@ -2,7 +2,7 @@ import { Button, Flex, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import NavBar from "../../components/navBar/navBar";
-import { Star, Check } from "lucide-react";
+import { Star, Check,  Building2 } from "lucide-react";
 import { useTransaction } from "../../context/transactionContext";
 import Footer from "../../components/footer/footer";
 import BeginningButton from "../../components/dededed/BeginingButton";
@@ -12,21 +12,17 @@ import {
 } from "../../sdk/models/hebergements";
 import { HebergementsAPI } from "../../sdk/api/hebergements";
 import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
-import { VillesAPI } from "../../sdk/api/villes";
-import { IVille } from "../../sdk/models/villes";
+import {
+  AccommodationOptionModal,
+  HotelServicesModal,
+} from "./hebergementsModals";
 
-const ViewHebergementContent: React.FC<IAccommodationData> = ({
-  _id,
-  name,
-  price,
-  rating,
-  review_count,
-  // ville,
-  images,
-  description,
-  amenities,
-  has_options,
-  options,
+interface ViewHebergementContentProps {
+  accommodation: IAccommodationData;
+}
+
+const ViewHebergementContent: React.FC<ViewHebergementContentProps> = ({
+  accommodation,
 }) => {
   const { setTransaction } = useTransaction();
   const navigate = useNavigate();
@@ -34,20 +30,28 @@ const ViewHebergementContent: React.FC<IAccommodationData> = ({
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [selectedOption, setSelectedOption] =
     useState<IAccommodationOption | null>(null);
+  const [isOpenOption, setIsOpenOption] = useState(false);
 
-  // Si il y a des options, on sélectionne la première par défaut
+  // Si il y a des options, on ne sélectionne pas par défaut
   useEffect(() => {
-    if (has_options && options && options.length > 0) {
-      setSelectedOption(null); // Ne pas sélectionner par défaut, forcer l'utilisateur à choisir
+    if (
+      accommodation.has_options &&
+      accommodation.options &&
+      accommodation.options.length > 0
+    ) {
+      setSelectedOption(null);
     }
-  }, [options]);
+  }, [accommodation]);
 
   const nextImage = (): void => {
-    setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    setCurrentImageIndex((prev) => (prev + 1) % accommodation.images.length);
   };
 
   const prevImage = (): void => {
-    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+    setCurrentImageIndex(
+      (prev) =>
+        (prev - 1 + accommodation.images.length) % accommodation.images.length
+    );
   };
 
   const renderStars = (rating: number): React.ReactNode[] => {
@@ -63,85 +67,6 @@ const ViewHebergementContent: React.FC<IAccommodationData> = ({
       />
     ));
   };
-
-  // const getBalancedAmenities = (amenitiesToUse: any): BalancedAmenities => {
-  //   const amenityEntries = Object.entries(amenitiesToUse) as [
-  //     string,
-  //     Amenity[]
-  //   ][];
-  //   const totalSections = amenityEntries.length;
-  //   const midPoint = Math.ceil(totalSections / 2);
-
-  //   return {
-  //     leftColumn: amenityEntries.slice(0, midPoint),
-  //     rightColumn: amenityEntries.slice(midPoint),
-  //   };
-  // };
-
-  // // Mapping des clés vers des titres en français
-  // const amenityTitles: Record<string, string> = {
-  //   entertainment: "Divertissement",
-  //   heating: "Chauffage et climatisation",
-  //   internet: "Internet et bureau",
-  //   kitchen: "Cuisine et salle à manger",
-  //   location: "Caractéristiques de l'emplacement",
-  //   parking: "Parking et installations",
-  //   safety: "Sécurité",
-  //   comfort: "Équipements de base",
-  //   laundry: "Lave-linge et sèche-linge",
-  // };
-
-  // const renderAmenitySection = (
-  //   title: string,
-  //   amenities: string
-  // ): React.ReactNode | null => {
-  //   if (!amenities || amenities.length === 0) return null;
-
-  //   return (
-  //     <div className="mb-6">
-  //       <h4 className="font-semibold text-gray-800 mb-3 text-base">{title}</h4>
-  //       <div className="space-y-3">
-  //         {/* {amenities.map((amenity, index) => {
-  //           const IconComponent = amenity.icon;
-  //           return (
-  //             <div
-  //               key={index}
-  //               className={`flex items-start space-x-3 ${
-  //                 !amenity.available ? "opacity-60" : ""
-  //               }`}
-  //             >
-  //               <div className="flex-shrink-0 mt-0.5">
-  //                 <IconComponent
-  //                   size={18}
-  //                   className={
-  //                     amenity.available ? "text-green-600" : "text-red-500"
-  //                   }
-  //                 />
-  //               </div>
-  //               <div className="flex-1 min-w-0">
-  //                 <span
-  //                   className={`block ${
-  //                     !amenity.available
-  //                       ? "line-through text-gray-500"
-  //                       : "text-gray-700"
-  //                   } text-sm font-medium`}
-  //                 >
-  //                   {amenity.name}
-  //                 </span>
-  //                 {amenity.description && (
-  //                   <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-  //                     {amenity.description}
-  //                   </p>
-  //                 )}
-  //               </div>
-  //             </div>
-  //           );
-  //         })} */}
-  //         {amenities}
-  //       </div>
-  //     </div>
-  //   );
-  // };
 
   const renderOptionCard = (
     option: IAccommodationOption,
@@ -173,60 +98,91 @@ const ViewHebergementContent: React.FC<IAccommodationData> = ({
         {/* Image */}
         <div className="aspect-video w-full overflow-hidden">
           <img
-            src={HandleGetFileLink(option.photo[0].file as string)}
+            src={HandleGetFileLink(option.photo[0]?.file as string)}
             alt={option.name}
             className="w-full h-full object-cover"
+            onError={(e) => {
+              e.currentTarget.src = "/placeholder-room.jpg";
+            }}
           />
         </div>
 
         {/* Content */}
         <div className="p-4">
           <div className="flex justify-between items-start mb-2">
-            <h4 className="font-semibold text-lg text-gray-800">
+            <h4 className="font-semibold text-lg text-gray-800 flex-1 mr-4">
               {option.name}
             </h4>
-            <div className="text-right">
+            <div className="text-right flex-shrink-0">
               <div className="text-xl font-bold text-blue-600">
-                {option.price} FCFA
+                {option.price?.toLocaleString()} FCFA
               </div>
               <div className="text-sm text-gray-600">par nuit</div>
             </div>
           </div>
-          <p className="text-gray-600 text-sm leading-relaxed">
+
+          <p className="text-gray-600 text-sm leading-relaxed mb-3">
             {option.description}
           </p>
+
+          {/* Détails supplémentaires */}
+          <div className="space-y-2 text-sm text-gray-600">
+            {option.size && (
+              <div className="flex justify-between">
+                <span>Superficie:</span>
+                <span className="font-medium">{option.size}</span>
+              </div>
+            )}
+            {option.maxGuests && (
+              <div className="flex justify-between">
+                <span>Capacité:</span>
+                <span className="font-medium">
+                  {option.maxGuests} personnes
+                </span>
+              </div>
+            )}
+            {option.bedType && (
+              <div className="flex justify-between">
+                <span>Type de lit:</span>
+                <span className="font-medium">{option.bedType}</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
   };
 
-  // Déterminer les équipements à afficher
-  const amenitiesToDisplay = selectedOption
-    ? selectedOption.amenities
-    : amenities;
-
-  const currentPrice = selectedOption ? selectedOption.price : price;
-
-  // Déterminer si le bouton de réservation doit être actif
-  const isReservationEnabled = options ? selectedOption !== null : true;
+  const currentPrice = selectedOption
+    ? selectedOption.price
+    : accommodation.price;
+  const isReservationEnabled = accommodation.has_options
+    ? selectedOption !== null
+    : true;
 
   return (
-    <div className="flex-1 w-fit">
-      <div>
-        {/* En-tête avec le nom de l'hébergement */}
-        <div className="bg-white shadow-md p-6">
-          <h2 className="text-2xl font-bold text-gray-800">{name}</h2>
-        </div>
+    <div className="flex-1 w-full">
+      {/* En-tête avec le nom de l'hébergement */}
+      <div className="bg-white shadow-md p-6">
+        <h2 className="text-2xl font-bold text-gray-800">
+          {accommodation.name}
+        </h2>
       </div>
+
       {/* Galerie d'images */}
       <div className="relative bg-gray-100">
         <img
-          src={HandleGetFileLink(images[currentImageIndex].file as string)}
+          src={HandleGetFileLink(
+            accommodation.images[currentImageIndex]?.file as string
+          )}
           alt={`${name} - Image ${currentImageIndex + 1}`}
-          className="w-full h-150 object-cover"
+          className="w-full h-96 object-cover"
+          onError={(e) => {
+            e.currentTarget.src = "/placeholder-hotel.jpg";
+          }}
         />
 
-        {images.length > 1 && (
+        {accommodation.images.length > 1 && (
           <>
             <button
               onClick={prevImage}
@@ -244,50 +200,60 @@ const ViewHebergementContent: React.FC<IAccommodationData> = ({
             </button>
 
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-3 py-1 rounded-full text-sm">
-              {currentImageIndex + 1} / {images.length}
+              {currentImageIndex + 1} / {accommodation.images.length}
             </div>
           </>
         )}
 
         {/* Miniatures */}
-        <div className="absolute bottom-4 left-4 flex space-x-2">
-          {images.map((image, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentImageIndex(index)}
-              className={`w-12 h-8 rounded overflow-hidden border-2 transition-all ${
-                index === currentImageIndex
-                  ? "border-white"
-                  : "border-transparent opacity-70"
-              }`}
-              aria-label={`Aller à l'image ${index + 1}`}
-            >
-              <img
-                src={HandleGetFileLink(image.file as string)}
-                alt={`Miniature ${index + 1}`}
-                className="w-full h-full object-cover"
-              />
-            </button>
-          ))}
-        </div>
+        {accommodation.images.length > 1 && (
+          <div className="absolute bottom-4 left-4 flex space-x-2">
+            {accommodation.images.slice(0, 5).map((image, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentImageIndex(index)}
+                className={`w-12 h-8 rounded overflow-hidden border-2 transition-all ${
+                  index === currentImageIndex
+                    ? "border-white"
+                    : "border-transparent opacity-70"
+                }`}
+                aria-label={`Aller à l'image ${index + 1}`}
+              >
+                <img
+                  src={HandleGetFileLink(image.file as string)}
+                  alt={`Miniature ${index + 1}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "/placeholder-hotel.jpg";
+                  }}
+                />
+              </button>
+            ))}
+            {accommodation.images.length > 5 && (
+              <div className="w-12 h-8 rounded bg-black bg-opacity-50 flex items-center justify-center text-white text-xs">
+                +{accommodation.images.length - 5}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="p-6">
         {/* Prix et évaluation */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
           <div className="flex items-center space-x-1">
-            {renderStars(rating)}
-            <span className="font-semibold ml-2 text-lg">{rating}</span>
-            <span className="text-gray-600">({review_count} avis)</span>
-            {/* <span className="text-lg font-semibold text-gray-700 flex items-center gap-1">
-              <MapPin size={15} />
-              {ville}
-            </span> */}
+            {renderStars(accommodation.rating)}
+            <span className="font-semibold ml-2 text-lg">
+              {accommodation.rating.toFixed(1)}
+            </span>
+            <span className="text-gray-600">
+              ({accommodation.review_count} avis)
+            </span>
           </div>
-          {currentPrice && !has_options && (
+          {currentPrice && !accommodation.has_options && (
             <div className="text-left md:text-right">
               <div className="text-3xl font-bold text-blue-600">
-                {currentPrice} FCFA
+                {currentPrice.toLocaleString()} FCFA
               </div>
               <div className="text-gray-600">par nuit</div>
             </div>
@@ -299,40 +265,81 @@ const ViewHebergementContent: React.FC<IAccommodationData> = ({
           <h3 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
             À propos de ce logement
           </h3>
-          <p className="text-gray-700 leading-relaxed text-base">
-            {description}
+          <p className="text-gray-700 leading-relaxed text-base whitespace-pre-line">
+            {accommodation.description}
           </p>
         </div>
 
+        {/* Modal des services */}
+        <div className="mb-8">
+          <HotelServicesModal accommodation={accommodation} />
+        </div>
+
         {/* Options disponibles */}
-        {options && options.length > 0 && (
-          <div className="mb-8">
-            <h3 className="text-xl font-semibold mb-6 text-gray-800 border-b pb-2">
-              Options disponibles
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {options.map((option, index) => renderOptionCard(option, index))}
+        {accommodation.has_options &&
+          accommodation.options &&
+          accommodation.options.length > 0 && (
+            <div className="mb-8">
+              <h3 className="text-xl font-semibold mb-6 text-gray-800 border-b pb-2">
+                Options disponibles ({accommodation.options.length})
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {accommodation.options.map((option, index) =>
+                  renderOptionCard(option, index)
+                )}
+              </div>
+              {!selectedOption && (
+                <div className="text-center mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                  <p className="text-amber-800 font-medium">
+                    Sélectionnez une option pour voir les détails et pouvoir
+                    réserver
+                  </p>
+                </div>
+              )}
             </div>
-            {!selectedOption && (
-              <p className="text-center text-gray-600 mt-4 text-sm">
-                Sélectionnez une option pour voir les équipements et pouvoir
-                réserver
-              </p>
-            )}
-          </div>
-        )}
+          )}
 
-        {/* Équipements avec distribution équilibrée */}
-        {amenitiesToDisplay && (
-          <div className="mb-8">
-            <h3 className="text-xl font-semibold mb-6 text-gray-800 border-b pb-2">
-              {selectedOption
-                ? `Équipements - ${selectedOption.name}`
-                : "Ce que propose ce logement"}
-            </h3>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {selectedOption?.amenities}
+        {/* Informations sur l'option sélectionnée */}
+        {selectedOption && (
+          <div className="mb-8 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+            <h4 className="text-lg font-semibold text-blue-800 mb-4">
+              Option sélectionnée : {selectedOption.name}
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              {selectedOption.vue_sur && (
+                <div>
+                  <span className="font-medium">Vue sur:</span>{" "}
+                  {selectedOption.vue_sur}
+                </div>
+              )}
+              {selectedOption.childPolicy && (
+                <div>
+                  <span className="font-medium">Politique enfants:</span>{" "}
+                  {selectedOption.childPolicy}
+                </div>
+              )}
+              {selectedOption.additionalBeds && (
+                <div>
+                  <span className="font-medium">Lits supplémentaires:</span>{" "}
+                  {selectedOption.additionalBeds}
+                </div>
+              )}
+              <div className="text-xl font-bold text-blue-600">
+                Prix: {selectedOption.price?.toLocaleString()} FCFA / nuit
+              </div>
+              <button
+                onClick={() => setIsOpenOption(true)}
+                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2 font-medium"
+              >
+                <Building2 className="w-5 h-5" />
+                Voir tous les services et équipements
+              </button>
+              <AccommodationOptionModal
+                isOpen={isOpenOption}
+                onClose={() => setIsOpenOption(false)}
+                optionData={selectedOption}
+                getFileLink={HandleGetFileLink}
+              />
             </div>
           </div>
         )}
@@ -354,14 +361,14 @@ const ViewHebergementContent: React.FC<IAccommodationData> = ({
                 : isHovered
                 ? "white"
                 : "black",
-              borderRadius: "7px",
+              borderRadius: "8px",
               border: "none",
               fontFamily: "GeneralSans",
               transition: "all 0.3s ease",
               fontSize: "16px",
-              height: "40px",
-              padding: "0 20px",
-              fontWeight: "bold",
+              height: "48px",
+              padding: "0 24px",
+              fontWeight: "600",
               width: "100%",
               cursor: !isReservationEnabled ? "not-allowed" : "pointer",
             }}
@@ -370,10 +377,10 @@ const ViewHebergementContent: React.FC<IAccommodationData> = ({
             onClick={() => {
               if (isReservationEnabled && currentPrice) {
                 setTransaction({
-                  id: _id,
+                  id: accommodation._id,
                   title: selectedOption
-                    ? `${name} - ${selectedOption.name}`
-                    : name,
+                    ? `${accommodation.name} - ${selectedOption.name}`
+                    : accommodation.name,
                   amount: currentPrice,
                 });
                 navigate("/reservations-locations");
@@ -382,7 +389,7 @@ const ViewHebergementContent: React.FC<IAccommodationData> = ({
           >
             {!isReservationEnabled
               ? "Sélectionnez une option pour réserver"
-              : "Réserver maintenant"}
+              : `Réserver maintenant - ${currentPrice?.toLocaleString()} FCFA`}
           </Button>
         </div>
       </div>
@@ -390,43 +397,55 @@ const ViewHebergementContent: React.FC<IAccommodationData> = ({
   );
 };
 
-const ViewHebergement = () => {
-  const { id } = useParams();
+const ViewHebergement: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const [isMobile, setIsMobile] = useState(false);
   const { pathname } = useLocation();
-
-  const [villes, setVilles] = useState<IVille[]>([]);
   const [accommodation, setAccommodation] = useState<IAccommodationData>();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
+  // Fetch accommodation data
   useEffect(() => {
-    HebergementsAPI.GetByID(id as string)
+    if (!id) {
+      setError("ID de l'hébergement manquant");
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    HebergementsAPI.GetByID(id)
       .then((data) => {
-        // console.log("Les villes", villes)
-        // console.log("La ville est", villes.find((ville) => ville._id === accommodation?.ville)?.name)
-        // // data.ville = villes.find((ville) => ville._id === accommodation?.ville)?.name ?? ""
         setAccommodation(data);
         console.log("Hebergement fetched successfully:", data);
       })
       .catch((err) => {
-        console.error("Error fetching villes:", err);
-      });
-  }, [villes]);
-
-  useEffect(() => {
-    VillesAPI.List()
-      .then((data) => {
-        setVilles(data);
-        console.log("Villes fetched successfully:", data);
+        console.error("Error fetching accommodation:", err);
+        setError("Erreur lors du chargement de l'hébergement");
       })
-      .catch((err) => {
-        console.error("Error fetching villes:", err);
+      .finally(() => {
+        setLoading(false);
       });
-  }, []);
+  }, [id]);
 
+  // Fetch cities data
+  // useEffect(() => {
+  //   VillesAPI.List()
+  //     .then((data) => {
+  //       setVilles(data);
+  //       console.log("Villes fetched successfully:", data);
+  //     })
+  //     .catch((err) => {
+  //       console.error("Error fetching villes:", err);
+  //     });
+  // }, []);
+
+  // Scroll to top on pathname change
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
+  // Check mobile viewport
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
@@ -436,26 +455,49 @@ const ViewHebergement = () => {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  if (loading) {
+    return (
+      <Flex justify="center" align="center" style={{ minHeight: "100vh" }}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Chargement de l'hébergement...</p>
+        </div>
+      </Flex>
+    );
+  }
+
+  if (error || !accommodation) {
+    return (
+      <Flex justify="center" align="center" style={{ minHeight: "100vh" }}>
+        <div className="text-center">
+          <p className="text-red-600 text-lg mb-4">
+            {error || "Hébergement non trouvé"}
+          </p>
+          <Button onClick={() => window.history.back()}>Retour</Button>
+        </div>
+      </Flex>
+    );
+  }
+
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
-      {/* Header avec NavBar - Responsive */}
+
+      {/* Header avec NavBar */}
       <div
         className="relative z-20 flex items-center justify-center"
-        style={{
-          backgroundColor: "#FEF1D9",
-        }}
+        style={{ backgroundColor: "#FEF1D9" }}
       >
         <NavBar menu="OFFRES" />
       </div>
 
-      {/* Section héros - Responsive */}
+      {/* Section héros */}
       <Flex
         vertical
         className="relative w-full overflow-hidden"
         style={{
           backgroundImage: `url(${HandleGetFileLink(
-            accommodation?.main_image[0].file as string
+            accommodation.main_image[0]?.file as string
           )})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
@@ -463,19 +505,20 @@ const ViewHebergement = () => {
           paddingBottom: isMobile ? "10vw" : "80px",
         }}
       >
-        {/* Gradient overlay - de la couleur beige/crème vers transparent */}
+        {/* Gradient overlay */}
         <div
           className="absolute inset-0"
           style={{
             background: `linear-gradient(to right, 
-            rgba(250, 235, 215, 0.95) 0%,
-            rgba(250, 235, 215, 0.85) 20%,
-            rgba(250, 235, 215, 0.6) 40%,
-            rgba(250, 235, 215, 0.3) 60%,
-            rgba(250, 235, 215, 0.1) 80%,
-            transparent 100%)`,
+              rgba(250, 235, 215, 0.95) 0%,
+              rgba(250, 235, 215, 0.85) 20%,
+              rgba(250, 235, 215, 0.6) 40%,
+              rgba(250, 235, 215, 0.3) 60%,
+              rgba(250, 235, 215, 0.1) 80%,
+              transparent 100%)`,
           }}
         />
+
         <Flex
           style={{
             maxWidth: "1050px",
@@ -529,7 +572,7 @@ const ViewHebergement = () => {
         </Flex>
       </Flex>
 
-      {/* Contenu principal - Responsive */}
+      {/* Contenu principal */}
       <Flex
         style={{
           width: "100%",
@@ -540,7 +583,6 @@ const ViewHebergement = () => {
         vertical
         gap={0}
       >
-        {/* Section des circuits - Responsive */}
         <Flex
           vertical
           gap="20px"
@@ -549,16 +591,10 @@ const ViewHebergement = () => {
             paddingBottom: isMobile ? "1vw" : "2vw",
           }}
         >
-          {accommodation && (
-            <ViewHebergementContent
-              {...accommodation}
-              key={accommodation._id}
-            />
-          )}
+          <ViewHebergementContent accommodation={accommodation} />
         </Flex>
       </Flex>
 
-      {/* Footer */}
       <Footer />
     </Flex>
   );
