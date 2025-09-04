@@ -5,6 +5,7 @@ import Footer from "../../components/footer/footer";
 import { Button, Flex, Typography } from "antd";
 import NavBar from "../../components/navBar/navBar";
 import {
+  Car,
   Fuel,
   LucideIcon,
   Luggage,
@@ -18,12 +19,57 @@ import BeginningButton from "../../components/dededed/BeginingButton";
 import { ICarRentalData } from "../../sdk/models/vehicules";
 import { VehiculesAPI } from "../../sdk/api/vehicules";
 import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
+import { EquipmentModal, TarificationModal } from "./locationsModal";
+import { DollarCircleFilled } from "@ant-design/icons";
 
 const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
   const { setTransaction } = useTransaction();
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
+  const [showEquipmentModal, setShowEquipmentModal] = useState(false);
+  const [showTarificationModal, setShowTarificationModal] = useState(false);
+  const [_, setImageHeights] = useState<number[]>([]);
+  const [maxHeight, setMaxHeight] = useState<number>(400); // hauteur par défaut augmentée
+
+  // Fonction pour charger les images et déterminer la hauteur max
+  useEffect(() => {
+    const loadImages = async () => {
+      const heights: number[] = [];
+      let max = 320;
+
+      const imagePromises = car.images.map((image, index) => {
+        return new Promise<void>((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            // Calculer la hauteur en gardant le ratio aspect
+            const containerWidth = window.innerWidth; // ou la largeur de votre conteneur
+            const aspectRatio = img.width / img.height;
+            const calculatedHeight = containerWidth / aspectRatio;
+
+            heights[index] = calculatedHeight;
+            if (calculatedHeight > max) {
+              max = calculatedHeight;
+            }
+            resolve();
+          };
+          img.onerror = () => {
+            heights[index] = 320; // hauteur par défaut en cas d'erreur
+            resolve();
+          };
+          img.src = HandleGetFileLink(image.file as string);
+        });
+      });
+
+      await Promise.all(imagePromises);
+      setImageHeights(heights);
+      setMaxHeight(Math.min(max, 500)); // limiter la hauteur maximale à 500px
+    };
+
+    if (car.images && car.images.length > 0) {
+      loadImages();
+    }
+  }, [car.images]);
 
   const nextImage = (): void => {
     setCurrentImageIndex((prev) => (prev + 1) % car.images.length);
@@ -49,68 +95,6 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
     ));
   };
 
-  /* const renderFeatureSection = (
-    title: string,
-    features: CarFeature[]
-  ): React.ReactNode | null => {
-    if (!features || features.length === 0) return null;
-
-    return (
-      <div className="mb-6">
-        <h4 className="font-semibold text-gray-800 mb-3 text-base">{title}</h4>
-        <div className="space-y-3">
-          {features.map((feature, index) => {
-            const IconComponent = feature.icon;
-            return (
-              <div
-                key={index}
-                className={`flex items-start space-x-3 ${
-                  !feature.available ? "opacity-60" : ""
-                }`}
-              >
-                <div className="flex-shrink-0 mt-0.5">
-                  <IconComponent
-                    size={18}
-                    className={
-                      feature.available ? "text-green-600" : "text-red-500"
-                    }
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <span
-                    className={`block ${
-                      !feature.available
-                        ? "line-through text-gray-500"
-                        : "text-gray-700"
-                    } text-sm font-medium`}
-                  >
-                    {feature.name}
-                  </span>
-                  {feature.description && (
-                    <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                      {feature.description}
-                    </p>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-
-  // Mapping des clés vers des titres en français
-  const featureTitles: Record<string, string> = {
-    comfort: "Confort",
-    technology: "Technologie",
-    safety: "Sécurité",
-    entertainment: "Divertissement",
-    connectivity: "Connectivité",
-    climate: "Climatisation",
-    extras: "Équipements supplémentaires",
-  }; */
-
   const getFuelIcon = (fuelType: string): LucideIcon => {
     switch (fuelType) {
       case "Électrique":
@@ -132,40 +116,54 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
           </h2>
         </div>
       </div>
-      {/* Galerie d'images */}
+
+      {/* Galerie d'images avec hauteur adaptive */}
       <div className="relative bg-gray-100">
-        <img
-          src={HandleGetFileLink(car.images[currentImageIndex].file as string)}
-          alt={`${car.brand} ${car.model} - Image ${currentImageIndex + 1}`}
-          className="w-full h-80 object-cover"
-        />
+        <div
+          className="w-full overflow-hidden flex items-center justify-center"
+          style={{ height: `${maxHeight}px` }}
+        >
+          <img
+            src={HandleGetFileLink(
+              car.images[currentImageIndex].file as string
+            )}
+            alt={`${car.brand} ${car.model} - Image ${currentImageIndex + 1}`}
+            className="max-w-full max-h-full object-cover"
+            style={{
+              width: "auto",
+              height: "auto",
+              maxHeight: "100%",
+              maxWidth: "100%",
+            }}
+          />
+        </div>
 
         {car.images.length > 1 && (
           <>
             <button
               onClick={prevImage}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white hover:bg-gray-50 rounded-full p-3 shadow-lg transition-all"
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white hover:bg-gray-50 rounded-full p-3 shadow-lg transition-all z-10"
               aria-label="Image précédente"
             >
               <span className="text-lg font-bold">‹</span>
             </button>
             <button
               onClick={nextImage}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white hover:bg-gray-50 rounded-full p-3 shadow-lg transition-all"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white hover:bg-gray-50 rounded-full p-3 shadow-lg transition-all z-10"
               aria-label="Image suivante"
             >
               <span className="text-lg font-bold">›</span>
             </button>
 
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-3 py-1 rounded-full text-sm">
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-3 py-1 rounded-full text-sm z-10">
               {currentImageIndex + 1} / {car.images.length}
             </div>
           </>
         )}
 
         {/* Miniatures */}
-        <div className="absolute bottom-4 left-4 flex space-x-2">
-          {car.images.slice(0, 5).map((image, index) => (
+        <div className="absolute bottom-4 left-4 flex space-x-2 z-10">
+          {car.images.map((image, index) => (
             <button
               key={index}
               onClick={() => setCurrentImageIndex(index)}
@@ -202,7 +200,7 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
           </div>
           <div className="text-left md:text-right">
             <div className="text-3xl font-bold text-blue-600">
-              {car.price_per_day}€
+              {car.price_per_day} FCFA
             </div>
             <div className="text-gray-600">par jour</div>
           </div>
@@ -263,10 +261,38 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
           <p className="text-gray-700 leading-relaxed text-base">
             {car.description}
           </p>
+          <Flex style={{ gap: "10px", marginTop: "20px" }}>
+            <button
+              onClick={() => setShowEquipmentModal(true)}
+              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Car className="w-5 h-5" />
+              Voir les équipements
+            </button>
+
+            <button
+              onClick={() => setShowTarificationModal(true)}
+              className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+            >
+              <DollarCircleFilled className="w-5 h-5" />
+              Voir la tarification
+            </button>
+          </Flex>
+          <EquipmentModal
+            isOpen={showEquipmentModal}
+            onClose={() => setShowEquipmentModal(false)}
+            equipment={car}
+          />
+
+          <TarificationModal
+            isOpen={showTarificationModal}
+            onClose={() => setShowTarificationModal(false)}
+            tarification={car.tarification}
+          />
         </div>
 
         {/* Équipements avec distribution équilibrée */}
-        <div className="mb-8">
+        {/* <div className="mb-8">
           <h3 className="text-xl font-semibold mb-6 text-gray-800 border-b pb-2">
             Équipements et options
           </h3>
@@ -274,7 +300,7 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {car.features}
           </div>
-        </div>
+        </div> */}
 
         {/* Bouton de location */}
         <div className="mt-8 pt-6 border-t">
@@ -427,7 +453,7 @@ const ViewLocation = () => {
                 textTransform: "uppercase",
               }}
             >
-              Nos hébergements
+              Nos vehicules
             </Typography.Title>
             <Typography.Text
               style={{
