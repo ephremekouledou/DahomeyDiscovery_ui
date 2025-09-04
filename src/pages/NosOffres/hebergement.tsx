@@ -20,7 +20,6 @@ import { IAccommodationData } from "../../sdk/models/hebergements";
 import { HebergementsAPI } from "../../sdk/api/hebergements";
 import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
 import { VillesAPI } from "../../sdk/api/villes";
-import { IVille } from "../../sdk/models/villes";
 import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { PageSettings } from "../../sdk/api/pageMedias";
 
@@ -634,7 +633,6 @@ const Hebergements = () => {
   // const accommodation = createExampleAccommodation();
 
   const [hebergements, setHebergements] = useState<IAccommodationData[]>([]);
-  const [villes, setVilles] = useState<IVille[]>([]);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -778,38 +776,48 @@ const Hebergements = () => {
       });
   }, []);
 
-  useEffect(() => {
-    VillesAPI.List()
-      .then((data) => {
-        setVilles(data);
-        console.log("Villes fetched successfully:", data);
-      })
-      .catch((err) => {
-        console.error("Error fetching villes:", err);
-      });
-  }, []);
+  // useEffect(() => {
+  //   VillesAPI.List()
+  //     .then((data) => {
+  //       setVilles(data);
+  //       console.log("Villes fetched successfully:", data);
+  //     })
+  //     .catch((err) => {
+  //       console.error("Error fetching villes:", err);
+  //     });
+  // }, []);
 
   useEffect(() => {
-    HebergementsAPI.List()
-      .then((data) => {
-        // we replace the id of the ville by the name before setting
-        // Remplacer l'id de la ville par son nom
-        const mappedData = data.map((hebergement: any) => {
-          const villeObj = villes.find(
-            (ville) => ville._id === hebergement.ville
-          );
-          return {
-            ...hebergement,
-            ville: villeObj ? villeObj.name : hebergement.ville,
-          };
-        });
-        setHebergements(mappedData);
-        console.log("Hébergements fetched successfully:", data);
-      })
-      .catch((err) => {
-        console.error("Error fetching hébergements:", err);
-      });
-  }, [villes]);
+    const fetchData = async () => {
+      try {
+        // Fetch both datasets concurrently
+        const [villesData, hebergementsData] = await Promise.all([
+          VillesAPI.List(),
+          HebergementsAPI.List(),
+        ]);
+
+        console.log("Villes fetched successfully:", villesData);
+
+        // Create a lookup map for better performance
+        const villesMap = new Map(
+          villesData.map((ville) => [ville._id, ville.name])
+        );
+
+        // Map hebergements with ville names
+        const mappedHebergements = hebergementsData.map((hebergement) => ({
+          ...hebergement,
+          ville: villesMap.get(hebergement.ville) || hebergement.ville,
+        }));
+
+        setHebergements(mappedHebergements);
+        console.log("Hébergements fetched successfully:", hebergementsData);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const getGridColumns = () => {
     if (isMobile) return 1;
