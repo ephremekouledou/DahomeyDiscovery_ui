@@ -70,10 +70,10 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
   };
 
   const navItems: NavItem[] = [
-    { key: "ACCUEIL", label: "ACCUEIL", path: "/" },
+    { key: "ACCUEIL", label: "Accueil", path: "/" },
     {
       key: "CIRCUITS",
-      label: "NOS CIRCUITS",
+      label: "Circuits",
       subItems: [
         {
           key: "CIRCUIT_SIGNATURE",
@@ -92,24 +92,29 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
         },
       ],
     },
-    {
-      key: "OFFRES",
-      label: "NOS OFFRES",
-      subItems: [
-        {
-          key: "HÉBERGEMENT",
-          label: "Hébergements",
-          path: "/hebergements",
-        },
-        {
-          key: "LOCATION",
-          label: "Location de voiture",
-          path: "/locations",
-        },
-      ],
-    },
-    { key: "A PROPOS", label: "À PROPOS", path: "/a-propos" },
-    { key: "ACTUALITES", label: "ACTUALITÉS", path: "/actualites" },
+    { key: "HÉBERGEMENT", label: "Hébergements", path: "/hebergements" },
+    { key: "LOCATION", label: "Voitures", path: "/locations" },
+    { key: "TRANSFERT", label: "Transferts", path: "/transferts" },
+    { key: "RESTAU", label: "Restaurants", path: "/restaurants" },
+    { key: "ATTRACTION", label: "Attractions", path: "/attractions" },
+    // {
+    //   key: "OFFRES",
+    //   label: "NOS OFFRES",
+    //   subItems: [
+    //     {
+    //       key: "HÉBERGEMENT",
+    //       label: "Hébergements",
+    //       path: "/hebergements",
+    //     },
+    //     {
+    //       key: "LOCATION",
+    //       label: "Location de voiture",
+    //       path: "/locations",
+    //     },
+    //   ],
+    // },
+    // { key: "A PROPOS", label: "À PROPOS", path: "/a-propos" },
+    // { key: "ACTUALITES", label: "ACTUALITÉS", path: "/actualites" },
   ];
 
   // Get responsive font sizes based on device and scroll state
@@ -539,18 +544,6 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
               {/* Desktop and Tablet Navigation */}
               {!isMobile && (
                 <>
-                  {/* First part of nav items */}
-                  <Flex
-                    align="center"
-                    gap={isTablet ? "12px" : "24px"}
-                    flex="1"
-                    justify="flex-end"
-                  >
-                    {navItems
-                      .slice(0, 3)
-                      .map((item) => renderDesktopNavItem(item))}
-                  </Flex>
-
                   {/* Center Logo */}
                   <Flex justify="center" style={{ margin: "0 16px" }}>
                     <Link to="/">
@@ -567,16 +560,14 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
                     </Link>
                   </Flex>
 
-                  {/* Second part of nav items */}
+                  {/* First part of nav items */}
                   <Flex
                     align="center"
                     gap={isTablet ? "12px" : "24px"}
                     flex="1"
-                    justify="flex-start"
+                    justify="flex-end"
                   >
-                    {navItems
-                      .slice(3, 5)
-                      .map((item) => renderDesktopNavItem(item))}
+                    {navItems.map((item) => renderDesktopNavItem(item))}
 
                     <Link to="/reservations-circuits">
                       <Button

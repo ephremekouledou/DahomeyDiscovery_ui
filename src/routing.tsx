@@ -1,9 +1,7 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Acceuil from "./pages/Acceuil/Acceuil";
 import NotFound from "./pages/NotFound";
-import Actualites from "./pages/Actualites/Actualites";
 import BonneAddress from "./pages/BonneAddress/BonneAddress";
-import Apropos from "./pages/Apropos/Apropos";
 import Circuits from "./pages/Circuits/Circuits";
 import { CircuitView } from "./components/CircuitView/CircuitView";
 import CircuitsCartes from "./pages/Circuits/CircuitsCartes";
@@ -15,6 +13,9 @@ import ReservationCircuit from "./pages/Reservations/reservationCircuits";
 import ReservationLocation from "./pages/Reservations/reservationLocations";
 import ViewHebergement from "./pages/NosOffres/viewHebergement";
 import ViewLocation from "./pages/NosOffres/viewLocation";
+import Transferts from "./pages/Transfers/transferts";
+import Restaurants from "./pages/Restaurants/restaurants";
+import Attractions from "./pages/Attractions/attractions";
 
 const router = createBrowserRouter([
   {
@@ -75,15 +76,30 @@ const router = createBrowserRouter([
     errorElement: <NotFound />,
   },
   {
-    path: "/a-propos",
-    element: <Apropos />,
+    path: "/transferts",
+    element: <Transferts />,
     errorElement: <NotFound />,
   },
   {
-    path: "/actualites",
-    element: <Actualites />,
+    path: "/restaurants",
+    element: <Restaurants />,
     errorElement: <NotFound />,
   },
+  {
+    path: "/attractions",
+    element: <Attractions />,
+    errorElement: <NotFound />,
+  },
+  // {
+  //   path: "/a-propos",
+  //   element: <Apropos />,
+  //   errorElement: <NotFound />,
+  // },
+  // {
+  //   path: "/actualites",
+  //   element: <Actualites />,
+  //   errorElement: <NotFound />,
+  // },
   {
     path: "/reservations-circuits",
     element: <ReservationCircuit />,

@@ -469,7 +469,7 @@ const ViewHebergement: React.FC = () => {
         className="relative z-20 flex items-center justify-center"
         style={{ backgroundColor: "#FEF1D9" }}
       >
-        <NavBar menu="OFFRES" />
+        <NavBar menu="HÉBERGEMENT" />
       </div>
 
       {/* Section héros */}

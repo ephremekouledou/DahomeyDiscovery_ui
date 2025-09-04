@@ -822,7 +822,7 @@ const Hebergements = () => {
       <BeginningButton />
       {/* Header avec NavBar */}
       <div className="relative z-20 flex items-center justify-center">
-        <NavBar menu="OFFRES" />
+        <NavBar menu="HÉBERGEMENT" />
       </div>
 
       {/* Section héros - Responsive */}

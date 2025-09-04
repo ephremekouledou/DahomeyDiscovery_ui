@@ -387,7 +387,7 @@ const ViewLocation = () => {
           backgroundColor: "#FEF1D9",
         }}
       >
-        <NavBar menu="OFFRES" />
+        <NavBar menu="LOCATION" />
       </div>
 
       {/* Section héros - Responsive */}
