@@ -39,8 +39,6 @@ import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { PageSettings } from "../../sdk/api/pageMedias";
 import { useScreenSizeResponsive } from "../../components/CircuitView/Timeline";
 
-
-
 const ServicesSection = () => {
   const services = [
     {
@@ -277,7 +275,7 @@ const CarRentalCard: React.FC<CarRentalCardProps> = ({
     <>
       {/* Carte principale */}
       <div
-        className={`bg-white rounded-xl shadow-lg overflow-hidden max-w-sm hover:shadow-xl transition-shadow duration-300 ${className}`}
+        className={`bg-white rounded-xl shadow-lg overflow-hidden w-full max-w-md hover:shadow-xl transition-shadow duration-300 ${className}`}
       >
         <div className="relative">
           <img
@@ -321,7 +319,7 @@ const CarRentalCard: React.FC<CarRentalCardProps> = ({
           </div>
         </div>
 
-        <div className="p-4">
+        <div className="p-5">
           <div className="flex justify-between items-start mb-2">
             <div>
               <h3 className="font-bold text-lg text-gray-800">
@@ -368,25 +366,12 @@ const CarRentalCard: React.FC<CarRentalCardProps> = ({
           </div> */}
 
           {/* Prix et bouton */}
-          <div className="flex items-center justify-between">
-            <div>
-              <span className="text-2xl font-bold text-gray-800">
-                {car.price_per_day}€
-              </span>
-              <span className="text-gray-600 text-sm"> / jour</span>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex-1">
+              <div className="text-xl font-bold text-gray-800">
+                {car.price_per_day} FCFA / jour
+              </div>
             </div>
-
-            {/* <button
-              onClick={openModal}
-              disabled={!car.availability}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 bg-blue-600 hover:bg-blue-700 text-white ${
-                car.availability
-                  ? "bg-blue-600 hover:bg-blue-700 text-white"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
-            >
-              Détails
-            </button> */}
 
             <Button
               type="primary"
@@ -398,10 +383,11 @@ const CarRentalCard: React.FC<CarRentalCardProps> = ({
                 border: "none",
                 fontFamily: "GeneralSans",
                 transition: "all 0.3s ease",
-                fontSize: "16px",
+                fontSize: "14px",
                 height: "40px",
-                padding: "0 20px",
+                padding: "0 16px",
                 fontWeight: "bold",
+                minWidth: "80px",
               }}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
