@@ -7,6 +7,7 @@ import {
   ChevronDown,
   Filter,
   X,
+  Building,
 } from "lucide-react";
 import { Button, Flex, Typography, Drawer } from "antd";
 import NavBar from "../../components/navBar/navBar";
@@ -37,6 +38,15 @@ export const CITIES = [
 ] as const;
 
 export type City = (typeof CITIES)[number];
+
+// Types d'hébergement disponibles
+export const ACCOMMODATION_TYPES = [
+  { value: "hotel", label: "Hôtel" },
+  { value: "appartement", label: "Appartement" },
+  { value: "villa", label: "Villa" },
+] as const;
+
+export type AccommodationType = (typeof ACCOMMODATION_TYPES)[number]["value"];
 
 const BonneAdresse = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -195,6 +205,12 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({
     return `${accommodation.price} FCFA`;
   };
 
+  // Obtenir le label du type d'hébergement
+  const getTypeLabel = (type: string) => {
+    const typeObj = ACCOMMODATION_TYPES.find(t => t.value === type);
+    return typeObj ? typeObj.label : type;
+  };
+
   return (
     <>
       {/* Carte principale */}
@@ -214,6 +230,13 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({
             <span className="text-xs font-semibold text-gray-700 flex items-center gap-1">
               <MapPin size={12} />
               {accommodation.ville}
+            </span>
+          </div>
+          {/* Badge type d'hébergement */}
+          <div className="absolute top-3 right-3 bg-blue-500 bg-opacity-90 rounded-full px-3 py-1">
+            <span className="text-xs font-semibold text-white flex items-center gap-1">
+              <Building size={12} />
+              {getTypeLabel(accommodation.type)}
             </span>
           </div>
         </div>
@@ -290,14 +313,15 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({
   );
 };
 
-// Interface pour les filtres (modifiée avec ville)
+// Interface pour les filtres (modifiée avec type d'hébergement)
 interface FilterOptions {
   priceRange: [number, number];
   minRating: number;
   selectedAmenities: string[];
   accommodationType: "all" | "owner" | "partner";
   searchTerm: string;
-  selectedCities: City[]; // Nouveau filtre par ville
+  selectedCities: City[]; // Filtre par ville
+  selectedTypes: AccommodationType[]; // Nouveau filtre par type d'hébergement
 }
 
 const FilterSection = ({
@@ -313,7 +337,8 @@ const FilterSection = ({
 }) => {
   const [openSections, setOpenSections] = useState({
     type: true,
-    cities: true, // Nouvelle section pour les villes
+    cities: true,
+    accommodationTypes: true, // Nouvelle section pour les types d'hébergement
     price: true,
     rating: true,
     amenities: false,
@@ -348,19 +373,20 @@ const FilterSection = ({
     setFilters({ ...filters, priceRange: newPriceRange });
   };
 
-  // const handleAmenityToggle = (amenity: string) => {
-  //   const newAmenities = filters.selectedAmenities.includes(amenity)
-  //     ? filters.selectedAmenities.filter((a) => a !== amenity)
-  //     : [...filters.selectedAmenities, amenity];
-  //   setFilters({ ...filters, selectedAmenities: newAmenities });
-  // };
-
   // Nouvelle fonction pour gérer les villes
   const handleCityToggle = (city: City) => {
     const newCities = filters.selectedCities.includes(city)
       ? filters.selectedCities.filter((c) => c !== city)
       : [...filters.selectedCities, city];
     setFilters({ ...filters, selectedCities: newCities });
+  };
+
+  // Nouvelle fonction pour gérer les types d'hébergement
+  const handleTypeToggle = (type: AccommodationType) => {
+    const newTypes = filters.selectedTypes.includes(type)
+      ? filters.selectedTypes.filter((t) => t !== type)
+      : [...filters.selectedTypes, type];
+    setFilters({ ...filters, selectedTypes: newTypes });
   };
 
   const clearFilters = () => {
@@ -371,6 +397,7 @@ const FilterSection = ({
       accommodationType: "all",
       searchTerm: "",
       selectedCities: [],
+      selectedTypes: [],
     });
   };
 
@@ -420,7 +447,7 @@ const FilterSection = ({
         )}
       </div>
 
-      {/* Villes - Nouvelle section */}
+      {/* Villes */}
       <div className="mb-6">
         <button
           onClick={() => toggleSection("cities")}
@@ -457,7 +484,44 @@ const FilterSection = ({
         )}
       </div>
 
-      {/* Type d'hébergement */}
+      {/* Types d'hébergement - Nouvelle section */}
+      <div className="mb-6">
+        <button
+          onClick={() => toggleSection("accommodationTypes")}
+          className="flex items-center justify-between w-full text-left font-semibold text-gray-700 mb-3"
+        >
+          <span className="flex items-center gap-2">
+            <Building size={16} />
+            Types d'hébergement
+          </span>
+          {openSections.accommodationTypes ? (
+            <ChevronUp size={16} />
+          ) : (
+            <ChevronDown size={16} />
+          )}
+        </button>
+        {openSections.accommodationTypes && (
+          <div className="space-y-2">
+            {ACCOMMODATION_TYPES.map((type) => (
+              <label key={type.value} className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={filters.selectedTypes.includes(type.value)}
+                  onChange={() => handleTypeToggle(type.value)}
+                  className="mr-2 text-orange-500"
+                />
+                <span className="text-sm text-gray-700">{type.label}</span>
+                {/* Afficher le nombre d'hébergements par type */}
+                <span className="text-xs text-gray-500 ml-auto">
+                  ({accommodations.filter((acc) => acc.type === type.value).length})
+                </span>
+              </label>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Type d'hébergement (Owner/Partner)
       <div className="mb-6">
         <button
           onClick={() => toggleSection("type")}
@@ -496,7 +560,7 @@ const FilterSection = ({
             ))}
           </div>
         )}
-      </div>
+      </div> */}
 
       {/* Prix */}
       <div className="mb-6">
@@ -595,43 +659,11 @@ const FilterSection = ({
           </div>
         )}
       </div>
-
-      {/* Équipements */}
-      {/* <div className="mb-6">
-        <button
-          onClick={() => toggleSection("amenities")}
-          className="flex items-center justify-between w-full text-left font-semibold text-gray-700 mb-3"
-        >
-          Équipements
-          {openSections.amenities ? (
-            <ChevronUp size={16} />
-          ) : (
-            <ChevronDown size={16} />
-          )}
-        </button>
-        {openSections.amenities && (
-          <div className="space-y-2 max-h-60 overflow-y-auto">
-            {allAmenities.map((amenity) => (
-              <label key={amenity} className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={filters.selectedAmenities.includes(amenity)}
-                  onChange={() => handleAmenityToggle(amenity)}
-                  className="mr-2 text-orange-500"
-                />
-                <span className="text-sm text-gray-700">{amenity}</span>
-              </label>
-            ))}
-          </div>
-        )}
-      </div> */}
     </div>
   );
 };
 
 const Hebergements = () => {
-  // const accommodation = createExampleAccommodation();
-
   const [hebergements, setHebergements] = useState<IAccommodationData[]>([]);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
@@ -662,13 +694,14 @@ const Hebergements = () => {
     accommodationType: "all",
     searchTerm: "",
     selectedCities: [],
+    selectedTypes: [], // Nouveau filtre pour les types d'hébergement
   });
 
   const { pathname } = useLocation();
   const { setTransaction } = useTransaction();
   const navigate = useNavigate();
 
-  // Filtrer les hébergements (modifié pour supporter les villes)
+  // Mettre à jour la plage de prix des filtres une fois les hébergements chargés
   useEffect(() => {
     if (hebergements.length > 0 && filters.priceRange[1] === 1000000) {
       // Seulement si on a encore les valeurs par défaut
@@ -679,7 +712,7 @@ const Hebergements = () => {
     }
   }, [hebergements, realPriceRange, filters.priceRange]);
 
-  // Filtrer les hébergements
+  // Filtrer les hébergements (modifié pour supporter les types d'hébergement)
   const filteredAccommodations = useMemo(() => {
     if (hebergements.length === 0) return []; // Pas d'hébergements = pas de résultats
 
@@ -701,7 +734,14 @@ const Hebergements = () => {
         }
       }
 
-      // Filtre par type
+      // Nouveau filtre par type d'hébergement
+      if (filters.selectedTypes.length > 0) {
+        if (!filters.selectedTypes.includes(accommodation.type as AccommodationType)) {
+          return false;
+        }
+      }
+
+      // Filtre par type (owner/partner)
       if (filters.accommodationType !== "all") {
         const isOwner = filters.accommodationType === "owner";
         if (accommodation.owner !== isOwner) return false;
@@ -732,17 +772,6 @@ const Hebergements = () => {
       return true;
     });
   }, [hebergements, filters]);
-
-  // Mettre à jour la plage de prix des filtres une fois les hébergements chargés
-  useEffect(() => {
-    if (hebergements.length > 0 && filters.priceRange[1] === 1000000) {
-      // Seulement si on a encore les valeurs par défaut
-      setFilters((prev) => ({
-        ...prev,
-        priceRange: [realPriceRange[0], realPriceRange[1]],
-      }));
-    }
-  }, [hebergements, realPriceRange, filters.priceRange]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -775,17 +804,6 @@ const Hebergements = () => {
         console.error("Error fetching circuits:", err);
       });
   }, []);
-
-  // useEffect(() => {
-  //   VillesAPI.List()
-  //     .then((data) => {
-  //       setVilles(data);
-  //       console.log("Villes fetched successfully:", data);
-  //     })
-  //     .catch((err) => {
-  //       console.error("Error fetching villes:", err);
-  //     });
-  // }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -1001,6 +1019,14 @@ const Hebergements = () => {
                 {filters.selectedCities.length > 0 && (
                   <span> dans {filters.selectedCities.join(", ")}</span>
                 )}
+                {filters.selectedTypes.length > 0 && (
+                  <span>
+                    {" "}
+                    - {filters.selectedTypes.map(type => 
+                      ACCOMMODATION_TYPES.find(t => t.value === type)?.label || type
+                    ).join(", ")}
+                  </span>
+                )}
               </div>
 
               {/* Message si aucun résultat */}
@@ -1018,6 +1044,7 @@ const Hebergements = () => {
                         accommodationType: "all",
                         searchTerm: "",
                         selectedCities: [],
+                        selectedTypes: [],
                       })
                     }
                     type="primary"

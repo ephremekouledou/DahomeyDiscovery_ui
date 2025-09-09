@@ -262,6 +262,7 @@ export const emptyIAccommodationOption = (): IAccommodationOption => ({
 // Interface principale pour les données d'hébergement
 export interface IAccommodationData extends IDefault, IAccommodationEquipment {
   name: string;
+  type: string;
   price?: number;
   rating: number;
   review_count: number;
@@ -441,6 +442,7 @@ export const emptyIAccommodationData = (): IAccommodationData => ({
   not_delete: false,
   not_update: false,
   name: "",
+  type: "",
   price: 0,
   rating: 0,
   review_count: 0,
@@ -458,6 +460,7 @@ export const emptyIAccommodationData = (): IAccommodationData => ({
 // Interface pour l'ajout/mise à jour d'hébergement
 export interface IAddUpdateAccommodationData extends IAccommodationEquipment {
   name: string;
+  type: string;
   price?: number;
   rating: number;
   review_count: number;
@@ -473,6 +476,7 @@ export interface IAddUpdateAccommodationData extends IAccommodationEquipment {
 
 export const emptyIAccommodationForm = (): IAddUpdateAccommodationData => ({
   name: "",
+  type: "",
   price: 0,
   rating: 0,
   review_count: 0,
