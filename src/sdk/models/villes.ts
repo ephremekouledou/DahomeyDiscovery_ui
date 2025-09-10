@@ -1,3 +1,4 @@
+import { InclusList, ITimeline } from "./circuits";
 import { IDefault, MultiAppFile, WhoTypes } from "./models";
 
 export interface IVilleActivity {
@@ -16,7 +17,12 @@ export interface IVille extends IDefault {
   name: string;
   description: string;
   image: MultiAppFile[];
-  activities: IVilleActivity[];
+  full_description: string;
+  timeline: ITimeline[];
+  inclus: InclusList[];
+  exclus: InclusList[];
+  price: number;
+  price_supp: number;
 }
 
 export const emptyIVille = (): IVille => ({
@@ -36,19 +42,165 @@ export const emptyIVille = (): IVille => ({
   name: "",
   description: "",
   image: [],
-  activities: [],
+  full_description: "",
+  timeline: [],
+  inclus: [],
+  exclus: [],
+  price: 0,
+  price_supp: 0,
 });
 
 export interface IAddUpdateVilleData {
   name: string;
   description: string;
   image: MultiAppFile[];
-  activities: IVilleActivity[];
+  full_description: string;
+  timeline: ITimeline[];
+  inclus: InclusList[];
+  exclus: InclusList[];
+  price: number;
+  price_supp: number;
 }
 
 export const emptyIVilleForm = (): IAddUpdateVilleData => ({
   name: "",
   description: "",
   image: [],
-  activities: [emptyIVilleActivity()],
+  full_description: "",
+  timeline: [],
+  inclus: [],
+  exclus: [],
+  price: 0,
+  price_supp: 0,
 });
+
+export interface JsonVilleStructure extends IDefault {
+  name: string;
+  description: string;
+  image: MultiAppFile[];
+  full_description: string;
+  timeline: {
+    _id: string;
+    times: {
+      _id: string;
+      hour: string;
+      activity: string;
+    }[];
+    title: string;
+    position: string;
+    image: MultiAppFile[];
+  }[];
+  inclus: any[];
+  exclus: any[];
+  times: {
+    _id: string;
+    step: string;
+    hour: string;
+    activity: string;
+  }[];
+  price: number;
+  price_supp: number;
+}
+
+export function jsonVilleToIAddUpdateVilleData(
+  json: JsonVilleStructure
+): IAddUpdateVilleData {
+  return {
+    name: json.name,
+    description: json.description,
+    image: json.image,
+    full_description: json.full_description,
+    timeline: json.timeline.map((tl) => ({
+      _id: tl._id,
+      times: json.times
+        .filter((times) => times.step === tl._id)
+        .map((time) => ({
+          _id: time._id,
+          hour: time.hour,
+          activity: time.activity,
+        })),
+      title: tl.title,
+      position: tl.position,
+      image: tl.image,
+    })),
+    inclus: json.inclus.map((inc) => ({
+      _id: inc._id || "",
+      title: inc.title || "",
+    })),
+    exclus: json.exclus.map((exc) => ({
+      _id: exc._id || "",
+      title: exc.title || "",
+    })),
+    price: json.price,
+    price_supp: json.price_supp,
+  };
+}
+
+export function iAddUpdateVilleDataToJsonVille(
+  circuit: IVille
+): JsonVilleStructure {
+  return {
+    _id: circuit._id,
+    created_at: new Date(),
+    updated_at: new Date(),
+    created_by: {
+      id: "",
+      type: WhoTypes.UnkownWhoType,
+    },
+    updated_by: {
+      id: "",
+      type: WhoTypes.UnkownWhoType,
+    },
+    not_delete: false,
+    not_update: false,
+    name: circuit.name,
+    description: circuit.description,
+    image: circuit.image.map((img) => ({
+      id: img.id,
+      file: img.file,
+      name: img.name,
+      contentType: img.contentType,
+      size: img.size,
+      date: img.date,
+    })),
+    full_description: circuit.full_description,
+    price: circuit.price,
+    price_supp: circuit.price_supp,
+    timeline: circuit.timeline.map((tl) => ({
+      _id: tl._id,
+      times: tl.times.map((time) => ({
+        _id: time._id,
+        hour: time.hour,
+        activity: time.activity,
+      })),
+      title: tl.title,
+      position: tl.position,
+      image: tl.image.map((img) => ({
+        id: img.id,
+        file: img.file,
+        name: img.name,
+        contentType: img.contentType,
+        size: img.size,
+        date: img.date,
+      })),
+    })),
+    inclus: circuit.inclus.map((inc) => ({
+      _id: inc._id,
+      title: inc.title,
+    })),
+    exclus: circuit.exclus.map((exc) => ({
+      _id: exc._id,
+      title: exc.title,
+    })),
+    times: (circuit?.timeline || [])
+      .map((tl) =>
+        (tl.times || []).map((times) => ({
+          _id: times._id,
+          step: tl._id,
+          hour: times.hour,
+          activity: times.activity,
+        }))
+      )
+      .flat(), // Le champ times du JSON semble être séparé et pourrait nécessiter une logique particulière
+  };
+}

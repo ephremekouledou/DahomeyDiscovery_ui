@@ -886,7 +886,7 @@ export const CircuitView = () => {
             justify="center"
             style={{ padding: screenSize.isMobile ? "20px 0" : "0" }}
           >
-            <Link to="/reserver">
+            <Link to="/reservations-circuits">
               <Button
                 type="primary"
                 size="large"

@@ -523,7 +523,7 @@ const FinalElement = ({
           >
             Fin du voyage
           </h3>
-          <p
+          {/* <p
             className={`mb-2 transition-colors duration-500 ${
               isActive ? "text-white/90" : "text-gray-600"
             }`}
@@ -544,7 +544,7 @@ const FinalElement = ({
             }}
           >
             Transfert organisé • Assistance jusqu'au départ
-          </p>
+          </p> */}
           <p
             className={`mt-4 transition-colors duration-500 ${
               isActive ? "text-white/85" : "text-gray-500"
@@ -592,7 +592,7 @@ const FinalElement = ({
         >
           Fin du voyage
         </h3>
-        <p
+        {/* <p
           className={`mb-2 transition-colors duration-500 ${
             isActive ? "text-white/90" : "text-gray-600"
           }`}
@@ -613,7 +613,7 @@ const FinalElement = ({
           }}
         >
           Transfert organisé • Assistance jusqu'au départ
-        </p>
+        </p> */}
         <p
           className={`mt-4 transition-colors duration-500 ${
             isActive ? "text-white/85" : "text-gray-500"
