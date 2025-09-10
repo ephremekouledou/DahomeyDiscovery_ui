@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { CarRentalCardProps } from "./locations";
 import Footer from "../../components/footer/footer";
-import { Button, Flex, Typography } from "antd";
+import { Button, Flex, Image as AntdImage, Typography } from "antd";
 import NavBar from "../../components/navBar/navBar";
 import {
   Car,
@@ -40,7 +40,7 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
 
       const imagePromises = car.images.map((image, index) => {
         return new Promise<void>((resolve) => {
-          const img = new Image();
+          const img = new window.Image();
           img.onload = () => {
             // Calculer la hauteur en gardant le ratio aspect
             const containerWidth = window.innerWidth; // ou la largeur de votre conteneur
@@ -123,7 +123,7 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
           className="w-full overflow-hidden flex items-center justify-center"
           style={{ height: `${maxHeight}px` }}
         >
-          <img
+          <AntdImage
             src={HandleGetFileLink(
               car.images[currentImageIndex].file as string
             )}
@@ -198,12 +198,12 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
               <span>{car.location}</span>
             </div> */}
           </div>
-          <div className="text-left md:text-right">
+          {/* <div className="text-left md:text-right">
             <div className="text-3xl font-bold text-blue-600">
               {car.price_per_day} FCFA
             </div>
             <div className="text-gray-600">par jour</div>
-          </div>
+          </div> */}
         </div>
 
         {/* Spécifications détaillées */}

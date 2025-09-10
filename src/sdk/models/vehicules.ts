@@ -94,6 +94,7 @@ export interface ICarTarification {
   from: number;
   to: number;
   price: number;
+  price_driver: number;
   description: string;
 }
 
@@ -102,6 +103,7 @@ export const emptyICarTarification = (): ICarTarification => ({
   from: 0,
   to: 0,
   price: 0,
+  price_driver: 0,
   description: "",
 });
 

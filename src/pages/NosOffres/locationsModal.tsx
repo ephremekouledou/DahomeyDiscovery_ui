@@ -1,6 +1,5 @@
 import { Modal } from "antd";
 import {
-  Car,
   Euro,
   Shield,
   Navigation,
@@ -8,7 +7,6 @@ import {
   AlertCircle,
   Wrench,
 } from "lucide-react";
-import { useState } from "react";
 import { ICarTarification } from "../../sdk/models/vehicules";
 
 interface EquipmentModalProps {
@@ -219,7 +217,10 @@ export const TarificationModal = ({
                       Durée (jours)
                     </th>
                     <th className="border border-gray-300 px-4 py-3 text-right text-sm font-semibold text-gray-700">
-                      Prix/jour
+                      Prix/jour (sans chauffeur)
+                    </th>
+                    <th className="border border-gray-300 px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                      Prix/jour (avec chauffeur)
                     </th>
                     <th className="border border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-700">
                       Description
@@ -242,6 +243,11 @@ export const TarificationModal = ({
                           {tarif.price} FCFA
                         </span>
                       </td>
+                      <td className="border border-gray-300 px-4 py-3 text-sm font-semibold text-right">
+                        <span className="text-green-600">
+                          {tarif.price_driver} FCFA
+                        </span>
+                      </td>
                       <td className="border border-gray-300 px-4 py-3 text-sm text-gray-600">
                         {tarif.description || "Aucune description"}
                       </td>
@@ -256,111 +262,3 @@ export const TarificationModal = ({
     </Modal>
   );
 };
-
-// Composant principal de démonstration
-export default function CarModalsDemo() {
-  const [showEquipmentModal, setShowEquipmentModal] = useState(false);
-  const [showTarificationModal, setShowTarificationModal] = useState(false);
-
-  // Données d'exemple pour les équipements
-  const sampleEquipment = {
-    siege_bebe: true,
-    siege_bebe_badge: "Gratuit",
-    siege_enfant: true,
-    siege_enfant_badge: "5../../assets/icons//jour",
-    rehausseur: false,
-    rehausseur_badge: "",
-    gps: true,
-    gps_badge: "10FCFA/jour",
-    wifi_portable: true,
-    wifi_portable_badge: "Premium",
-    bluetooth: true,
-    bluetooth_badge: "Inclus",
-    conducteur_supplementaire: true,
-    conducteur_supplementaire_badge: "20FCFA",
-    forfait_peage: false,
-    forfait_peage_badge: "",
-    coffre_toit: true,
-    coffre_toit_badge: "15FCFA/jour",
-    equipement_mobilite_reduite: false,
-    equipement_mobilite_reduite_badge: "",
-    gilet_fluorescent: true,
-    gilet_fluorescent_badge: "Obligatoire",
-    triangle: true,
-    triangle_badge: "Inclus",
-    roue_secours: true,
-    roue_secours_badge: "Standard",
-    kit_ampoules: true,
-    kit_ampoules_badge: "Inclus",
-    cdw: true,
-    cdw_badge: "Premium",
-  };
-
-  // Données d'exemple pour la tarification
-  const sampleTarification = [
-    { _id: "1", from: 1, to: 3, price: 50, description: "Tarif court séjour" },
-    { _id: "2", from: 4, to: 7, price: 45, description: "Tarif semaine" },
-    { _id: "3", from: 8, to: 14, price: 40, description: "Tarif longue durée" },
-    { _id: "4", from: 15, to: 30, price: 35, description: "Tarif mensuel" },
-  ];
-
-  return (
-    <div className="p-8 space-y-4">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        Gestion des Modales Véhicule
-      </h1>
-
-      <div className="flex gap-4">
-        <button
-          onClick={() => setShowEquipmentModal(true)}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Car className="w-5 h-5" />
-          Voir les équipements
-        </button>
-
-        <button
-          onClick={() => setShowTarificationModal(true)}
-          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-        >
-          <Euro className="w-5 h-5" />
-          Voir la tarification
-        </button>
-      </div>
-
-      <div className="bg-gray-100 p-4 rounded-lg">
-        <h3 className="font-semibold mb-2">Instructions d'utilisation :</h3>
-        <ul className="text-sm text-gray-600 space-y-1">
-          <li>
-            • La modale des équipements se charge avec les données de
-            l'interface ICarEquipment
-          </li>
-          <li>
-            • La modale de tarification ne s'affiche que si tarification.length
-            0
-          </li>
-          <li>
-            • Les équipements sont organisés par catégories avec des indicateurs
-            visuels
-          </li>
-          <li>
-            • La tarification est présentée sous forme de tableau avec calcul
-            automatique
-          </li>
-        </ul>
-      </div>
-
-      <EquipmentModal
-        isOpen={showEquipmentModal}
-        onClose={() => setShowEquipmentModal(false)}
-        equipment={sampleEquipment}
-      />
-
-      <TarificationModal
-        isOpen={showTarificationModal}
-        onClose={() => setShowTarificationModal(false)}
-        tarification={sampleTarification}
-      />
-    </div>
-  );
-}
