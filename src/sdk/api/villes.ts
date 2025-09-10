@@ -70,24 +70,25 @@ export class VillesAPI {
         });
       }
 
-      data.activities.forEach((activity, index) => {
-        activity.image.map((file, indexj) => {
-          if (file.file instanceof File) {
-            const activityPromise = (villeImagePromise = FileAPI.Upload(
-              file.file,
-              "villes",
-              file.name
-            )
-              .then((id: string) => {
-                data.activities[index].image[indexj].file = id;
-                activitiesPromises.push(activityPromise);
-              })
-              .catch((err: any) => {
-                throw handleErr(err);
-              }));
-          }
+      if (data.timeline !== undefined) {
+        data.timeline.forEach((option, index) => {
+          option.image.map((file, indexj) => {
+            if (file.file instanceof File) {
+              activitiesPromises.push(
+                FileAPI.Upload(file.file, "villes", file.name)
+                  .then((id: string) => {
+                    if (data.timeline !== undefined) {
+                      data.timeline[index].image[indexj].file = id;
+                    }
+                  })
+                  .catch((err: any) => {
+                    throw handleErr(err);
+                  })
+              );
+            }
+          });
         });
-      });
+      }
 
       // Attendre que tous les uploads soient terminés
       Promise.all([villeImagePromise, ...activitiesPromises].filter(Boolean))
@@ -98,14 +99,18 @@ export class VillesAPI {
               data.image[index].file === null ? "" : data.image[index].file;
           });
 
-          data.activities.map((_, index) => {
-            data.activities[index].image.map((_, indexj) => {
-              data.activities[index].image[indexj].file =
-                data.activities[index].image[indexj].file === null
-                  ? ""
-                  : data.activities[index].image[indexj].file;
+          if (data.timeline !== undefined) {
+            data.timeline.forEach((option, index) => {
+              option.image.map((_, indexj) => {
+                if (data.timeline !== undefined) {
+                  data.timeline[index].image[indexj].file =
+                    data.timeline[index].image[indexj].file === null
+                      ? ""
+                      : data.timeline[index].image[indexj].file;
+                }
+              });
             });
-          });
+          }
 
           // Envoi des données
           return axiosSiteData.post(url, data, axiosSiteDataConfig);
@@ -145,24 +150,25 @@ export class VillesAPI {
         });
       }
 
-      data.activities.forEach((activity, index) => {
-        activity.image.map((file, indexj) => {
-          if (file.file instanceof File) {
-            const activityPromise = (villeImagePromise = FileAPI.Upload(
-              file.file,
-              "villes",
-              file.name
-            )
-              .then((id: string) => {
-                data.activities[index].image[indexj].file = id;
-                activitiesPromises.push(activityPromise);
-              })
-              .catch((err: any) => {
-                throw handleErr(err);
-              }));
-          }
+      if (data.timeline !== undefined) {
+        data.timeline.forEach((option, index) => {
+          option.image.map((file, indexj) => {
+            if (file.file instanceof File) {
+              activitiesPromises.push(
+                FileAPI.Upload(file.file, "villes", file.name)
+                  .then((id: string) => {
+                    if (data.timeline !== undefined) {
+                      data.timeline[index].image[indexj].file = id;
+                    }
+                  })
+                  .catch((err: any) => {
+                    throw handleErr(err);
+                  })
+              );
+            }
+          });
         });
-      });
+      }
 
       // Attendre que tous les uploads soient terminés
       Promise.all([villeImagePromise, ...activitiesPromises].filter(Boolean))
@@ -173,14 +179,18 @@ export class VillesAPI {
               data.image[index].file === null ? "" : data.image[index].file;
           });
 
-          data.activities.map((_, index) => {
-            data.activities[index].image.map((_, indexj) => {
-              data.activities[index].image[indexj].file =
-                data.activities[index].image[indexj].file === null
-                  ? ""
-                  : data.activities[index].image[indexj].file;
+          if (data.timeline !== undefined) {
+            data.timeline.forEach((option, index) => {
+              option.image.map((_, indexj) => {
+                if (data.timeline !== undefined) {
+                  data.timeline[index].image[indexj].file =
+                    data.timeline[index].image[indexj].file === null
+                      ? ""
+                      : data.timeline[index].image[indexj].file;
+                }
+              });
             });
-          });
+          }
 
           // Envoi des données
           return axiosSiteData.put(url, data, axiosSiteDataConfig);
