@@ -1,5 +1,6 @@
 import { IDefault, MultiAppFile, WhoTypes } from "./models";
 import { IVilleActivity } from "./villes";
+import { v4 } from "uuid";
 
 export interface IAcceuilCircuitCard extends IVilleActivity {
   category: string;
@@ -24,6 +25,20 @@ export const emptyIAcceuilComment = (): IAcceuilComment => ({
   name: "",
   lieu_origine: "",
   description: "",
+});
+
+export interface IRestaurantSettings {
+  _id: string;
+  type: string;
+  image: MultiAppFile[];
+  rotation: string;
+}
+
+export const emptyIRestaurantSettings = (): IRestaurantSettings => ({
+  _id: v4(),
+  type: "",
+  image: [],
+  rotation: "0",
 });
 
 export interface IPageMedia extends IDefault {
@@ -54,6 +69,11 @@ export interface IPageMedia extends IDefault {
   locations_background_van: MultiAppFile[];
   locations_carrousel: MultiAppFile[];
   a_propos_general_carrousel: MultiAppFile[];
+  restaurant_title: string;
+  restaurant_subtitle: string;
+  restaurant_description: string;
+  restaurants: IRestaurantSettings[];
+  restaurant_catalogue: MultiAppFile[];
 }
 
 export const emptyIPageMedia = (): IPageMedia => ({
@@ -99,6 +119,11 @@ export const emptyIPageMedia = (): IPageMedia => ({
   locations_background_van: [],
   locations_carrousel: [],
   a_propos_general_carrousel: [],
+  restaurant_title: "",
+  restaurant_subtitle: "",
+  restaurant_description: "",
+  restaurants: [],
+  restaurant_catalogue: [],
 });
 
 export interface IAddUpdatePageMedia {
@@ -129,4 +154,9 @@ export interface IAddUpdatePageMedia {
   locations_background_van: MultiAppFile[];
   locations_carrousel: MultiAppFile[];
   a_propos_general_carrousel: MultiAppFile[];
+  restaurant_title: string;
+  restaurant_subtitle: string;
+  restaurant_description: string;
+  restaurants: IRestaurantSettings[];
+  restaurant_catalogue: MultiAppFile[];
 }
