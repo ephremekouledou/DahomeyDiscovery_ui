@@ -16,6 +16,8 @@ import ViewLocation from "./pages/NosOffres/viewLocation";
 import Transferts from "./pages/Transfers/transferts";
 import Restaurants from "./pages/Restaurants/restaurants";
 import Attractions from "./pages/Attractions/attractions";
+import Apropos from "./pages/Apropos/Apropos";
+import Actualites from "./pages/Actualites/Actualites";
 
 const router = createBrowserRouter([
   {
@@ -90,16 +92,16 @@ const router = createBrowserRouter([
     element: <Attractions />,
     errorElement: <NotFound />,
   },
-  // {
-  //   path: "/a-propos",
-  //   element: <Apropos />,
-  //   errorElement: <NotFound />,
-  // },
-  // {
-  //   path: "/actualites",
-  //   element: <Actualites />,
-  //   errorElement: <NotFound />,
-  // },
+  {
+    path: "/a-propos",
+    element: <Apropos />,
+    errorElement: <NotFound />,
+  },
+  {
+    path: "/actualites",
+    element: <Actualites />,
+    errorElement: <NotFound />,
+  },
   {
     path: "/reservations-circuits",
     element: <ReservationCircuit />,
