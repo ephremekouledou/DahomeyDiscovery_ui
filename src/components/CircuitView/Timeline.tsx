@@ -299,6 +299,7 @@ const TimelineItem = ({
                 ? `${getResponsiveStyles.imageSize.width - 220}px`
                 : `${getResponsiveStyles.imageSize.width - 300}px`
               : "0",
+          minHeight: screenSize.isMobile ? "auto" : "300px",
         }}
       >
         {isLeft && (
@@ -378,6 +379,7 @@ const TimelineItem = ({
                 ? `${getResponsiveStyles.imageSize.width - 220}px`
                 : `${getResponsiveStyles.imageSize.width - 300}px`
               : "0",
+          minHeight: screenSize.isMobile ? "auto" : "300px",
         }}
       >
         {!isLeft && (
@@ -438,7 +440,7 @@ const TimelineItem = ({
             className={`rounded-lg overflow-hidden shadow-lg transition-all duration-500 ${
               isActive ? "opacity-100 scale-105" : "opacity-70 scale-100"
             }`}
-            style={getResponsiveStyles.imageSize}
+            style={{ ...getResponsiveStyles.imageSize, minHeight: "300px" }}
           >
             <img
               src={HandleGetFileLink(timeline.image[0].file as string)}
