@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  Star,
   Users,
   Luggage,
   Fuel,
@@ -27,7 +26,7 @@ import { Element, scroller } from "react-scroll";
 import voitureFront from "/images/voitureFront.webp";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
 import Footer from "../../components/footer/footer";
-import { Button, Flex, Typography } from "antd";
+import { Button, Flex, Rate, Typography } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import NavBar from "../../components/navBar/navBar";
 import { useTransaction } from "../../context/transactionContext";
@@ -233,20 +232,6 @@ const CarRentalCard: React.FC<CarRentalCardProps> = ({
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
 
-  const renderStars = (rating: number): React.ReactNode[] => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <Star
-        key={i}
-        size={16}
-        className={
-          i < Math.floor(rating)
-            ? "fill-yellow-400 text-yellow-400"
-            : "text-gray-300"
-        }
-      />
-    ));
-  };
-
   const getCategoryColor = (category: string): string => {
     const colors: Record<string, string> = {
       Économique: "bg-green-100 text-green-800",
@@ -353,7 +338,7 @@ const CarRentalCard: React.FC<CarRentalCardProps> = ({
 
           {/* Rating et avis */}
           <div className="flex items-center mb-3">
-            {renderStars(car.rating)}
+            <Rate allowHalf disabled defaultValue={car.rating} />
             <span className="text-sm text-gray-600 ml-2">
               ({car.review_count} avis)
             </span>

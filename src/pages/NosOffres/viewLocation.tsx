@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { CarRentalCardProps } from "./locations";
 import Footer from "../../components/footer/footer";
-import { Button, Flex, Image as AntdImage, Typography } from "antd";
+import { Button, Flex, Image as AntdImage, Typography, Rate } from "antd";
 import NavBar from "../../components/navBar/navBar";
 import {
   Car,
@@ -10,7 +10,6 @@ import {
   LucideIcon,
   Luggage,
   Settings,
-  Star,
   Users,
   Zap,
 } from "lucide-react";
@@ -80,20 +79,18 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
       (prev) => (prev - 1 + car.images.length) % car.images.length
     );
   };
-
-  const renderStars = (rating: number): React.ReactNode[] => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <Star
-        key={i}
-        size={16}
-        className={
-          i < Math.floor(rating)
-            ? "fill-yellow-400 text-yellow-400"
-            : "text-gray-300"
-        }
-      />
-    ));
-  };
+  //   return Array.from({ length: 5 }, (_, i) => (
+  //     <Star
+  //       key={i}
+  //       size={16}
+  //       className={
+  //         i < Math.floor(rating)
+  //           ? "fill-yellow-400 text-yellow-400"
+  //           : "text-gray-300"
+  //       }
+  //     />
+  //   ));
+  // };
 
   const getFuelIcon = (fuelType: string): LucideIcon => {
     switch (fuelType) {
@@ -189,7 +186,8 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-1">
-              {renderStars(car.rating)}
+              {/* {renderStars(car.rating)} */}
+              <Rate allowHalf disabled defaultValue={car.rating} />
               <span className="font-semibold ml-2 text-lg">{car.rating}</span>
               <span className="text-gray-600">({car.review_count} avis)</span>
             </div>

@@ -9,7 +9,7 @@ import {
   X,
   Building,
 } from "lucide-react";
-import { Button, Flex, Typography, Drawer } from "antd";
+import { Button, Flex, Typography, Drawer, Rate } from "antd";
 import NavBar from "../../components/navBar/navBar";
 import { useLocation, useNavigate } from "react-router-dom";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
@@ -176,19 +176,19 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const renderStars = (rating: number): React.ReactNode[] => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <Star
-        key={i}
-        size={isMobile ? 14 : 16}
-        className={
-          i < Math.floor(rating)
-            ? "fill-yellow-400 text-yellow-400"
-            : "text-gray-300"
-        }
-      />
-    ));
-  };
+  // const renderStars = (rating: number): React.ReactNode[] => {
+  //   return Array.from({ length: 5 }, (_, i) => (
+  //     <Star
+  //       key={i}
+  //       size={isMobile ? 14 : 16}
+  //       className={
+  //         i < Math.floor(rating)
+  //           ? "fill-yellow-400 text-yellow-400"
+  //           : "text-gray-300"
+  //       }
+  //     />
+  //   ));
+  // };
 
   // Calculer le prix à afficher
   const getPriceDisplay = () => {
@@ -254,7 +254,8 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({
 
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-1">
-                  {renderStars(accommodation.rating)}
+                  {/* {renderStars(accommodation.rating)} */}
+                  <Rate allowHalf disabled defaultValue={accommodation.rating} />
                   <span
                     className={`text-gray-600 ml-2 ${
                       isMobile ? "text-xs" : "text-sm"

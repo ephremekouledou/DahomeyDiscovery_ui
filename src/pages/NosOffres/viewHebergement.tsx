@@ -1,8 +1,8 @@
-import { Button, Flex, Typography } from "antd";
+import { Button, Flex, Rate, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import NavBar from "../../components/navBar/navBar";
-import { Star, Check, Building2 } from "lucide-react";
+import { Check, Building2 } from "lucide-react";
 import { useTransaction } from "../../context/transactionContext";
 import Footer from "../../components/footer/footer";
 import BeginningButton from "../../components/dededed/BeginingButton";
@@ -55,20 +55,6 @@ const ViewHebergementContent: React.FC<ViewHebergementContentProps> = ({
       (prev) =>
         (prev - 1 + accommodation.images.length) % accommodation.images.length
     );
-  };
-
-  const renderStars = (rating: number): React.ReactNode[] => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <Star
-        key={i}
-        size={16}
-        className={
-          i < Math.floor(rating)
-            ? "fill-yellow-400 text-yellow-400"
-            : "text-gray-300"
-        }
-      />
-    ));
   };
 
   const renderOptionCard = (
@@ -258,7 +244,7 @@ const ViewHebergementContent: React.FC<ViewHebergementContentProps> = ({
         {/* Prix et évaluation */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
           <div className="flex items-center space-x-1">
-            {renderStars(accommodation.rating)}
+            <Rate allowHalf disabled defaultValue={accommodation.rating} />
             <span className="font-semibold ml-2 text-lg">
               {accommodation.rating.toFixed(1)}
             </span>
