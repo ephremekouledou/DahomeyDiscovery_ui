@@ -1,9 +1,14 @@
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import "./Acceuil.css";
 import backChevron from "../../assets/icons/backChevron.png";
 import vector from "../../assets/icons/homeVector.png";
-import VideoBackground from "../../components/videoBackground/videoBackground";
-import { Flex, Typography } from "antd";
+import { Button, Flex, Typography } from "antd";
 import Footer from "../../components/footer/footer";
 import "../../assets/Fonts/font.css";
 import { Link, useLocation } from "react-router-dom";
@@ -26,13 +31,15 @@ import {
 import { PageSettings } from "../../sdk/api/pageMedias";
 import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
+import { FlipWords } from "../../components/ui/flip-words";
+import NavBar from "../../components/navBar/navBar";
 
 const TESTIMONIALS = [
   {
     id: 1,
-    name: "LA STYLISTE BAROUDEUSE",
+    name: "LA STYLISTE BAROUDEUSE",
     service: "",
-    text: "Une véritable expérience humaine ! Mon séjour au Bénin avec Dahomey Discovery a été parfaitement orchestré : découvertes, rencontres, paysages à couper le souffle… de Cotonou à Abomey en passant par Porto-Novo, Ganvié et Ouidah. Une équipe à l’écoute, pro et passionnée. Pour une immersion authentique et sereine, je recommande à 100 % !",
+    text: "Une véritable expérience humaine ! Mon séjour au Bénin avec Dahomey Discovery a été parfaitement orchestré : découvertes, rencontres, paysages à couper le souffle… de Cotonou à Abomey en passant par Porto-Novo, Ganvié et Ouidah. Une équipe à l'écoute, pro et passionnée. Pour une immersion authentique et sereine, je recommande à 100 % !",
     avatar: "👩‍💼",
   },
   {
@@ -53,7 +60,7 @@ const TESTIMONIALS = [
     id: 4,
     name: "Odette & son fils",
     service: "Montpellier",
-    text: "J’ai réalisé mon rêve de découvrir le Bénin. Plus qu’un voyage, ce fut une immersion culturelle et humaine rendue possible grâce à une équipe attentionnée. Ce que j’ai particulièrement apprécié, c’est que cette famille travaille avec leurs enfants : mon fils s’est lié d’amitié avec le leur. Une expérience professionnelle et humaine à la fois.",
+    text: "J'ai réalisé mon rêve de découvrir le Bénin. Plus qu'un voyage, ce fut une immersion culturelle et humaine rendue possible grâce à une équipe attentionnée. Ce que j'ai particulièrement apprécié, c'est que cette famille travaille avec leurs enfants : mon fils s'est lié d'amitié avec le leur. Une expérience professionnelle et humaine à la fois.",
     avatar: "👨‍💼",
   },
 ] as const;
@@ -125,7 +132,6 @@ const CircuitCard = React.memo(
           <CardItem
             className="relative overflow-hidden w-full"
             style={{
-              // aspectRatio: "5/7",
               height: dimensions.height,
               width: dimensions.width,
               maxWidth: "100%",
@@ -187,7 +193,7 @@ const TestimonialCarousel = React.memo(
           minWidth: isMobile ? "320px" : isTablet ? "350px" : "400px",
           width: isMobile ? "85vw" : isTablet ? "45vw" : "30vw",
           maxWidth: isMobile ? "400px" : isTablet ? "450px" : "500px",
-          minHeight: isMobile ? "280px" : "300px", // Hauteur minimum
+          minHeight: isMobile ? "280px" : "300px",
         },
         fontSize: isMobile ? "14px" : isTablet ? "15px" : "17px",
       };
@@ -209,10 +215,8 @@ const TestimonialCarousel = React.memo(
     // Calculer la hauteur maximale des cartes
     useEffect(() => {
       const calculateMaxHeight = () => {
-        // Vérifier que toutes les cartes sont présentes
         const validCards = cardsRef.current.filter((card) => card !== null);
         if (validCards.length < TESTIMONIALS.length) {
-          // Pas toutes les cartes sont encore montées, réessayer plus tard
           setTimeout(calculateMaxHeight, 50);
           return;
         }
@@ -220,7 +224,6 @@ const TestimonialCarousel = React.memo(
         let maxHeight = 0;
         const minHeight = parseInt(config.cardStyle.minHeight);
 
-        // Reset toutes les hauteurs à auto pour mesurer le contenu naturel
         validCards.forEach((cardRef) => {
           if (cardRef) {
             cardRef.style.height = "auto";
@@ -228,14 +231,12 @@ const TestimonialCarousel = React.memo(
           }
         });
 
-        // Forcer un reflow pour s'assurer que les mesures sont à jour
         validCards.forEach((cardRef) => {
           if (cardRef) {
-            cardRef.offsetHeight; // Force reflow
+            cardRef.offsetHeight;
           }
         });
 
-        // Mesurer les hauteurs après le reflow
         validCards.forEach((cardRef) => {
           if (cardRef) {
             const cardHeight = cardRef.getBoundingClientRect().height;
@@ -243,11 +244,9 @@ const TestimonialCarousel = React.memo(
           }
         });
 
-        // S'assurer que la hauteur ne soit pas inférieure à la hauteur minimum
         const finalHeight = Math.max(maxHeight, minHeight);
         setMaxCardHeight(finalHeight);
 
-        // Appliquer la hauteur calculée à TOUTES les cartes (incluant les duplicatas)
         cardsRef.current.forEach((cardRef) => {
           if (cardRef) {
             cardRef.style.height = `${finalHeight}px`;
@@ -255,7 +254,6 @@ const TestimonialCarousel = React.memo(
           }
         });
 
-        // Aussi appliquer aux cartes dupliquées
         const allCards = document.querySelectorAll("[data-testimonial-card]");
         allCards.forEach((card) => {
           (card as HTMLElement).style.height = `${finalHeight}px`;
@@ -263,12 +261,10 @@ const TestimonialCarousel = React.memo(
         });
       };
 
-      // Attendre que le DOM soit stable
       const timer1 = setTimeout(calculateMaxHeight, 100);
       const timer2 = setTimeout(calculateMaxHeight, 300);
       const timer3 = setTimeout(calculateMaxHeight, 500);
 
-      // Recalculer si la taille d'écran change
       const handleResize = () => {
         setTimeout(calculateMaxHeight, 100);
       };
@@ -308,13 +304,13 @@ const TestimonialCarousel = React.memo(
       };
     }, [config.scrollSpeed, config.cardWidth, isPaused]);
 
-    const handleMouseEnter = () => {
+    const handleMouseEnter = useCallback(() => {
       setIsPaused(true);
-    };
+    }, []);
 
-    const handleMouseLeave = () => {
+    const handleMouseLeave = useCallback(() => {
       setIsPaused(false);
-    };
+    }, []);
 
     return (
       <div
@@ -356,7 +352,6 @@ const TestimonialCarousel = React.memo(
                     margin: "0 auto",
                     maxWidth: config.cardStyle.maxWidth,
                     minHeight: config.cardStyle.minHeight,
-                    // La hauteur sera définie dynamiquement par le useEffect
                   }}
                 >
                   <div className={screenSize === "mobile" ? "mb-4" : "mb-8"}>
@@ -436,13 +431,28 @@ const Acceuil = () => {
   const { screenSize, isMobile, isTablet } = useScreenSizeResponsive();
   const { pathname } = useLocation();
   const container = useRef<HTMLDivElement>(null);
-  const { isLoaded, hasRun, setHasRun } = useAnimation();
+  const { isLoaded, hasRun, setHasRun, setIsLoaded } = useAnimation();
   const fontLoaded = useFontLoadedRobust();
   const location = useLocation();
   const [settings, SetSettings] = useState<IPageMedia>(emptyIPageMedia());
 
-  // État pour gérer l'affichage du loader
+  // États pour gérer l'affichage et les composants video
   const [showLoader, setShowLoader] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isSmallMobile, setIsSmallMobile] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+
+  // Vérification responsive pour la video
+  useEffect(() => {
+    const checkResponsive = () => {
+      const width = window.innerWidth;
+      setIsSmallMobile(width < 480);
+    };
+
+    checkResponsive();
+    window.addEventListener("resize", checkResponsive);
+    return () => window.removeEventListener("resize", checkResponsive);
+  }, []);
 
   // Memoized style calculations
   const styles = useMemo(() => {
@@ -452,7 +462,6 @@ const Acceuil = () => {
       height: "auto" as const,
     };
 
-    // Amélioration du positionnement des pourcentages
     const percentageStyles = {
       position: "absolute" as const,
       color: "#411E1C",
@@ -460,7 +469,6 @@ const Acceuil = () => {
       fontSize: isMobile ? "1.8rem" : isTablet ? "2.5rem" : "3.5rem",
       fontWeight: "700",
       zIndex: 10,
-      // Centrage vertical amélioré
       top: "50%",
       transform: "translateY(-50%)",
     };
@@ -476,7 +484,6 @@ const Acceuil = () => {
         ...percentageStyles,
         right: isMobile ? "5vw" : isTablet ? "15vw" : "20vw",
       },
-      // Styles pour le loader - positionné entre les pourcentages
       loaderContainer: {
         position: "absolute" as const,
         top: "50%",
@@ -486,6 +493,142 @@ const Acceuil = () => {
       },
     };
   }, [isMobile, isTablet]);
+
+  // Video background styles
+  const videoStyles = useMemo(() => {
+    const getVectorDimensions = () => {
+      if (isSmallMobile) {
+        return { height: "24px", width: "120px", paddingRight: "12px" };
+      }
+      if (isMobile) {
+        return { height: "28px", width: "140px", paddingRight: "16px" };
+      }
+      if (isTablet) {
+        return { height: "40px", width: "200px", paddingRight: "24px" };
+      }
+      return { height: "64px", width: "288px", paddingRight: "40px" };
+    };
+
+    const getTitleFontSize = () => {
+      if (isSmallMobile) {
+        return "36px";
+      }
+      if (isMobile) {
+        return "48px";
+      }
+      if (isTablet) {
+        return "72px";
+      }
+      return "120px";
+    };
+
+    const getButtonStyles = () => {
+      const baseStyles = {
+        backgroundColor: isHovered ? "#ff3100" : "#F59F00",
+        color: isHovered ? "white" : "black",
+        border: "none",
+        fontFamily: "GeneralSans",
+        transition: "all 0.3s ease",
+        fontWeight: "600",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+      };
+
+      if (isSmallMobile) {
+        return {
+          ...baseStyles,
+          borderRadius: "24px",
+          padding: "6px 12px",
+          fontSize: "12px",
+          minHeight: "36px",
+          minWidth: "200px",
+        };
+      }
+      if (isMobile) {
+        return {
+          ...baseStyles,
+          borderRadius: "28px",
+          padding: "8px 16px",
+          fontSize: "14px",
+          minHeight: "42px",
+          minWidth: "240px",
+        };
+      }
+      if (isTablet) {
+        return {
+          ...baseStyles,
+          borderRadius: "48px",
+          padding: "12px 24px",
+          fontSize: "16px",
+          minHeight: "52px",
+          minWidth: "280px",
+        };
+      }
+      return {
+        ...baseStyles,
+        borderRadius: "96px",
+        padding: "16px 32px",
+        fontSize: "18px",
+        minHeight: "64px",
+        minWidth: "320px",
+      };
+    };
+
+    const getContainerPadding = () => {
+      if (isSmallMobile) {
+        return "12px";
+      }
+      if (isMobile) {
+        return "16px";
+      }
+      if (isTablet) {
+        return "24px";
+      }
+      return "32px";
+    };
+
+    const getFlexGap = () => {
+      if (isSmallMobile) {
+        return "4px";
+      }
+      if (isMobile) {
+        return "8px";
+      }
+      if (isTablet) {
+        return "12px";
+      }
+      return "16px";
+    };
+
+    const getTitleLineHeight = () => {
+      if (isSmallMobile || isMobile) {
+        return "0.9";
+      }
+      if (isTablet) {
+        return "0.95";
+      }
+      return "1";
+    };
+
+    const getLetterSpacing = () => {
+      if (isSmallMobile) {
+        return "0.02em";
+      }
+      if (isMobile) {
+        return "0.03em";
+      }
+      return "0.05em";
+    };
+
+    return {
+      vectorDimensions: getVectorDimensions(),
+      titleFontSize: getTitleFontSize(),
+      buttonStyles: getButtonStyles(),
+      containerPadding: getContainerPadding(),
+      flexGap: getFlexGap(),
+      titleLineHeight: getTitleLineHeight(),
+      letterSpacing: getLetterSpacing(),
+    };
+  }, [isSmallMobile, isMobile, isTablet, isHovered]);
 
   // Styles CSS pour le loader et les animations
   const loaderAndAnimationStyles = useMemo(
@@ -541,6 +684,59 @@ const Acceuil = () => {
       animation: floatUp3 3.5s ease-in-out infinite 1s;
       will-change: transform;
     }
+
+    /* Video Background Styles */
+    .video-container {
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .background-video {
+      position: absolute !important;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+    }
+
+    /* Ensure video covers properly on all devices */
+    @media (max-aspect-ratio: 16/9) {
+      .background-video {
+        width: 100%;
+        height: auto;
+        min-height: 100%;
+      }
+    }
+
+    @media (min-aspect-ratio: 16/9) {
+      .background-video {
+        width: auto;
+        height: 100%;
+        min-width: 100%;
+      }
+    }
+
+    /* Button hover effects */
+    .ant-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25) !important;
+    }
+
+    /* Prevent content overflow */
+    #videoContent {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    /* Ensure proper text rendering */
+    .ant-typography {
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
     
     @media (prefers-reduced-motion: reduce) {
       .circuit-card-1, .circuit-card-2, .circuit-card-3 {
@@ -563,16 +759,28 @@ const Acceuil = () => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
+  // Fonction pour gérer le chargement de la vidéo
+  const handleVideoLoad = useCallback(() => {
+    setVideoLoaded(true);
+    setIsLoaded(true);
+  }, [setIsLoaded]);
+
+  // Fonction pour gérer les erreurs de chargement
+  const handleVideoError = useCallback(() => {
+    console.error("Erreur lors du chargement de la vidéo");
+    setVideoLoaded(true);
+    setIsLoaded(true);
+  }, [setIsLoaded]);
+
   // Effet pour gérer l'affichage du loader
   useEffect(() => {
-    if (isLoaded && fontLoaded) {
-      // Petit délai pour que l'utilisateur voie le loader
+    if (isLoaded && fontLoaded && videoLoaded) {
       const timer = setTimeout(() => {
         setShowLoader(false);
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [isLoaded, fontLoaded]);
+  }, [isLoaded, fontLoaded, videoLoaded]);
 
   useEffect(() => {
     PageSettings.List()
@@ -612,6 +820,7 @@ const Acceuil = () => {
         isFirstLoad &&
         isLoaded &&
         fontLoaded &&
+        videoLoaded &&
         !showLoader &&
         container.current
       ) {
@@ -675,10 +884,22 @@ const Acceuil = () => {
       }
     },
     {
-      dependencies: [hasRun, location, isLoaded, fontLoaded, showLoader],
+      dependencies: [
+        hasRun,
+        location,
+        isLoaded,
+        fontLoaded,
+        videoLoaded,
+        showLoader,
+      ],
       scope: container,
     }
   );
+
+  const handleButtonClick = useCallback(() => {
+    console.log("Navigate to experience selection");
+    // Add your navigation logic here
+  }, []);
 
   return (
     <div ref={container} className="h-screen relative bg-white">
@@ -712,20 +933,236 @@ const Acceuil = () => {
       </div>
 
       {/* Loader - affiché entre les pourcentages pendant le chargement */}
-      {showLoader ||
-        (settings._id === "" && (
-          <div style={styles.loaderContainer}>
-            <div className="loading-spinner"></div>
-          </div>
-        ))}
+      {(showLoader || settings._id === "" || !videoLoaded) && (
+        <div style={styles.loaderContainer}>
+          <div className="loading-spinner"></div>
+        </div>
+      )}
 
       {/* Contenu principal avec masque */}
       <div id="mask-wrapper" className="absolute z-0 inset-0 origin-center">
         <BeginningButton />
         <Flex vertical gap={0}>
-          {/* Section vidéo */}
+          {/* Section vidéo - intégrée directement */}
           <section className="one">
-            <VideoBackground />
+            <div
+              className="video-container"
+              style={{
+                position: "relative",
+                width: "100%",
+                height: "100vh",
+                minHeight: isSmallMobile
+                  ? "500px"
+                  : isMobile
+                  ? "600px"
+                  : "700px",
+                overflow: "hidden",
+              }}
+            >
+              {/* Video Background */}
+              {settings.banniere &&
+                settings.banniere.length > 0 &&
+                settings.banniere[0].file && (
+                  <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="background-video"
+                    onLoadedData={handleVideoLoad}
+                    onError={handleVideoError}
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      transform: "translate(-50%, -50%)",
+                      zIndex: 1,
+                    }}
+                  >
+                    <source
+                      src={HandleGetFileLink(
+                        settings.banniere[0].file as string
+                      )}
+                      type="video/mp4"
+                    />
+                    Your browser does not support the video tag.
+                  </video>
+                )}
+
+              {/* Overlay d'assombrissement */}
+              <div
+                className="video-overlay"
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  backgroundColor: "rgba(0, 0, 0, 0.0)",
+                  zIndex: 2,
+                }}
+              />
+
+              {/* Navigation Bar */}
+              <div
+                id="navBar"
+                className="relative flex items-center justify-center"
+                style={{
+                  zIndex: 30,
+                  padding: isSmallMobile ? "4px" : isMobile ? "6px" : "8px",
+                }}
+              >
+                <NavBar menu="ACCUEIL" />
+              </div>
+
+              {/* Main Content */}
+              <div
+                className="relative flex items-center justify-center text-white"
+                style={{
+                  zIndex: 20,
+                  height: `calc(100vh - ${
+                    isSmallMobile
+                      ? "60px"
+                      : isMobile
+                      ? "70px"
+                      : isTablet
+                      ? "80px"
+                      : "90px"
+                  })`,
+                  padding: `0 ${videoStyles.containerPadding}`,
+                  maxWidth: "100%",
+                }}
+              >
+                <Flex
+                  vertical
+                  gap={videoStyles.flexGap}
+                  justify="center"
+                  align="center"
+                  style={{
+                    textAlign: "center",
+                    width: "100%",
+                  }}
+                  id="videoContent"
+                >
+                  {/* Vector and Title Container */}
+                  <Flex
+                    vertical
+                    align="center"
+                    style={{
+                      width: "100%",
+                      position: "relative",
+                    }}
+                  >
+                    {/* Vector Image */}
+                    <Flex
+                      justify="flex-end"
+                      style={{
+                        width: "100%",
+                        marginBottom: isSmallMobile ? "4px" : "8px",
+                        position: "relative",
+                        right: "30vw",
+                      }}
+                    >
+                      <img
+                        src={vector}
+                        alt="Vector"
+                        style={{
+                          height: videoStyles.vectorDimensions.height,
+                          width: videoStyles.vectorDimensions.width,
+                          paddingRight:
+                            videoStyles.vectorDimensions.paddingRight,
+                          maxWidth: "90%",
+                          objectFit: "contain",
+                        }}
+                      />
+                    </Flex>
+
+                    {/* Main Title */}
+                    <Typography.Title
+                      level={1}
+                      style={{
+                        color: "white",
+                        fontSize: videoStyles.titleFontSize,
+                        fontWeight: "1000",
+                        lineHeight: videoStyles.titleLineHeight,
+                        letterSpacing: videoStyles.letterSpacing,
+                        margin: "0",
+                        fontFamily: "DragonAngled",
+                        textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
+                        wordBreak: isSmallMobile ? "break-word" : "normal",
+                        hyphens: isSmallMobile ? "auto" : "none",
+                      }}
+                    >
+                      {isSmallMobile ? (
+                        <>
+                          Reconnectez-vous à{" "}
+                          <FlipWords
+                            words={[
+                              "la Terre Mère",
+                              "vos racines",
+                              "l'energie des ancestres",
+                              "la vie",
+                            ]}
+                          />{" "}
+                          !
+                        </>
+                      ) : (
+                        <>
+                          Reconnectez-vous à <br />
+                          <FlipWords
+                            words={[
+                              "la Terre Mère",
+                              "vos racines",
+                              "l'energie des ancestres",
+                              "la vie",
+                            ]}
+                          />{" "}
+                          !
+                        </>
+                      )}
+                    </Typography.Title>
+                  </Flex>
+
+                  {/* Call to Action Button */}
+                  <div
+                    style={{
+                      marginTop: isSmallMobile
+                        ? "16px"
+                        : isMobile
+                        ? "20px"
+                        : isTablet
+                        ? "24px"
+                        : "32px",
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Button
+                      type="primary"
+                      size="large"
+                      style={videoStyles.buttonStyles}
+                      onMouseEnter={() => setIsHovered(true)}
+                      onMouseLeave={() => setIsHovered(false)}
+                      onClick={handleButtonClick}
+                    >
+                      <span
+                        style={{
+                          whiteSpace: isSmallMobile ? "nowrap" : "normal",
+                          textOverflow: "ellipsis",
+                          overflow: "hidden",
+                        }}
+                      >
+                        Je choisis mon expérience
+                      </span>
+                    </Button>
+                  </div>
+                </Flex>
+              </div>
+            </div>
           </section>
 
           {/* Section principale avec circuits */}
@@ -911,7 +1348,8 @@ const Acceuil = () => {
               minHeight: "300px",
             }}
           >
-            {settings.acceuil_carrousel.length > 0 &&
+            {settings.acceuil_carrousel &&
+              settings.acceuil_carrousel.length > 0 &&
               settings.acceuil_carrousel[0].file !== null && (
                 <ImageCarousel
                   images={settings.acceuil_carrousel.map((item) =>
@@ -923,7 +1361,8 @@ const Acceuil = () => {
 
           {/* Section finale */}
           <section className="four">
-            {settings.acceuil_image_fin.length > 0 &&
+            {settings.acceuil_image_fin &&
+              settings.acceuil_image_fin.length > 0 &&
               settings.acceuil_image_fin[0].file !== null && (
                 <img
                   src={HandleGetFileLink(
