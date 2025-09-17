@@ -75,11 +75,6 @@ function Footer() {
       label: "Conditions générales",
       path: "/conditions-generales",
     },
-    {
-      key: "POLITIQUE",
-      label: "Politique de confidentialité",
-      path: "/politique-confidentialite",
-    },
   ];
 
   const contactItems = [

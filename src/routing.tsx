@@ -18,6 +18,7 @@ import Restaurants from "./pages/Restaurants/restaurants";
 import Attractions from "./pages/Attractions/attractions";
 import Apropos from "./pages/Apropos/Apropos";
 import Actualites from "./pages/Actualites/Actualites";
+import CGV from "./pages/CGV/cgv";
 
 const router = createBrowserRouter([
   {
@@ -95,6 +96,11 @@ const router = createBrowserRouter([
   {
     path: "/a-propos",
     element: <Apropos />,
+    errorElement: <NotFound />,
+  },
+  {
+    path: "/conditions-generales",
+    element: <CGV />,
     errorElement: <NotFound />,
   },
   {

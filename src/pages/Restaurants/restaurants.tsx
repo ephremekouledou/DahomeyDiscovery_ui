@@ -10,6 +10,7 @@ import BeginningButton from "../../components/dededed/BeginingButton";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
 import { PageSettings } from "../../sdk/api/pageMedias";
+import { useLocation } from "react-router-dom";
 
 const RestaurantCard: React.FC<{ restaurant: IRestaurantSettings }> = ({
   restaurant,
@@ -43,6 +44,7 @@ const RestaurantCard: React.FC<{ restaurant: IRestaurantSettings }> = ({
 
 const Restaurants = () => {
   const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
+  const { pathname } = useLocation();
 
   useEffect(() => {
     PageSettings.List()
@@ -54,6 +56,10 @@ const Restaurants = () => {
         console.error("Error fetching circuits:", err);
       });
   }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   return (
     <Flex justify="center" vertical>
