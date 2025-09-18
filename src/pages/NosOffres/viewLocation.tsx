@@ -326,9 +326,10 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
                 id: car._id,
                 title: car.name,
                 amount: car.price_per_day,
+                tarification: car.tarification,
               });
               // we redirect to the payment page
-              navigate("/reservations-locations");
+              navigate("/reservations-vehicules");
             }}
           >
             {car.availability

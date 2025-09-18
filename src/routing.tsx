@@ -19,6 +19,7 @@ import Attractions from "./pages/Attractions/attractions";
 import Apropos from "./pages/Apropos/Apropos";
 import Actualites from "./pages/Actualites/Actualites";
 import CGV from "./pages/CGV/cgv";
+import ReservationVehicule from "./pages/Reservations/reservationVehicule";
 
 const router = createBrowserRouter([
   {
@@ -116,6 +117,11 @@ const router = createBrowserRouter([
   {
     path: "/reservations-locations",
     element: <ReservationLocation />,
+    errorElement: <NotFound />,
+  },
+  {
+    path: "/reservations-vehicules",
+    element: <ReservationVehicule />,
     errorElement: <NotFound />,
   },
 ]);

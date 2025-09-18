@@ -1,9 +1,11 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
+import { ICarTarification } from "../sdk/models/vehicules";
 
 export interface Transaction {
-    id: string;
-    amount: number;
-    title: string;
+  id: string;
+  title: string;
+  amount: number;
+  tarification: ICarTarification[];
 }
 
 interface TransactionContextType {
@@ -28,7 +30,9 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
 export const useTransaction = (): TransactionContextType => {
   const context = useContext(TransactionContext);
   if (!context) {
-    throw new Error("useTransaction must be used within an TransactionProvider");
+    throw new Error(
+      "useTransaction must be used within an TransactionProvider"
+    );
   }
   return context;
 };
