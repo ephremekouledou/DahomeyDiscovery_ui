@@ -2,44 +2,62 @@ import { useState, useEffect } from "react";
 import {
   Input,
   Button,
-  Steps,
   Card,
   Typography,
-  Progress,
   message,
-  Checkbox,
   Radio,
-  Select,
-  DatePicker,
   InputNumber,
   Flex,
+  Select,
 } from "antd";
 import {
   UserOutlined,
-  BankOutlined,
   MailOutlined,
   DeleteOutlined,
-  GlobalOutlined,
+  ClockCircleOutlined,
   ContactsOutlined,
   EnvironmentOutlined,
-  ClockCircleOutlined,
+  GlobalOutlined,
+  BankOutlined,
 } from "@ant-design/icons";
-import dayjs from "dayjs";
-import { FormPage, InputType } from "./reservationsModels";
 import NavBar from "../../components/navBar/navBar";
 import { useTransaction } from "../../context/transactionContext";
+import { fedaKey } from "../../sdk/api/api";
+
+// Types pour TypeScript
+interface FormValues {
+  [key: string]: any;
+  chauffeur?: string;
+  nombreJours?: number;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  zip?: string;
+}
+
+interface FedaPayWindow extends Window {
+  FedaPay?: {
+    CHECKOUT_COMPLETED: string;
+    CHECKOUT_FAILED: string;
+    init: (options: any) => void;
+    checkout: (options: any) => Promise<any>;
+  };
+}
 
 const { Title } = Typography;
-const { Step } = Steps;
 const { Option } = Select;
-
+/*  */
 const ReservationVehicule = () => {
   const [messageApi, contextHolder] = message.useMessage();
-  const [currentPage, setCurrentPage] = useState(0);
-  const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
+  const [formValues, setFormValues] = useState<FormValues>({});
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const totalPages = 3; // Modifié pour 3 pages maintenant
+  const [_, setIsPaymentModalVisible] = useState(false);
   const { transaction } = useTransaction();
 
   // Add responsive window width tracking
@@ -57,7 +75,36 @@ const ReservationVehicule = () => {
     document.title = "Réservation de Location";
   }, []);
 
-  // Calculate total amount based on days
+  // Charger le script FedaPay
+  useEffect(() => {
+    const loadFedaPayScript = () => {
+      // Vérifier si le script est déjà chargé
+      if ((window as FedaPayWindow).FedaPay) {
+        return Promise.resolve();
+      }
+
+      return new Promise<void>((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = "https://cdn.fedapay.com/checkout.js";
+        script.async = true;
+        script.onload = () => {
+          console.log("FedaPay script loaded successfully");
+          resolve();
+        };
+        script.onerror = () => {
+          console.error("Failed to load FedaPay script");
+          reject(new Error("Failed to load FedaPay script"));
+        };
+        document.head.appendChild(script);
+      });
+    };
+
+    loadFedaPayScript().catch((error) => {
+      console.error("Error loading FedaPay:", error);
+      messageApi.error("Erreur lors du chargement du système de paiement");
+    });
+  }, [messageApi]);
+
   // Helper to get the correct tarification based on nombreJours
   const getTarificationForDays = () => {
     const days = Number(formValues.nombreJours) || 0;
@@ -82,491 +129,196 @@ const ReservationVehicule = () => {
     const days = Number(formValues.nombreJours) || 0;
     const tarification = getTarificationForDays();
     if (!tarification) return 0;
-    // If chauffeur is "true" (as string), use price_driver, else use price
+
     const withDriver = formValues.chauffeur === "true";
     const pricePerDay = withDriver
       ? tarification.price_driver
       : tarification.price;
+
     return pricePerDay * days;
   };
 
-  // Responsive variables based on screen size
-  const isMobile = windowWidth < 768;
-
-  // Form pages configuration
-  const formPages: FormPage[] = [
-    {
-      title: "Durée de location",
-      fields: [
-        {
-          name: "chauffeur",
-          label: "Reservation avec chauffeur",
-          required: true,
-          errorMsg: "Veuillez indiquer si vous voulez un chauffeur",
-          placeholder: "Nombre de jours",
-          type: "radio",
-          options: [
-            { label: "Oui", value: "true" },
-            { label: "Non", value: "false" },
-          ],
-        },
-        {
-          name: "nombreJours",
-          label: "Nombre de jours de location",
-          required: true,
-          errorMsg: "Veuillez indiquer le nombre de jours",
-          placeholder: "Nombre de jours",
-          prefix: <ClockCircleOutlined />,
-          type: "number",
-          min: 1,
-          max: 365,
-        },
-      ],
-    },
-    {
-      title: "Informations personnelles",
-      fields: [
-        {
-          name: "email",
-          label: "Adresse email",
-          required: true,
-          errorMsg: "Veuillez entrer votre email",
-          placeholder: "client@example.com",
-          prefix: <MailOutlined />,
-          type: "text",
-        },
-        {
-          name: "firstName",
-          label: "Prénom",
-          required: true,
-          errorMsg: "Veuillez entrer votre prénom",
-          placeholder: "Jean",
-          prefix: <UserOutlined />,
-          type: "text",
-        },
-        {
-          name: "lastName",
-          label: "Nom de famille",
-          required: true,
-          errorMsg: "Veuillez entrer votre nom",
-          placeholder: "Dupont",
-          prefix: <UserOutlined />,
-          type: "text",
-        },
-        {
-          name: "phone",
-          label: "Numéro de téléphone",
-          required: true,
-          errorMsg: "Veuillez entrer votre numéro de téléphone",
-          placeholder: "+33612345678",
-          prefix: <ContactsOutlined />,
-          type: "text",
-        },
-        {
-          name: "address",
-          label: "Adresse",
-          required: true,
-          errorMsg: "Veuillez entrer votre adresse",
-          placeholder: "123 rue de Paris",
-          prefix: <BankOutlined />,
-          type: "text",
-        },
-        {
-          name: "city",
-          label: "Ville",
-          required: true,
-          errorMsg: "Veuillez entrer votre ville",
-          placeholder: "Paris",
-          prefix: <EnvironmentOutlined />,
-          type: "text",
-        },
-        {
-          name: "state",
-          label: "Région/État",
-          required: true,
-          errorMsg: "Veuillez entrer votre région",
-          placeholder: "Île-de-France",
-          prefix: <GlobalOutlined />,
-          type: "text",
-        },
-        {
-          name: "country",
-          label: "Code pays",
-          required: true,
-          errorMsg: "Veuillez sélectionner votre pays",
-          placeholder: "Sélectionnez votre pays",
-          prefix: <GlobalOutlined />,
-          type: "select",
-          options: [
-            { label: "France (FR)", value: "FR" },
-            { label: "Belgique (BE)", value: "BE" },
-            { label: "Suisse (CH)", value: "CH" },
-            { label: "Canada (CA)", value: "CA" },
-            { label: "États-Unis (US)", value: "US" },
-            { label: "Allemagne (DE)", value: "DE" },
-            { label: "Espagne (ES)", value: "ES" },
-            { label: "Italie (IT)", value: "IT" },
-            { label: "Royaume-Uni (GB)", value: "GB" },
-            { label: "Bénin (BJ)", value: "BJ" },
-            { label: "Côte d'Ivoire (CI)", value: "CI" },
-            { label: "Sénégal (SN)", value: "SN" },
-            { label: "Mali (ML)", value: "ML" },
-            { label: "Burkina Faso (BF)", value: "BF" },
-            { label: "Niger (NE)", value: "NE" },
-            { label: "Togo (TG)", value: "TG" },
-            { label: "Ghana (GH)", value: "GH" },
-            { label: "Nigeria (NG)", value: "NG" },
-            { label: "Maroc (MA)", value: "MA" },
-            { label: "Tunisie (TN)", value: "TN" },
-            { label: "Algérie (DZ)", value: "DZ" },
-            { label: "Autre", value: "OTHER" },
-          ],
-        },
-        {
-          name: "zip",
-          label: "Code postal",
-          required: true,
-          errorMsg: "Veuillez entrer votre code postal",
-          placeholder: "75001",
-          prefix: <BankOutlined />,
-          type: "text",
-        },
-      ],
-    },
-  ];
-
-  const handleInputChange = (
-    field: string,
-    value: any,
-    fieldType?: InputType
-  ) => {
-    if (fieldType === "checkbox") {
-      // For checkboxes, we need to handle arrays of selected values
-      setFormValues((prev) => {
-        const currentValues = prev[field] || [];
-
-        // If we're getting an array directly from Checkbox.Group (which happens when using the onChange)
-        if (Array.isArray(value)) {
-          return {
-            ...prev,
-            [field]: value,
-          };
-        }
-        // If we're getting a single value (which happens when clicking individual checkboxes)
-        else {
-          if (Array.isArray(currentValues)) {
-            if (currentValues.includes(value)) {
-              return {
-                ...prev,
-                [field]: currentValues.filter((v) => v !== value),
-              };
-            } else {
-              return {
-                ...prev,
-                [field]: [...currentValues, value],
-              };
-            }
-          }
-          return {
-            ...prev,
-            [field]: [value],
-          };
-        }
-      });
-    } else if (fieldType === "date") {
-      // Handle date values - convert dayjs to string for storage
-      setFormValues({
-        ...formValues,
-        [field]: value ? value.format("YYYY-MM-DD") : null,
-      });
-    } else {
-      setFormValues({
-        ...formValues,
-        [field]: value,
-      });
-    }
-  };
-
-  const nextPage = () => {
-    // Simple validation
-    const currentFields = formPages[currentPage].fields;
-    let isValid = true;
-    let errorMessages: string[] = [];
-
-    currentFields.forEach((field) => {
-      if (field.required) {
-        if (field.type === "checkbox" || field.type === "radio") {
-          if (!formValues[field.name]) {
-            isValid = false;
-            if (field.errorMsg) {
-              errorMessages.push(field.errorMsg);
-            }
-          }
-        } else {
-          if (!formValues[field.name]) {
-            isValid = false;
-            if (field.errorMsg) {
-              errorMessages.push(field.errorMsg);
-            }
-          }
-        }
-      }
-    });
-
-    if (isValid && currentPage < totalPages - 1) {
-      setCurrentPage(currentPage + 1);
-    } else if (!isValid) {
-      messageApi.error("Veuillez remplir tous les champs obligatoires");
-    }
-  };
-
-  const prevPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const resetForm = () => {
-    setFormValues({});
-  };
-
-  // Modified API call for the new form structure
-  const handlePost = async (data: any) => {
+  // Traitement après un paiement réussi
+  const handleReservationSuccess = async (transactionData: any) => {
     try {
       setIsSubmitting(true);
-      // Format data to match expected API format
-      const totalAmount = calculateTotalAmount();
-      const formattedData = {
-        nombreJours: data.nombreJours,
-        circuit: data.circuit,
-        dateReservation: data.dateReservation,
-        nombreParticipants: data.nombreParticipants,
-        montantTotal: totalAmount,
+      setIsPaymentModalVisible(false);
+
+      // Préparer les données de réservation
+      const reservationData = {
+        nombreJours: formValues.nombreJours,
+        chauffeur: formValues.chauffeur === "true",
+        montantTotal: calculateTotalAmount(),
         item: transaction?.title || "Location",
+        paymentData: {
+          transaction_id: transactionData.id,
+          transaction_reference: transactionData.reference,
+          status: transactionData.status,
+        },
         customer: {
-          email: data.email,
-          first_name: data.firstName,
-          last_name: data.lastName,
-          phone: data.phone,
-          address: data.address,
-          city: data.city,
-          state: data.state,
-          country: data.country,
-          zip: data.zip,
+          email: formValues.email,
+          firstName: formValues.firstName,
+          lastName: formValues.lastName,
+          phone: formValues.phone,
+          address: formValues.address,
+          city: formValues.city,
+          state: formValues.state,
+          country: formValues.country,
+          zip: formValues.zip,
         },
       };
 
-      console.log("Formatted data to be sent:", formattedData);
+      console.log("Données de réservation à envoyer:", reservationData);
 
-      // Uncomment and modify the API endpoint as needed
+      // Ici vous pouvez faire l'appel API pour sauvegarder la réservation
       /*
-      const res = await axios.post('https://your-api-endpoint.com/api/reservation', formattedData, {
+      const response = await axios.post('https://your-api-endpoint.com/api/reservations', reservationData, {
         headers: {
           'Content-Type': 'application/json'
         }
       });
 
-      // Check if response status is in the 2xx range
-      if (res.status >= 200 && res.status < 300) {
-        messageApi.success("Réservation soumise avec succès!");
+      if (response.status >= 200 && response.status < 300) {
+        messageApi.success("Réservation enregistrée avec succès!");
         setTimeout(() => {
-          messageApi.info("Redirection vers la page d'accueil...");
-          navigate('/');
+          // navigate('/confirmation', { state: { reservation: reservationData } });
         }, 2000);
-      } else {
-        messageApi.error(`Echec de la soumission de la réservation! Statut: ${res.status}`);
       }
       */
 
-      // Simulation for demo purposes
-      messageApi.success("Paiement effectué avec succès!");
+      // Simulation pour la démo
       setTimeout(() => {
-        messageApi.info("Redirection vers la confirmation...");
+        messageApi.info(
+          "Réservation enregistrée! Redirection vers la confirmation..."
+        );
         // navigate('/confirmation');
       }, 2000);
-    } catch (error: any) {
-      console.error("Form submission error:", error);
-      const errorMessage =
-        error?.response?.data?.message ||
-        "Erreur inconnue. Veuillez réessayer.";
-      messageApi.error(`Echec du paiement! ${errorMessage}`);
+    } catch (error) {
+      console.error(
+        "Erreur lors de l'enregistrement de la réservation:",
+        error
+      );
+      messageApi.error("Erreur lors de l'enregistrement de la réservation");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const submitForm = () => {
-    // Check if all required fields are filled
-    let isValid = true;
-    formPages.forEach((page) => {
-      page.fields.forEach((field) => {
-        if (field.required) {
-          if (field.type === "checkbox" || field.type === "radio") {
-            if (!formValues[field.name]) {
-              isValid = false;
-            }
-          } else {
-            if (!formValues[field.name]) {
-              isValid = false;
-            }
-          }
-        }
+  // Configuration pour le paiement FedaPay
+  const initiateFedaPayment = async () => {
+    try {
+      const fedaPayWindow = window as FedaPayWindow;
+
+      if (!fedaPayWindow.FedaPay) {
+        messageApi.error(
+          "Le système de paiement n'est pas encore chargé. Veuillez réessayer."
+        );
+        return;
+      }
+
+      const totalAmount = calculateTotalAmount();
+
+      // Initialiser FedaPay
+      fedaPayWindow.FedaPay.init({
+        public_key: fedaKey,
+        sandbox: true, // Mettre à false en production
       });
-    });
 
-    if (isValid) {
-      console.log("Form submitted with values:", formValues);
-      handlePost(formValues);
-    } else {
-      messageApi.error("Veuillez remplir tous les champs obligatoires");
-    }
-  };
-
-  const renderFormFields = () => {
-    const currentFields = formPages[currentPage].fields;
-
-    return currentFields.map((field) => (
-      <div key={field.name} style={{ marginBottom: "24px" }}>
-        <div style={{ display: "flex", marginBottom: "4px" }}>
-          <label
-            style={{ fontSize: "14px", fontWeight: "500", color: "#4B5563" }}
-          >
-            {field.label}{" "}
-            {field.required && <span style={{ color: "#EF4444" }}>*</span>}
-          </label>
-        </div>
-
-        {field.type === "select" ? (
-          // Select dropdown
-          <Select
-            value={formValues[field.name]}
-            onChange={(value) =>
-              handleInputChange(field.name, value, field.type)
-            }
-            placeholder={field.placeholder}
-            size={isMobile ? "middle" : "large"}
-            style={{ width: "100%" }}
-            suffixIcon={field.prefix}
-          >
-            {field.options?.map((option) => (
-              <Option key={option.value} value={option.value}>
-                {option.label}
-              </Option>
-            ))}
-          </Select>
-        ) : field.type === "date" ? (
-          // Date picker
-          <DatePicker
-            value={
-              formValues[field.name] ? dayjs(formValues[field.name]) : null
-            }
-            onChange={(date) => handleInputChange(field.name, date, field.type)}
-            placeholder={field.placeholder}
-            size={isMobile ? "middle" : "large"}
-            style={{ width: "100%" }}
-            format="DD/MM/YYYY"
-            disabledDate={(current) =>
-              current && current < dayjs().startOf("day")
-            }
-          />
-        ) : field.type === "number" ? (
-          // Number input
-          <InputNumber
-            value={formValues[field.name]}
-            onChange={(value) =>
-              handleInputChange(field.name, value, field.type)
-            }
-            placeholder={field.placeholder}
-            size={isMobile ? "middle" : "large"}
-            style={{ width: "100%" }}
-            min={field.min}
-            max={field.max}
-            prefix={field.prefix}
-          />
-        ) : field.type === "checkbox" && !field.options ? (
-          // Single checkbox (boolean)
-          <Checkbox
-            checked={!!formValues[field.name]}
-            onChange={(e) =>
-              handleInputChange(field.name, e.target.checked, field.type)
-            }
-            style={{ marginLeft: 0 }}
-          >
-            {field.placeholder}
-          </Checkbox>
-        ) : field.type === "checkbox" && field.options ? (
-          // Checkbox group (multiple selection)
-          <Checkbox.Group
-            options={field.options}
-            value={formValues[field.name] || []}
-            onChange={(checkedValues) =>
-              handleInputChange(field.name, checkedValues, field.type)
-            }
-            style={{ display: "flex", flexDirection: "column", gap: "8px" }}
-          />
-        ) : field.type === "radio" ? (
-          // Radio button group (single selection)
-          <Radio.Group
-            options={field.options}
-            value={formValues[field.name]}
-            onChange={(e) =>
-              handleInputChange(field.name, e.target.value, field.type)
-            }
-            buttonStyle="solid"
-            style={{ display: "flex", flexDirection: "column", gap: "8px" }}
-          />
-        ) : field.type === "textarea" ? (
-          // Textarea for longer text
-          <Input.TextArea
-            value={formValues[field.name] || ""}
-            onChange={(e) => handleInputChange(field.name, e.target.value)}
-            placeholder={field.placeholder}
-            size={isMobile ? "middle" : "large"}
-            style={{ width: "100%" }}
-            rows={4}
-          />
-        ) : (
-          // Default text input
-          <Input
-            value={formValues[field.name] || ""}
-            onChange={(e) => handleInputChange(field.name, e.target.value)}
-            placeholder={field.placeholder}
-            prefix={field.prefix}
-            size={isMobile ? "middle" : "large"}
-            style={{ width: "100%" }}
-          />
-        )}
-      </div>
-    ));
-  };
-
-  // Get responsive steps props
-  const getStepsProps = () => {
-    const baseProps = {
-      current: currentPage,
-      style: {
-        marginBottom: isMobile ? "24px" : "32px",
-      },
-    };
-
-    if (isMobile) {
-      return {
-        ...baseProps,
-        progressDot: true,
-        direction: "vertical" as const,
+      // Configuration de la transaction
+      const checkoutOptions = {
+        amount: totalAmount,
+        currency: "XOF",
+        description: `Location de ${transaction?.title} - ${formValues.nombreJours} jour(s)`,
+        callback_url: window.location.origin + "/payment-success",
+        cancel_url: window.location.origin + "/payment-cancel",
+        customer: {
+          email: formValues.email || "client@example.com",
+          firstname: formValues.firstName || "Client",
+          lastname: formValues.lastName || "Location",
+          phone_number: formValues.phone || "+22900000000",
+        },
+        custom_metadata: {
+          vehicle: transaction?.title,
+          days: formValues.nombreJours,
+          with_driver: formValues.chauffeur === "true",
+        },
       };
-    }
 
-    return baseProps;
+      // Lancer le checkout
+      const result = await fedaPayWindow.FedaPay.checkout(checkoutOptions);
+
+      if (result && result.transaction) {
+        console.log("Paiement réussi:", result);
+        messageApi.success("Paiement effectué avec succès!");
+        await handleReservationSuccess(result.transaction);
+      }
+    } catch (error) {
+      console.error("Erreur lors du paiement:", error);
+      messageApi.error(
+        "Erreur lors du traitement du paiement. Veuillez réessayer."
+      );
+    }
   };
 
-  // Get responsive button styles
-  const buttonContainerStyle = {
-    display: "flex",
-    justifyContent: "space-between",
-    marginTop: "32px",
-    flexDirection: isMobile ? ("column" as const) : ("row" as const),
-    gap: isMobile ? "16px" : "0",
+  // Responsive variables based on screen size
+  const isMobile = windowWidth < 768;
+
+  const handleInputChange = (field: string, value: any) => {
+    setFormValues({
+      ...formValues,
+      [field]: value,
+    });
+  };
+
+  const resetForm = () => {
+    setFormValues({});
+    setIsPaymentModalVisible(false);
+  };
+
+  const handlePayment = () => {
+    // Vérifier si les champs obligatoires sont remplis
+    const requiredFields = [
+      "chauffeur",
+      "nombreJours",
+      "email",
+      "firstName",
+      "lastName",
+      "phone",
+      "address",
+      "city",
+      "state",
+      "country",
+      "zip",
+    ];
+
+    const missingFields = requiredFields.filter((field) => !formValues[field]);
+
+    if (missingFields.length > 0) {
+      messageApi.error("Veuillez remplir tous les champs obligatoires");
+      return;
+    }
+
+    // Lancer le paiement directement
+    initiateFedaPayment();
+  };
+
+  // Vérifier si tous les champs sont remplis
+  const areAllFieldsValid = () => {
+    const requiredFields = [
+      "chauffeur",
+      "nombreJours",
+      "email",
+      "firstName",
+      "lastName",
+      "phone",
+      "address",
+      "city",
+      "state",
+      "country",
+      "zip",
+    ];
+
+    return requiredFields.every((field) => formValues[field]);
   };
 
   // Get responsive container styles
@@ -583,51 +335,12 @@ const ReservationVehicule = () => {
         justify="center"
         align="center"
         vertical
-        style={{ backgroundColor: "#F9FAFB" }}
+        style={{ backgroundColor: "#F9FAFB", minHeight: "100vh" }}
       >
         {/* Header avec NavBar */}
         <div className="relative z-20 flex items-center justify-center">
           <NavBar menu="" />
         </div>
-        {/* Custom CSS for Steps colors */}
-        <style>
-          {`
-          .ant-steps-item-finish .ant-steps-item-icon {
-            background-color: #f59f00 !important;
-            border-color: #f59f00 !important;
-          }
-          
-          .ant-steps-item-process .ant-steps-item-icon {
-            background-color: #f59f00 !important;
-            border-color: #f59f00 !important;
-          }
-          
-          .ant-steps-item-finish .ant-steps-item-title::after {
-            background-color: #f59f00 !important;
-          }
-          
-          .ant-steps-item-finish .ant-steps-item-title {
-            color: #f59f00 !important;
-          }
-          
-          .ant-steps-item-process .ant-steps-item-title {
-            color: #f59f00 !important;
-          }
-          
-          .ant-steps-item-process .ant-steps-item-description {
-            color: #f59f00 !important;
-          }
-          
-          .ant-steps-item-wait .ant-steps-item-icon {
-            border-color: #d9d9d9 !important;
-            background-color: #fff !important;
-          }
-          
-          .ant-steps-item-wait .ant-steps-item-icon > .ant-steps-icon {
-            color: #d9d9d9 !important;
-          }
-        `}
-        </style>
 
         {contextHolder}
 
@@ -650,19 +363,6 @@ const ReservationVehicule = () => {
               Réservation de véhicule
             </Title>
 
-            <Steps {...getStepsProps()}>
-              {formPages.map((page, index) => (
-                <Step
-                  key={index}
-                  title={page.title}
-                  description={isMobile ? `Étape ${index + 1}` : undefined}
-                  style={{
-                    color: currentPage === index ? "#f59f00" : undefined,
-                  }}
-                />
-              ))}
-            </Steps>
-
             <div
               style={{
                 paddingLeft: isMobile ? "8px" : "16px",
@@ -670,16 +370,6 @@ const ReservationVehicule = () => {
               }}
             >
               <div style={{ padding: isMobile ? "4px" : "8px" }}>
-                <Title
-                  level={5}
-                  style={{
-                    marginBottom: isMobile ? "16px" : "24px",
-                    fontSize: isMobile ? "16px" : "18px",
-                  }}
-                >
-                  {/* {formPages[currentPage].title} */}
-                </Title>
-
                 {/* Display location info - always visible */}
                 <Card
                   style={{
@@ -698,77 +388,421 @@ const ReservationVehicule = () => {
                   </div>
                 </Card>
 
-                {/* Display total amount only after number of days is entered */}
-                {formValues.nombreJours && (
-                  <>
-                    <Card
+                {/* Formulaire simplifié */}
+                <div>
+                  {/* Chauffeur */}
+                  <div style={{ marginBottom: "24px" }}>
+                    <div style={{ display: "flex", marginBottom: "4px" }}>
+                      <label
+                        style={{
+                          fontSize: "14px",
+                          fontWeight: "500",
+                          color: "#4B5563",
+                        }}
+                      >
+                        Réservation avec chauffeur{" "}
+                        <span style={{ color: "#EF4444" }}>*</span>
+                      </label>
+                    </div>
+                    <Radio.Group
+                      options={[
+                        { label: "Oui", value: "true" },
+                        { label: "Non", value: "false" },
+                      ]}
+                      value={formValues.chauffeur}
+                      onChange={(e) =>
+                        handleInputChange("chauffeur", e.target.value)
+                      }
+                      buttonStyle="solid"
                       style={{
-                        backgroundColor: "#fff7ed",
-                        border: "1px solid #f59f00",
-                        marginBottom: "24px",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "8px",
+                      }}
+                    />
+                  </div>
+
+                  {/* Nombre de jours */}
+                  <div style={{ marginBottom: "24px" }}>
+                    <div style={{ display: "flex", marginBottom: "4px" }}>
+                      <label
+                        style={{
+                          fontSize: "14px",
+                          fontWeight: "500",
+                          color: "#4B5563",
+                        }}
+                      >
+                        Nombre de jours de location{" "}
+                        <span style={{ color: "#EF4444" }}>*</span>
+                      </label>
+                    </div>
+                    <InputNumber
+                      value={formValues.nombreJours}
+                      onChange={(value) =>
+                        handleInputChange("nombreJours", value)
+                      }
+                      placeholder="Nombre de jours"
+                      size={isMobile ? "middle" : "large"}
+                      style={{ width: "100%" }}
+                      min={1}
+                      max={365}
+                      prefix={<ClockCircleOutlined />}
+                    />
+                  </div>
+
+                  {/* Section Informations Personnelles */}
+                  <Card
+                    style={{
+                      backgroundColor: "#f8fafc",
+                      border: "1px solid #e2e8f0",
+                      marginBottom: "24px",
+                    }}
+                  >
+                    <Title
+                      level={5}
+                      style={{ marginBottom: "16px", color: "#374151" }}
+                    >
+                      Informations personnelles
+                    </Title>
+
+                    {/* Email */}
+                    <div style={{ marginBottom: "16px" }}>
+                      <div style={{ display: "flex", marginBottom: "4px" }}>
+                        <label
+                          style={{
+                            fontSize: "14px",
+                            fontWeight: "500",
+                            color: "#4B5563",
+                          }}
+                        >
+                          Adresse email{" "}
+                          <span style={{ color: "#EF4444" }}>*</span>
+                        </label>
+                      </div>
+                      <Input
+                        value={formValues.email || ""}
+                        onChange={(e) =>
+                          handleInputChange("email", e.target.value)
+                        }
+                        placeholder="client@example.com"
+                        prefix={<MailOutlined />}
+                        size={isMobile ? "middle" : "large"}
+                        style={{ width: "100%" }}
+                      />
+                    </div>
+
+                    {/* Prénom et Nom */}
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "16px",
+                        marginBottom: "16px",
+                        flexDirection: isMobile ? "column" : "row",
                       }}
                     >
-                      <div style={{ textAlign: "center" }}>
-                        <Title
-                          level={4}
-                          style={{ color: "#f59f00", marginBottom: "8px" }}
-                        >
-                          Montant total à payer
-                        </Title>
-                        <div>
-                          <p
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: "flex", marginBottom: "4px" }}>
+                          <label
                             style={{
-                              fontSize: "24px",
-                              fontWeight: "bold",
-                              color: "#f59f00",
+                              fontSize: "14px",
+                              fontWeight: "500",
+                              color: "#4B5563",
                             }}
                           >
-                            {calculateTotalAmount().toLocaleString("fr-FR")}{" "}
-                            FCFA
-                          </p>
-                          <p style={{ fontSize: "14px", color: "#666" }}>
-                            {/* {transaction?.amount.toLocaleString("fr-FR")} FCFA ×{" "} */}
-                            {formValues.chauffeur === "true"
-                              ? getTarificationForDays()?.price_driver.toLocaleString(
-                                  "fr-FR"
-                                )
-                              : getTarificationForDays()?.price.toLocaleString(
-                                  "fr-FR"
-                                )}{" "}
-                            FCFA × {formValues.nombreJours} jour(s)
-                          </p>
+                            Prénom <span style={{ color: "#EF4444" }}>*</span>
+                          </label>
                         </div>
+                        <Input
+                          value={formValues.firstName || ""}
+                          onChange={(e) =>
+                            handleInputChange("firstName", e.target.value)
+                          }
+                          placeholder="Jean"
+                          prefix={<UserOutlined />}
+                          size={isMobile ? "middle" : "large"}
+                          style={{ width: "100%" }}
+                        />
                       </div>
-                    </Card>
-                  </>
+
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: "flex", marginBottom: "4px" }}>
+                          <label
+                            style={{
+                              fontSize: "14px",
+                              fontWeight: "500",
+                              color: "#4B5563",
+                            }}
+                          >
+                            Nom de famille{" "}
+                            <span style={{ color: "#EF4444" }}>*</span>
+                          </label>
+                        </div>
+                        <Input
+                          value={formValues.lastName || ""}
+                          onChange={(e) =>
+                            handleInputChange("lastName", e.target.value)
+                          }
+                          placeholder="Dupont"
+                          prefix={<UserOutlined />}
+                          size={isMobile ? "middle" : "large"}
+                          style={{ width: "100%" }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Téléphone */}
+                    <div style={{ marginBottom: "16px" }}>
+                      <div style={{ display: "flex", marginBottom: "4px" }}>
+                        <label
+                          style={{
+                            fontSize: "14px",
+                            fontWeight: "500",
+                            color: "#4B5563",
+                          }}
+                        >
+                          Numéro de téléphone{" "}
+                          <span style={{ color: "#EF4444" }}>*</span>
+                        </label>
+                      </div>
+                      <Input
+                        value={formValues.phone || ""}
+                        onChange={(e) =>
+                          handleInputChange("phone", e.target.value)
+                        }
+                        placeholder="+22912345678"
+                        prefix={<ContactsOutlined />}
+                        size={isMobile ? "middle" : "large"}
+                        style={{ width: "100%" }}
+                      />
+                    </div>
+
+                    {/* Adresse */}
+                    <div style={{ marginBottom: "16px" }}>
+                      <div style={{ display: "flex", marginBottom: "4px" }}>
+                        <label
+                          style={{
+                            fontSize: "14px",
+                            fontWeight: "500",
+                            color: "#4B5563",
+                          }}
+                        >
+                          Adresse <span style={{ color: "#EF4444" }}>*</span>
+                        </label>
+                      </div>
+                      <Input
+                        value={formValues.address || ""}
+                        onChange={(e) =>
+                          handleInputChange("address", e.target.value)
+                        }
+                        placeholder="123 rue de Paris"
+                        prefix={<BankOutlined />}
+                        size={isMobile ? "middle" : "large"}
+                        style={{ width: "100%" }}
+                      />
+                    </div>
+
+                    {/* Ville et Région */}
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "16px",
+                        marginBottom: "16px",
+                        flexDirection: isMobile ? "column" : "row",
+                      }}
+                    >
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: "flex", marginBottom: "4px" }}>
+                          <label
+                            style={{
+                              fontSize: "14px",
+                              fontWeight: "500",
+                              color: "#4B5563",
+                            }}
+                          >
+                            Ville <span style={{ color: "#EF4444" }}>*</span>
+                          </label>
+                        </div>
+                        <Input
+                          value={formValues.city || ""}
+                          onChange={(e) =>
+                            handleInputChange("city", e.target.value)
+                          }
+                          placeholder="Cotonou"
+                          prefix={<EnvironmentOutlined />}
+                          size={isMobile ? "middle" : "large"}
+                          style={{ width: "100%" }}
+                        />
+                      </div>
+
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: "flex", marginBottom: "4px" }}>
+                          <label
+                            style={{
+                              fontSize: "14px",
+                              fontWeight: "500",
+                              color: "#4B5563",
+                            }}
+                          >
+                            Région/État{" "}
+                            <span style={{ color: "#EF4444" }}>*</span>
+                          </label>
+                        </div>
+                        <Input
+                          value={formValues.state || ""}
+                          onChange={(e) =>
+                            handleInputChange("state", e.target.value)
+                          }
+                          placeholder="Littoral"
+                          prefix={<GlobalOutlined />}
+                          size={isMobile ? "middle" : "large"}
+                          style={{ width: "100%" }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Code pays et Code postal */}
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "16px",
+                        marginBottom: "16px",
+                        flexDirection: isMobile ? "column" : "row",
+                      }}
+                    >
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: "flex", marginBottom: "4px" }}>
+                          <label
+                            style={{
+                              fontSize: "14px",
+                              fontWeight: "500",
+                              color: "#4B5563",
+                            }}
+                          >
+                            Code pays{" "}
+                            <span style={{ color: "#EF4444" }}>*</span>
+                          </label>
+                        </div>
+                        <Select
+                          value={formValues.country}
+                          onChange={(value) =>
+                            handleInputChange("country", value)
+                          }
+                          placeholder="Sélectionnez votre pays"
+                          size={isMobile ? "middle" : "large"}
+                          style={{ width: "100%" }}
+                          suffixIcon={<GlobalOutlined />}
+                        >
+                          <Option value="FR">France (FR)</Option>
+                          <Option value="BE">Belgique (BE)</Option>
+                          <Option value="CH">Suisse (CH)</Option>
+                          <Option value="CA">Canada (CA)</Option>
+                          <Option value="US">États-Unis (US)</Option>
+                          <Option value="DE">Allemagne (DE)</Option>
+                          <Option value="ES">Espagne (ES)</Option>
+                          <Option value="IT">Italie (IT)</Option>
+                          <Option value="GB">Royaume-Uni (GB)</Option>
+                          <Option value="BJ">Bénin (BJ)</Option>
+                          <Option value="CI">Côte d'Ivoire (CI)</Option>
+                          <Option value="SN">Sénégal (SN)</Option>
+                          <Option value="ML">Mali (ML)</Option>
+                          <Option value="BF">Burkina Faso (BF)</Option>
+                          <Option value="NE">Niger (NE)</Option>
+                          <Option value="TG">Togo (TG)</Option>
+                          <Option value="GH">Ghana (GH)</Option>
+                          <Option value="NG">Nigeria (NG)</Option>
+                          <Option value="MA">Maroc (MA)</Option>
+                          <Option value="TN">Tunisie (TN)</Option>
+                          <Option value="DZ">Algérie (DZ)</Option>
+                          <Option value="OTHER">Autre</Option>
+                        </Select>
+                      </div>
+
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: "flex", marginBottom: "4px" }}>
+                          <label
+                            style={{
+                              fontSize: "14px",
+                              fontWeight: "500",
+                              color: "#4B5563",
+                            }}
+                          >
+                            Code postal{" "}
+                            <span style={{ color: "#EF4444" }}>*</span>
+                          </label>
+                        </div>
+                        <Input
+                          value={formValues.zip || ""}
+                          onChange={(e) =>
+                            handleInputChange("zip", e.target.value)
+                          }
+                          placeholder="75001"
+                          prefix={<BankOutlined />}
+                          size={isMobile ? "middle" : "large"}
+                          style={{ width: "100%" }}
+                        />
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+
+                {/* Display total amount only after fields are filled */}
+                {formValues.nombreJours && formValues.chauffeur && (
+                  <Card
+                    style={{
+                      backgroundColor: "#fff7ed",
+                      border: "1px solid #f59f00",
+                      marginBottom: "24px",
+                    }}
+                  >
+                    <div style={{ textAlign: "center" }}>
+                      <Title
+                        level={4}
+                        style={{ color: "#f59f00", marginBottom: "8px" }}
+                      >
+                        Montant total à payer
+                      </Title>
+                      <div>
+                        <p
+                          style={{
+                            fontSize: "24px",
+                            fontWeight: "bold",
+                            color: "#f59f00",
+                          }}
+                        >
+                          {calculateTotalAmount().toLocaleString("fr-FR")} FCFA
+                        </p>
+                        <p style={{ fontSize: "14px", color: "#666" }}>
+                          {formValues.chauffeur === "true"
+                            ? getTarificationForDays()?.price_driver.toLocaleString(
+                                "fr-FR"
+                              )
+                            : getTarificationForDays()?.price.toLocaleString(
+                                "fr-FR"
+                              )}{" "}
+                          FCFA × {formValues.nombreJours} jour(s)
+                        </p>
+                        {formValues.chauffeur === "true" && (
+                          <p style={{ fontSize: "12px", color: "#f59f00" }}>
+                            Avec chauffeur inclus
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
                 )}
 
-                {renderFormFields()}
-              </div>
-
-              <div style={buttonContainerStyle}>
+                {/* Boutons d'action */}
                 <div
                   style={{
                     display: "flex",
+                    justifyContent: "space-between",
+                    marginTop: "32px",
                     flexDirection: isMobile
                       ? ("column" as const)
                       : ("row" as const),
-                    gap: "8px",
-                    width: isMobile ? "100%" : "auto",
+                    gap: isMobile ? "16px" : "0",
                   }}
                 >
-                  {currentPage > 0 && (
-                    <Button
-                      onClick={prevPage}
-                      style={{
-                        marginRight: isMobile ? "0" : "8px",
-                        width: isMobile ? "100%" : "auto",
-                      }}
-                    >
-                      Précédent
-                    </Button>
-                  )}
-
                   <Button
                     danger
                     icon={<DeleteOutlined />}
@@ -777,89 +811,36 @@ const ReservationVehicule = () => {
                   >
                     Effacer le formulaire
                   </Button>
-                </div>
 
-                <div style={{ width: isMobile ? "100%" : "auto" }}>
-                  {currentPage < totalPages - 1 ? (
-                    <Button
-                      type="primary"
-                      onClick={nextPage}
-                      style={{
-                        width: isMobile ? "100%" : "auto",
-                        backgroundColor: "#f59f00",
-                        borderColor: "#f59f00",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = "#e8900d";
-                        e.currentTarget.style.borderColor = "#e8900d";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = "#f59f00";
-                        e.currentTarget.style.borderColor = "#f59f00";
-                      }}
-                    >
-                      Suivant
-                    </Button>
-                  ) : (
-                    <Button
-                      type="primary"
-                      onClick={submitForm}
-                      loading={isSubmitting}
-                      disabled={isSubmitting}
-                      style={{
-                        width: isMobile ? "100%" : "auto",
-                        backgroundColor: "#f59f00",
-                        borderColor: "#f59f00",
-                      }}
-                      onMouseEnter={(e) => {
-                        if (!isSubmitting) {
-                          e.currentTarget.style.backgroundColor = "#e8900d";
-                          e.currentTarget.style.borderColor = "#e8900d";
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isSubmitting) {
-                          e.currentTarget.style.backgroundColor = "#f59f00";
-                          e.currentTarget.style.borderColor = "#f59f00";
-                        }
-                      }}
-                    >
-                      {isSubmitting ? "Traitement..." : "Payer"}
-                    </Button>
-                  )}
+                  <Button
+                    type="primary"
+                    onClick={handlePayment}
+                    disabled={!areAllFieldsValid() || isSubmitting}
+                    loading={isSubmitting}
+                    style={{
+                      width: isMobile ? "100%" : "auto",
+                      backgroundColor: "#f59f00",
+                      borderColor: "#f59f00",
+                    }}
+                    // onMouseEnter={(e) => {
+                    //   if (!e.currentTarget.disabled) {
+                    //     e.currentTarget.style.backgroundColor = "#e8900d";
+                    //     e.currentTarget.style.borderColor = "#e8900d";
+                    //   }
+                    // }}
+                    // onMouseLeave={(e) => {
+                    //   if (!e.currentTarget.disabled) {
+                    //     e.currentTarget.style.backgroundColor = "#f59f00";
+                    //     e.currentTarget.style.borderColor = "#f59f00";
+                    //   }
+                    // }}
+                  >
+                    Procéder au paiement
+                  </Button>
                 </div>
               </div>
             </div>
           </Card>
-
-          <div
-            style={{
-              marginTop: "16px",
-              display: "flex",
-              alignItems: "center",
-              flexDirection: isMobile ? "column" : "row",
-              gap: isMobile ? "8px" : "0",
-            }}
-          >
-            <Progress
-              percent={Math.round(((currentPage + 1) / totalPages) * 100)}
-              style={{
-                flexGrow: 1,
-                marginRight: isMobile ? "0" : "16px",
-                width: isMobile ? "100%" : "auto",
-              }}
-              showInfo={false}
-              strokeColor="#f59f00"
-            />
-            <span
-              style={{
-                color: "#4B5563",
-                fontSize: isMobile ? "14px" : "16px",
-              }}
-            >
-              Page {currentPage + 1} sur {totalPages}
-            </span>
-          </div>
         </div>
       </Flex>
     </>

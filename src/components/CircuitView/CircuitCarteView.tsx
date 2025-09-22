@@ -206,7 +206,7 @@ export const CircuitCarteView = () => {
       .catch((err) => {
         console.error("Error fetching ville:", err);
       });
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     VillesAPI.List()

@@ -98,11 +98,11 @@ function Footer() {
   ];
 
   const paymentMethods = [
+    { name: "Visa", logo: visa, color: "#1A1F71" },
+    { name: "Mastercard", logo: mastercard, color: "#EB001B" },
     { name: "MTN", logo: mtn, color: "#FFCC00" },
     { name: "Moov", logo: moov, color: "#00A651" },
     { name: "Celtis", logo: celtis, color: "#00A651" },
-    { name: "Visa", logo: visa, color: "#1A1F71" },
-    { name: "Mastercard", logo: mastercard, color: "#EB001B" },
   ];
 
   const renderSocialIcon = (social: any) => {
@@ -114,8 +114,8 @@ function Footer() {
         key={social.key}
         style={{
           backgroundColor: isHovered ? "#ff3100" : "#411E1C",
-          width: "36px",
-          height: "36px",
+          width: "56px",
+          height: "56px",
           borderRadius: "50%",
           justifyContent: "center",
           alignItems: "center",
@@ -131,7 +131,7 @@ function Footer() {
           rel="noopener noreferrer"
           style={{ textDecoration: "none" }}
         >
-          <Icon style={{ fontSize: "18px", color: "white" }} />
+          <Icon style={{ fontSize: "35px", color: "white" }} />
         </Link>
       </Flex>
     );
@@ -301,11 +301,11 @@ function Footer() {
                   key={method.name}
                   style={{
                     backgroundColor: "#411E1C",
-                    padding: "6px 10px",
-                    borderRadius: "6px",
+                    // padding: "6px 10px",
+                    // borderRadius: "6px",
                     alignItems: "center",
-                    gap: "6px",
-                    border: "1px solid #666",
+                    // gap: "6px",
+                    // border: "1px solid #666",
                     minWidth: "70px",
                     justifyContent: "center",
                   }}
@@ -314,21 +314,12 @@ function Footer() {
                     src={method.logo}
                     alt={method.name}
                     style={{
-                      height: "20px",
+                      height: "35px",
                       width: "auto",
                       objectFit: "contain",
                       display: "block",
                     }}
                   />
-                  <Typography.Text
-                    style={{
-                      color: "white",
-                      fontSize: "10px",
-                      fontFamily: "GeneralSans",
-                    }}
-                  >
-                    {method.name}
-                  </Typography.Text>
                 </Flex>
               ))}
             </Flex>

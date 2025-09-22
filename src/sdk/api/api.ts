@@ -4,6 +4,9 @@ export const axiosSiteData = axios.create();
 export const apiBaseURL = "https://api.dahomeydiscovery.com/api/v1";
 axiosSiteData.defaults.baseURL = apiBaseURL;
 
+export const fedaKey = "pk_sandbox_54Ed8w4N0dOVTST7OHwVWzHR"; // Public key
+// export const fedaKey = "pk_live_5f3f4e7e1c3b4b8a9c8b4567"; // Live key
+
 export const lsUserTokenKey = "Authorization";
 export const lsUserKey = "user";
 
