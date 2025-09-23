@@ -1081,6 +1081,7 @@ const Hebergements = () => {
                                   ...acc.options.map((opt: any) => opt.price)
                                 )
                               : acc.price,
+                              tarification: []
                         });
                         navigate("/reservations-locations");
                       }}
