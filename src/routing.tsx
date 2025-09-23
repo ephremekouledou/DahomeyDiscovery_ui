@@ -20,6 +20,7 @@ import Apropos from "./pages/Apropos/Apropos";
 import Actualites from "./pages/Actualites/Actualites";
 import CGV from "./pages/CGV/cgv";
 import ReservationVehicule from "./pages/Reservations/reservationVehicule";
+import AttractionDetailPage from "./pages/Attractions/viewAttractions";
 
 const router = createBrowserRouter([
   {
@@ -92,6 +93,11 @@ const router = createBrowserRouter([
   {
     path: "/attractions",
     element: <Attractions />,
+    errorElement: <NotFound />,
+  },
+  {
+    path: "/attractions/:id",
+    element: <AttractionDetailPage />,
     errorElement: <NotFound />,
   },
   {
