@@ -24,6 +24,9 @@ const Attractions = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const [attractions, setAttractions] = useState<IAttraction[]>([]);
+  const [filteredAttractions, setFilteredAttractions] = useState<IAttraction[]>(
+    []
+  );
   // const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
 
@@ -83,14 +86,28 @@ const Attractions = () => {
       });
   }, []);
 
-  const filteredAttractions = attractions.filter((attraction) => {
-    const matchesCategory =
-      selectedCategory === "all" || attraction.category === selectedCategory;
-    const matchesSearch =
-      attraction.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      attraction.location.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  useEffect(() => {
+    setFilteredAttractions(
+      attractions.filter((attraction) => {
+        const matchesCategory =
+          selectedCategory === "all" ||
+          attraction.category === selectedCategory;
+        const matchesSearch =
+          attraction.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          attraction.location.toLowerCase().includes(searchTerm.toLowerCase());
+        return matchesCategory && matchesSearch;
+      })
+    );
+  }, [attractions, selectedCategory, searchTerm]);
+
+  // const filteredAttractions = attractions.filter((attraction) => {
+  //   const matchesCategory =
+  //     selectedCategory === "all" || attraction.category === selectedCategory;
+  //   const matchesSearch =
+  //     attraction.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //     attraction.location.toLowerCase().includes(searchTerm.toLowerCase());
+  //   return matchesCategory && matchesSearch;
+  // });
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -108,7 +125,7 @@ const Attractions = () => {
       <BeginningButton />
       {/* Header avec NavBar */}
       <div className="relative z-20 flex items-center justify-center">
-        <NavBar menu="HÉBERGEMENT" />
+        <NavBar menu="ATTRACTION" />
       </div>
 
       <Flex
@@ -384,8 +401,8 @@ const Attractions = () => {
           </p>
           <button
             onClick={() => navigate(`/circuits-thematiques`)}
-            style={{color: "black"}}
-            className="bg-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors shadow-lg"
+            style={{ color: "black" }}
+            className="bg-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors shadow-lg cursor-pointer" 
           >
             Voir tous les circuits
           </button>
