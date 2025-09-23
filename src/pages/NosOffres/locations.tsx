@@ -1188,6 +1188,7 @@ const Locations = () => {
                         id: car.id,
                         title: car.name,
                         amount: car.pricePerDay,
+                        tarification: []
                       });
                       // we redirect to the payment page
                       navigate("/reservations-locations");
@@ -1259,6 +1260,7 @@ const Locations = () => {
                         id: car.id,
                         title: car.name,
                         amount: car.pricePerDay,
+                        tarification: []
                       });
                       // we redirect to the payment page
                       navigate("/reservations-locations");
@@ -1330,6 +1332,7 @@ const Locations = () => {
                         id: car.id,
                         title: car.name,
                         amount: car.pricePerDay,
+                        tarification: []
                       });
                       // we redirect to the payment page
                       navigate("/reservations-locations");

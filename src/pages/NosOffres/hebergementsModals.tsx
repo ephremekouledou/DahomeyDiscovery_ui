@@ -1028,6 +1028,7 @@ const AccommodationOptionModal: React.FC<AccommodationOptionModalProps> = ({
                   id: optionData._id,
                   title: optionData.name,
                   amount: optionData.price,
+                  tarification: []
                 });
                 navigate("/reservations-locations");
               }}

@@ -339,6 +339,7 @@ const ViewHebergementContent: React.FC<ViewHebergementContentProps> = ({
                     ? `${accommodation.name} - ${selectedOption.name}`
                     : accommodation.name,
                   amount: currentPrice,
+                  tarification: []
                 });
                 navigate("/reservations-locations");
               }
