@@ -89,6 +89,8 @@ const Transferts: React.FC = () => {
 
     const vehicle = getSelectedVehicle();
 
+    if (destination.departement === "Littoral") return 15000;
+
     return Math.round(destination.distance * (vehicle?.price ?? 0));
   };
 
