@@ -4,11 +4,12 @@ import { Flex, Typography } from "antd";
 import BeginningButton from "../../components/dededed/BeginingButton";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
-import attraction from "/images/attraction.jpg";
 import { useNavigate } from "react-router-dom";
 import { AttractionsAPI } from "../../sdk/api/attraction";
 import { IAttraction } from "../../sdk/models/attraction";
 import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
+import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
+import { PageSettings } from "../../sdk/api/pageMedias";
 
 interface Category {
   id: string;
@@ -27,6 +28,8 @@ const Attractions = () => {
   const [filteredAttractions, setFilteredAttractions] = useState<IAttraction[]>(
     []
   );
+  const [loading, setLoading] = useState<boolean>(true);
+  const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
   // const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
 
@@ -74,6 +77,18 @@ const Attractions = () => {
       description: "Spa, spectacles, détente",
     },
   ];
+
+  useEffect(() => {
+    PageSettings.List()
+      .then((data) => {
+        console.log("the settings are:", data);
+        setSettings(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching circuits:", err);
+      });
+  }, []);
 
   useEffect(() => {
     AttractionsAPI.List()
@@ -127,83 +142,86 @@ const Attractions = () => {
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="ATTRACTION" />
       </div>
-
-      <Flex
-        vertical
-        className="relative w-full overflow-hidden"
-        style={{
-          backgroundImage: `url(${attraction})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          padding: isMobile ? "4vh 4vw" : isTablet ? "6vh 6vw" : "8vh 8vw",
-          paddingBottom: isMobile ? "12vw" : isTablet ? "10vw" : "8vw",
-        }}
-      >
-        {/* Gradient overlay - de la couleur beige/crème vers transparent */}
-        <div
-          className="absolute inset-0"
+      {!loading && (
+        <Flex
+          vertical
+          className="relative w-full overflow-hidden"
           style={{
-            background: `linear-gradient(to right, 
+            backgroundImage: `url(${HandleGetFileLink(
+              settings.attraction_background[0].file as string
+            )})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            padding: isMobile ? "4vh 4vw" : isTablet ? "6vh 6vw" : "8vh 8vw",
+            paddingBottom: isMobile ? "12vw" : isTablet ? "10vw" : "8vw",
+          }}
+        >
+          {/* Gradient overlay - de la couleur beige/crème vers transparent */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(to right, 
                   rgba(250, 235, 215, 0.95) 0%,
                   rgba(250, 235, 215, 0.85) 20%,
                   rgba(250, 235, 215, 0.6) 40%,
                   rgba(250, 235, 215, 0.3) 60%,
                   rgba(250, 235, 215, 0.1) 80%,
                   transparent 100%)`,
-          }}
-        />
-        <Flex
-          style={{
-            maxWidth: "1050px",
-            width: "100%",
-            margin: "0 auto",
-            zIndex: 1,
-          }}
-        >
-          <Flex vertical gap={0}>
-            <Typography.Text
-              style={{
-                color: "#000000",
-                fontSize: isMobile ? "10px" : isTablet ? "14px" : "16px",
-                lineHeight: "1.1",
-                margin: "0",
-                textTransform: "uppercase",
-                fontFamily: "GeneralSans",
-                letterSpacing: "0.3em",
-              }}
-            >
-              Vivez le Bénin comme chez vous
-            </Typography.Text>
-            <Typography.Title
-              level={1}
-              style={{
-                color: "#FF3100",
-                fontSize: isMobile ? "32px" : isTablet ? "60px" : "85px",
-                fontWeight: "900",
-                lineHeight: "1",
-                letterSpacing: "0.03em",
-                marginTop: "20px",
-                marginBottom: "15px",
-                fontFamily: "DragonAngled",
-                textTransform: "uppercase",
-              }}
-            >
-              Découvrez des expériences inoubliables
-            </Typography.Title>
-            <Typography.Text
-              style={{
-                color: "#000000",
-                fontSize: isMobile ? "18px" : isTablet ? "32px" : "45px",
-                lineHeight: "1",
-                marginTop: "0",
-                fontFamily: "DragonAngled",
-              }}
-            >
-              Explorez les meilleures attractions et activités près de chez vous
-            </Typography.Text>
+            }}
+          />
+          <Flex
+            style={{
+              maxWidth: "1050px",
+              width: "100%",
+              margin: "0 auto",
+              zIndex: 1,
+            }}
+          >
+            <Flex vertical gap={0}>
+              <Typography.Text
+                style={{
+                  color: "#000000",
+                  fontSize: isMobile ? "10px" : isTablet ? "14px" : "16px",
+                  lineHeight: "1.1",
+                  margin: "0",
+                  textTransform: "uppercase",
+                  fontFamily: "GeneralSans",
+                  letterSpacing: "0.3em",
+                }}
+              >
+                Vivez le Bénin comme chez vous
+              </Typography.Text>
+              <Typography.Title
+                level={1}
+                style={{
+                  color: "#FF3100",
+                  fontSize: isMobile ? "32px" : isTablet ? "60px" : "85px",
+                  fontWeight: "900",
+                  lineHeight: "1",
+                  letterSpacing: "0.03em",
+                  marginTop: "20px",
+                  marginBottom: "15px",
+                  fontFamily: "DragonAngled",
+                  textTransform: "uppercase",
+                }}
+              >
+                {settings.attractions_title}
+              </Typography.Title>
+              <Typography.Text
+                style={{
+                  color: "#000000",
+                  fontSize: isMobile ? "18px" : isTablet ? "32px" : "45px",
+                  lineHeight: "1",
+                  marginTop: "0",
+                  fontFamily: "DragonAngled",
+                }}
+              >
+                {settings.attractions_subtitle}
+              </Typography.Text>
+            </Flex>
           </Flex>
         </Flex>
-      </Flex>
+      )}
 
       {/* Contenu principal */}
       <Flex

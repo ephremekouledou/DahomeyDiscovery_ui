@@ -13,7 +13,6 @@ import ReservationCircuit from "./pages/Reservations/reservationCircuits";
 import ReservationLocation from "./pages/Reservations/reservationLocations";
 import ViewHebergement from "./pages/NosOffres/viewHebergement";
 import ViewLocation from "./pages/NosOffres/viewLocation";
-import Transferts from "./pages/Transfers/transferts";
 import Restaurants from "./pages/Restaurants/restaurants";
 import Attractions from "./pages/Attractions/attractions";
 import Apropos from "./pages/Apropos/Apropos";
@@ -21,6 +20,7 @@ import Actualites from "./pages/Actualites/Actualites";
 import CGV from "./pages/CGV/cgv";
 import ReservationVehicule from "./pages/Reservations/reservationVehicule";
 import AttractionDetailPage from "./pages/Attractions/viewAttractions";
+import Transferts from "./pages/Transfers/transferts";
 
 const router = createBrowserRouter([
   {

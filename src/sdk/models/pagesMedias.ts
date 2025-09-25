@@ -41,6 +41,34 @@ export const emptyIRestaurantSettings = (): IRestaurantSettings => ({
   rotation: "0",
 });
 
+export interface ITransferDestination {
+  _id: string;
+  nom: string;
+  departement: string;
+  distance: number;
+}
+
+export const emptyITransferDestination = (): ITransferDestination => ({
+  _id: v4(),
+  nom: "",
+  departement: "",
+  distance: 0,
+});
+
+export interface ITransferVehicule {
+  _id: string;
+  nom: string;
+  price: number;
+  capacity: string;
+}
+
+export const emptyITransferVehicule = (): ITransferVehicule => ({
+  _id: v4(),
+  nom: "",
+  price: 0,
+  capacity: "",
+});
+
 export interface IPageMedia extends IDefault {
   circuit_infos: IAcceuilCircuitCard[];
   avis: IAcceuilComment[];
@@ -74,6 +102,14 @@ export interface IPageMedia extends IDefault {
   restaurant_description: string;
   restaurants: IRestaurantSettings[];
   restaurant_catalogue: MultiAppFile[];
+  attractions_title: string;
+  attractions_subtitle: string;
+  attraction_background: MultiAppFile[];
+  transfert_title: string;
+  transfert_subtitle: string;
+  transfert_background: MultiAppFile[];
+  transfer_destinations: ITransferDestination[];
+  transfer_vehicules: ITransferVehicule[];
 }
 
 export const emptyIPageMedia = (): IPageMedia => ({
@@ -124,6 +160,14 @@ export const emptyIPageMedia = (): IPageMedia => ({
   restaurant_description: "",
   restaurants: [],
   restaurant_catalogue: [],
+  attractions_title: "",
+  attractions_subtitle: "",
+  attraction_background: [],
+  transfert_title: "",
+  transfert_subtitle: "",
+  transfert_background: [],
+  transfer_destinations: [],
+  transfer_vehicules: [],
 });
 
 export interface IAddUpdatePageMedia {
@@ -159,4 +203,12 @@ export interface IAddUpdatePageMedia {
   restaurant_description: string;
   restaurants: IRestaurantSettings[];
   restaurant_catalogue: MultiAppFile[];
+  attractions_title: string;
+  attractions_subtitle: string;
+  attraction_background: MultiAppFile[];
+  transfert_title: string;
+  transfert_subtitle: string;
+  transfert_background: MultiAppFile[];
+  transfer_destinations: ITransferDestination[];
+  transfer_vehicules: ITransferVehicule[];
 }
