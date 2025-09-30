@@ -2,9 +2,16 @@ import { Link } from "react-router-dom";
 import "./navBar.css";
 import logo from "/images/Logo/logo-belge.png";
 import menuVector from "../../assets../../assets/icons/menuVector.png";
-import { Button, Flex, Drawer, Dropdown } from "antd";
+import { Button, Flex, Drawer, Dropdown, Avatar } from "antd";
 import { useState, useEffect } from "react";
-import { MenuOutlined, CloseOutlined, DownOutlined } from "@ant-design/icons";
+import {
+  MenuOutlined,
+  CloseOutlined,
+  DownOutlined,
+  UserOutlined,
+  LogoutOutlined,
+} from "@ant-design/icons";
+import { ClientsAPI } from "../../sdk/api/clients";
 
 type SubMenuItem = {
   key: string;
@@ -24,6 +31,14 @@ type NavBarProps = {
   scrolled?: boolean;
 };
 
+interface IClient {
+  id?: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  phone?: string;
+}
+
 const NavBar: React.FC<NavBarProps> = ({ menu }) => {
   const [menuSelected, setMenuSelected] = useState<string>(menu);
   const [menuHover, setMenuHover] = useState<string | null>(null);
@@ -31,10 +46,12 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
   const [isTablet, setIsTablet] = useState<boolean>(false);
   const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [isLoginHovered, setIsLoginHovered] = useState(false);
   const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>(
     null
   );
   const [scrolled, setScrolled] = useState<boolean>(false);
+  const [user, setUser] = useState<IClient | null>(null);
 
   // Enhanced responsive breakpoints
   useEffect(() => {
@@ -60,6 +77,12 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Check for logged in user
+  useEffect(() => {
+    const loggedUser = ClientsAPI.GetUser();
+    setUser(loggedUser);
+  }, []);
+
   const handleMenuClick = (menuItem: string) => {
     setMenuSelected(menuItem);
     setDrawerVisible(false);
@@ -67,6 +90,12 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
 
   const handleMobileMenuToggle = (menuKey: string) => {
     setExpandedMobileMenu(expandedMobileMenu === menuKey ? null : menuKey);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("user"); // Ajustez la clé selon votre implémentation
+    setUser(null);
+    window.location.href = "/";
   };
 
   const navItems: NavItem[] = [
@@ -97,24 +126,42 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
     { key: "TRANSFERT", label: "Transferts", path: "/transferts" },
     { key: "RESTAU", label: "Restaurants", path: "/restaurants" },
     { key: "ATTRACTION", label: "Attractions", path: "/attractions" },
-    // {
-    //   key: "OFFRES",
-    //   label: "NOS OFFRES",
-    //   subItems: [
-    //     {
-    //       key: "HÉBERGEMENT",
-    //       label: "Hébergements",
-    //       path: "/hebergements",
-    //     },
-    //     {
-    //       key: "LOCATION",
-    //       label: "Location de voiture",
-    //       path: "/locations",
-    //     },
-    //   ],
-    // },
-    // { key: "A PROPOS", label: "À PROPOS", path: "/a-propos" },
-    // { key: "ACTUALITES", label: "ACTUALITÉS", path: "/actualites" },
+  ];
+
+  // Dropdown menu items for user avatar
+  const userMenuItems = [
+    {
+      key: "profile",
+      label: (
+        <Link
+          to="/mon-profil"
+          style={{ textDecoration: "none", color: "inherit" }}
+        >
+          <Flex align="center" gap="8px">
+            <UserOutlined />
+            <span style={{ fontFamily: "GeneralSans", fontSize: "14px" }}>
+              Mon profil
+            </span>
+          </Flex>
+        </Link>
+      ),
+    },
+    {
+      key: "logout",
+      label: (
+        <Flex
+          align="center"
+          gap="8px"
+          onClick={handleLogout}
+          style={{ cursor: "pointer" }}
+        >
+          <LogoutOutlined />
+          <span style={{ fontFamily: "GeneralSans", fontSize: "14px" }}>
+            Se déconnecter
+          </span>
+        </Flex>
+      ),
+    },
   ];
 
   // Get responsive font sizes based on device and scroll state
@@ -159,6 +206,14 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
       return scrolled ? "55px" : "65px";
     }
     return scrolled ? "60px" : "70px";
+  };
+
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    if (!user) return "";
+    return `${user.first_name.charAt(0)}${user.last_name.charAt(
+      0
+    )}`.toUpperCase();
   };
 
   const renderDesktopNavItem = (item: NavItem) => {
@@ -446,12 +501,35 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
         {navItems.map((item) => renderMobileNavItem(item))}
       </Flex>
 
-      <Flex style={{ marginTop: "30px" }}>
-        <Link to="/reserver" style={{ width: "100%" }}>
+      {user ? (
+        <Flex vertical gap="12px" style={{ marginTop: "30px" }}>
+          <Link to="/mon-profil" style={{ width: "100%" }}>
+            <Button
+              type="default"
+              size="large"
+              block
+              icon={<UserOutlined />}
+              style={{
+                backgroundColor: "transparent",
+                color: "black",
+                borderRadius: "25px",
+                border: "2px solid #F59F00",
+                height: isMobile ? "48px" : "50px",
+                fontSize: isMobile ? "15px" : "16px",
+                fontWeight: "600",
+                fontFamily: "GeneralSans",
+              }}
+              onClick={() => setDrawerVisible(false)}
+            >
+              Mon profil
+            </Button>
+          </Link>
+
           <Button
             type="primary"
             size="large"
             block
+            icon={<LogoutOutlined />}
             style={{
               backgroundColor: "#F59F00",
               color: "black",
@@ -462,12 +540,59 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
               fontWeight: "600",
               fontFamily: "GeneralSans",
             }}
-            onClick={() => setDrawerVisible(false)}
+            onClick={() => {
+              handleLogout();
+              setDrawerVisible(false);
+            }}
           >
-            RÉSERVER
+            Se déconnecter
           </Button>
-        </Link>
-      </Flex>
+        </Flex>
+      ) : (
+        <Flex vertical gap="12px" style={{ marginTop: "30px" }}>
+          <Link to="/login" style={{ width: "100%" }}>
+            <Button
+              type="default"
+              size="large"
+              block
+              style={{
+                backgroundColor: "transparent",
+                color: "black",
+                borderRadius: "25px",
+                border: "2px solid #F59F00",
+                height: isMobile ? "48px" : "50px",
+                fontSize: isMobile ? "15px" : "16px",
+                fontWeight: "600",
+                fontFamily: "GeneralSans",
+              }}
+              onClick={() => setDrawerVisible(false)}
+            >
+              SE CONNECTER
+            </Button>
+          </Link>
+
+          <Link to="/reserver" style={{ width: "100%" }}>
+            <Button
+              type="primary"
+              size="large"
+              block
+              style={{
+                backgroundColor: "#F59F00",
+                color: "black",
+                borderRadius: "25px",
+                border: "none",
+                height: isMobile ? "48px" : "50px",
+                fontSize: isMobile ? "15px" : "16px",
+                fontWeight: "600",
+                fontFamily: "GeneralSans",
+              }}
+              onClick={() => setDrawerVisible(false)}
+            >
+              RÉSERVER
+            </Button>
+          </Link>
+        </Flex>
+      )}
     </Drawer>
   );
 
@@ -563,47 +688,171 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
                   {/* First part of nav items */}
                   <Flex
                     align="center"
-                    gap={isTablet ? "12px" : "24px"}
+                    gap={isTablet ? "8px" : "16px"}
                     flex="1"
                     justify="flex-end"
                   >
                     {navItems.map((item) => renderDesktopNavItem(item))}
 
-                    <Link to="/reservations-circuits">
-                      <Button
-                        type="primary"
-                        size={scrolled ? "middle" : "large"}
-                        style={{
-                          backgroundColor: isHovered ? "#ff3100" : "#F59F00",
-                          color: isHovered ? "white" : "black",
-                          borderRadius: "25px",
-                          border: "none",
-                          fontFamily: "GeneralSans",
-                          transition: "all 0.3s ease",
-                          fontSize: isTablet
-                            ? "13px"
-                            : getResponsiveFontSize(14),
-                          height: isTablet
-                            ? scrolled
-                              ? "32px"
-                              : "36px"
-                            : scrolled
-                            ? "36px"
-                            : "40px",
-                          padding: isTablet
-                            ? "0 12px"
-                            : scrolled
-                            ? "0 16px"
-                            : "0 20px",
-                          fontWeight: "600",
-                          whiteSpace: "nowrap",
-                        }}
-                        onMouseEnter={() => setIsHovered(true)}
-                        onMouseLeave={() => setIsHovered(false)}
-                      >
-                        RÉSERVER
-                      </Button>
-                    </Link>
+                    {user ? (
+                      // User is logged in - show avatar with dropdown and reserve button
+                      <>
+                        <Dropdown
+                          menu={{ items: userMenuItems }}
+                          trigger={["hover"]}
+                          placement="bottomRight"
+                          overlayStyle={{
+                            paddingTop: "8px",
+                            minWidth: "180px",
+                          }}
+                        >
+                          <Avatar
+                            style={{
+                              backgroundColor: "#F59F00",
+                              color: "black",
+                              cursor: "pointer",
+                              fontFamily: "GeneralSans",
+                              fontWeight: "600",
+                              fontSize: isTablet ? "14px" : "16px",
+                              width: isTablet
+                                ? scrolled
+                                  ? "36px"
+                                  : "40px"
+                                : scrolled
+                                ? "40px"
+                                : "44px",
+                              height: isTablet
+                                ? scrolled
+                                  ? "36px"
+                                  : "40px"
+                                : scrolled
+                                ? "40px"
+                                : "44px",
+                              transition: "all 0.3s ease",
+                            }}
+                          >
+                            {getUserInitials()}
+                          </Avatar>
+                        </Dropdown>
+
+                        <Link to="/reservations-circuits">
+                          <Button
+                            type="primary"
+                            size={scrolled ? "middle" : "large"}
+                            style={{
+                              backgroundColor: isHovered
+                                ? "#ff3100"
+                                : "#F59F00",
+                              color: isHovered ? "white" : "black",
+                              borderRadius: "25px",
+                              border: "none",
+                              fontFamily: "GeneralSans",
+                              transition: "all 0.3s ease",
+                              fontSize: isTablet
+                                ? "13px"
+                                : getResponsiveFontSize(14),
+                              height: isTablet
+                                ? scrolled
+                                  ? "32px"
+                                  : "36px"
+                                : scrolled
+                                ? "36px"
+                                : "40px",
+                              padding: isTablet
+                                ? "0 12px"
+                                : scrolled
+                                ? "0 16px"
+                                : "0 20px",
+                              fontWeight: "600",
+                              whiteSpace: "nowrap",
+                            }}
+                            onMouseEnter={() => setIsHovered(true)}
+                            onMouseLeave={() => setIsHovered(false)}
+                          >
+                            RÉSERVER
+                          </Button>
+                        </Link>
+                      </>
+                    ) : (
+                      // User is not logged in - show login and reserve buttons
+                      <>
+                        <Link to="/login">
+                          <Button
+                            type="default"
+                            size={scrolled ? "middle" : "large"}
+                            style={{
+                              backgroundColor: isLoginHovered
+                                ? "#F59F00"
+                                : "transparent",
+                              color: isLoginHovered ? "black" : "black",
+                              borderRadius: "25px",
+                              border: "2px solid #F59F00",
+                              fontFamily: "GeneralSans",
+                              transition: "all 0.3s ease",
+                              fontSize: isTablet
+                                ? "12px"
+                                : getResponsiveFontSize(13),
+                              height: isTablet
+                                ? scrolled
+                                  ? "32px"
+                                  : "36px"
+                                : scrolled
+                                ? "36px"
+                                : "40px",
+                              padding: isTablet
+                                ? "0 10px"
+                                : scrolled
+                                ? "0 14px"
+                                : "0 16px",
+                              fontWeight: "600",
+                              whiteSpace: "nowrap",
+                            }}
+                            onMouseEnter={() => setIsLoginHovered(true)}
+                            onMouseLeave={() => setIsLoginHovered(false)}
+                          >
+                            SE CONNECTER
+                          </Button>
+                        </Link>
+
+                        <Link to="/reservations-circuits">
+                          <Button
+                            type="primary"
+                            size={scrolled ? "middle" : "large"}
+                            style={{
+                              backgroundColor: isHovered
+                                ? "#ff3100"
+                                : "#F59F00",
+                              color: isHovered ? "white" : "black",
+                              borderRadius: "25px",
+                              border: "none",
+                              fontFamily: "GeneralSans",
+                              transition: "all 0.3s ease",
+                              fontSize: isTablet
+                                ? "13px"
+                                : getResponsiveFontSize(14),
+                              height: isTablet
+                                ? scrolled
+                                  ? "32px"
+                                  : "36px"
+                                : scrolled
+                                ? "36px"
+                                : "40px",
+                              padding: isTablet
+                                ? "0 12px"
+                                : scrolled
+                                ? "0 16px"
+                                : "0 20px",
+                              fontWeight: "600",
+                              whiteSpace: "nowrap",
+                            }}
+                            onMouseEnter={() => setIsHovered(true)}
+                            onMouseLeave={() => setIsHovered(false)}
+                          >
+                            RÉSERVER
+                          </Button>
+                        </Link>
+                      </>
+                    )}
                   </Flex>
                 </>
               )}

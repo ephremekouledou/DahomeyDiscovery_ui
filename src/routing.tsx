@@ -21,11 +21,23 @@ import CGV from "./pages/CGV/cgv";
 import ReservationVehicule from "./pages/Reservations/reservationVehicule";
 import AttractionDetailPage from "./pages/Attractions/viewAttractions";
 import Transferts from "./pages/Transfers/transferts";
+import LoginPage from "./pages/Auth/login";
+import RegisterPage from "./pages/Auth/register";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Acceuil />,
+    errorElement: <NotFound />,
+  },
+  {
+    path: "/login",
+    element: <LoginPage />,
+    errorElement: <NotFound />,
+  },
+  {
+    path: "/register",
+    element: <RegisterPage />,
     errorElement: <NotFound />,
   },
   {
