@@ -14,7 +14,7 @@ import {
   Globe,
   Zap,
 } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { AttractionsAPI } from "../../sdk/api/attraction";
 import { emptyIAttraction, IAttraction } from "../../sdk/models/attraction";
 import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
@@ -23,9 +23,14 @@ import BeginningButton from "../../components/dededed/BeginingButton";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
 import attractionImg from "/images/attraction.jpg";
+import { IClientHistory } from "../../sdk/models/clients";
+import { ClientsAPI } from "../../sdk/api/clients";
+import SimilarSelling from "../../components/dededed/similarSelling";
+import CrossSelling from "../../components/dededed/crossSelling";
 
 const AttractionDetailPage = () => {
   const { id } = useParams();
+  const { pathname } = useLocation();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedDate, setSelectedDate] = useState("2024-12-15");
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>("");
@@ -34,11 +39,25 @@ const AttractionDetailPage = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const [attraction, setAttraction] = useState<IAttraction>(emptyIAttraction());
+  const [history, setHistory] = useState<IClientHistory[]>([]);
+  const [attractions, setAttractions] = useState<IAttraction[]>([]);
 
   useEffect(() => {
     AttractionsAPI.GetByID(id as string)
       .then((data) => {
         setAttraction(data);
+        const newElement: IClientHistory = {
+          _id: data._id,
+          type: "attraction",
+          lien: pathname,
+        };
+        ClientsAPI.AddToClientHistory(newElement)
+          .then((_) => {
+            console.log("History added");
+          })
+          .catch((err) => {
+            console.error("History added not added", err);
+          });
         // Sélectionner automatiquement la première tarification si disponible
         if (data.price && data.price.length > 0) {
           setSelectedTarification(data.price[0]._id);
@@ -60,6 +79,28 @@ const AttractionDetailPage = () => {
     window.addEventListener("resize", checkScreenSize);
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
+
+  useEffect(() => {
+    AttractionsAPI.List()
+      .then((data) => {
+        console.log("the attractions are:", data);
+        setAttractions(data.filter((h) => h._id != id));
+      })
+      .catch((err) => {
+        console.error("Error fetching attractions:", err);
+      });
+  }, []);
+
+  useEffect(() => {
+    ClientsAPI.ListClientHistory()
+      .then((data) => {
+        setHistory(data.history);
+        console.log("History fetched", data.history);
+      })
+      .catch((err) => {
+        console.error("History added not added", err);
+      });
+  }, [id]);
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % attraction.images.length);
@@ -176,6 +217,7 @@ const AttractionDetailPage = () => {
 
       {/* Contenu principal */}
       <Flex
+        vertical
         style={{
           maxWidth: "1250px",
           width: "100%",
@@ -546,6 +588,8 @@ const AttractionDetailPage = () => {
             </div>
           </div>
         </div>
+        <SimilarSelling items={attractions} type="attraction" maxItems={4} />
+        <CrossSelling history={history} maxItems={5} />
       </Flex>
 
       {/* Footer */}

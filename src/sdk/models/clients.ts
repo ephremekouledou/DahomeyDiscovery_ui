@@ -6,7 +6,7 @@ import { ICarRentalData } from "./vehicules";
 
 export interface IClientHistory {
   _id: string;
-  created_at: string; // time.Time en Go → string en ISO date
+  created_at?: string; // time.Time en Go → string en ISO date
   type: string;
   lien: string;
   circuit?: ICircuit;

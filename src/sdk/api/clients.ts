@@ -1,4 +1,9 @@
-import { IAddClientBody, IAddUpdateClient, IClient } from "../models/clients";
+import {
+  IAddClientBody,
+  IAddUpdateClient,
+  IClient,
+  IClientHistory,
+} from "../models/clients";
 import {
   axiosSiteData,
   lsUserKey,
@@ -212,5 +217,35 @@ export class ClientsAPI {
     localStorage.removeItem(lsUserKey);
     localStorage.removeItem(lsUserTokenKey);
     window.location.href = "/login";
+  }
+
+  static AddToClientHistory(data: IClientHistory): Promise<IClient> {
+    var url = this.getBaseURL() + "/history";
+    return new Promise((resolve, reject) => {
+      axiosSiteData
+        .post(url, data, axiosSiteDataConfig)
+        .then((response: any) => {
+          const data: IClient = response.data;
+          resolve(data);
+        })
+        .catch((err: any) => {
+          reject(handleErr(err));
+        });
+    });
+  }
+
+  static ListClientHistory(): Promise<IClient> {
+    var url = this.getBaseURL() + "/history";
+    return new Promise((resolve, reject) => {
+      axiosSiteData
+        .get(url, axiosSiteDataConfig)
+        .then((response: any) => {
+          const data: IClient = response.data;
+          resolve(data);
+        })
+        .catch((err: any) => {
+          reject(handleErr(err));
+        });
+    });
   }
 }

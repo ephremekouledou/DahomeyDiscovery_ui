@@ -20,6 +20,10 @@ import { VehiculesAPI } from "../../sdk/api/vehicules";
 import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
 import { EquipmentModal, TarificationModal } from "./locationsModal";
 import { DollarCircleFilled } from "@ant-design/icons";
+import { IClientHistory } from "../../sdk/models/clients";
+import { ClientsAPI } from "../../sdk/api/clients";
+import SimilarSelling from "../../components/dededed/similarSelling";
+import CrossSelling from "../../components/dededed/crossSelling";
 
 const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
   const { setTransaction } = useTransaction();
@@ -346,6 +350,8 @@ const ViewLocation = () => {
   const { id } = useParams();
   const [isMobile, setIsMobile] = useState(false);
   const { pathname } = useLocation();
+  const [history, setHistory] = useState<IClientHistory[]>([]);
+  const [cars, setCars] = useState<ICarRentalData[]>([]);
 
   const [car, setCar] = useState<ICarRentalData | null>(null);
 
@@ -357,6 +363,18 @@ const ViewLocation = () => {
       .then((data) => {
         setCar(data);
         console.log("Vehicule fetched successfully:", data);
+        const newElement: IClientHistory = {
+          _id: data._id,
+          type: "location",
+          lien: pathname,
+        };
+        ClientsAPI.AddToClientHistory(newElement)
+          .then((_) => {
+            console.log("History added");
+          })
+          .catch((err) => {
+            console.error("History added not added", err);
+          });
       })
       .catch((err) => {
         console.error("Error fetching vehicule:", err);
@@ -375,6 +393,28 @@ const ViewLocation = () => {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  useEffect(() => {
+    VehiculesAPI.List()
+      .then((data) => {
+        setCars(data.filter((h) => h._id != id));
+        console.log("Cars fetched successfully:", data);
+      })
+      .catch((err) => {
+        console.error("Error fetching cars:", err);
+      });
+  }, []);
+
+  useEffect(() => {
+    ClientsAPI.ListClientHistory()
+      .then((data) => {
+        setHistory(data.history);
+        console.log("History fetched", data.history);
+      })
+      .catch((err) => {
+        console.error("History added not added", err);
+      });
+  }, [id]);
 
   return (
     <Flex justify="center" vertical>
@@ -497,6 +537,8 @@ const ViewLocation = () => {
           )} */}
           </Flex>
         )}
+        <SimilarSelling items={cars} type="location" maxItems={4} />
+        <CrossSelling history={history} maxItems={5} />
       </Flex>
 
       {/* Footer */}

@@ -16,6 +16,11 @@ import {
   AccommodationOptionModal,
   HotelServicesModal,
 } from "./hebergementsModals";
+import { ClientsAPI } from "../../sdk/api/clients";
+import { IClientHistory } from "../../sdk/models/clients";
+import CrossSelling from "../../components/dededed/crossSelling";
+import { VillesAPI } from "../../sdk/api/villes";
+import SimilarSelling from "../../components/dededed/similarSelling";
 
 interface ViewHebergementContentProps {
   accommodation: IAccommodationData;
@@ -339,7 +344,7 @@ const ViewHebergementContent: React.FC<ViewHebergementContentProps> = ({
                     ? `${accommodation.name} - ${selectedOption.name}`
                     : accommodation.name,
                   amount: currentPrice,
-                  tarification: []
+                  tarification: [],
                 });
                 navigate("/reservations-locations");
               }
@@ -372,6 +377,8 @@ const ViewHebergement: React.FC = () => {
   const [accommodation, setAccommodation] = useState<IAccommodationData>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [history, setHistory] = useState<IClientHistory[]>([]);
+  const [hebergements, setHebergements] = useState<IAccommodationData[]>([]);
 
   // Fetch accommodation data
   useEffect(() => {
@@ -386,6 +393,18 @@ const ViewHebergement: React.FC = () => {
       .then((data) => {
         setAccommodation(data);
         console.log("Hebergement fetched successfully:", data);
+        const newElement: IClientHistory = {
+          _id: data._id,
+          type: "hebergement",
+          lien: pathname,
+        };
+        ClientsAPI.AddToClientHistory(newElement)
+          .then((_) => {
+            console.log("History added");
+          })
+          .catch((err) => {
+            console.error("History added not added", err);
+          });
       })
       .catch((err) => {
         console.error("Error fetching accommodation:", err);
@@ -393,6 +412,49 @@ const ViewHebergement: React.FC = () => {
       })
       .finally(() => {
         setLoading(false);
+      });
+  }, [id]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch both datasets concurrently
+        const [villesData, hebergementsData] = await Promise.all([
+          VillesAPI.List(),
+          HebergementsAPI.List(),
+        ]);
+
+        console.log("Villes fetched successfully:", villesData);
+
+        // Create a lookup map for better performance
+        const villesMap = new Map(
+          villesData.map((ville) => [ville._id, ville.name])
+        );
+
+        // Map hebergements with ville names
+        const mappedHebergements = hebergementsData.map((hebergement) => ({
+          ...hebergement,
+          ville: villesMap.get(hebergement.ville) || hebergement.ville,
+        }));
+
+        setHebergements(mappedHebergements.filter((h) => h._id != id));
+        console.log("Hébergements fetched successfully:", hebergementsData);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    ClientsAPI.ListClientHistory()
+      .then((data) => {
+        setHistory(data.history);
+        console.log("History fetched", data.history);
+      })
+      .catch((err) => {
+        console.error("History added not added", err);
       });
   }, [id]);
 
@@ -561,6 +623,8 @@ const ViewHebergement: React.FC = () => {
         >
           <ViewHebergementContent accommodation={accommodation} />
         </Flex>
+        <SimilarSelling items={hebergements} type="hebergement" maxItems={4} />
+        <CrossSelling history={history} maxItems={5} />
       </Flex>
 
       <Footer />
