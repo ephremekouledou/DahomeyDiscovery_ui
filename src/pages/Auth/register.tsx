@@ -3,8 +3,8 @@ import { Form, Input, Button, Typography, Card, message } from "antd";
 import {
   MailOutlined,
   LockOutlined,
-  UserOutlined,
-  PhoneOutlined,
+  // UserOutlined,
+  // PhoneOutlined,
   EyeTwoTone,
   EyeInvisibleOutlined,
 } from "@ant-design/icons";
@@ -55,20 +55,20 @@ const RegisterPage: React.FC = () => {
   };
 
   // Validation du numéro de téléphone
-  const validatePhone = (_: any, value: string) => {
-    if (!value) {
-      return Promise.reject(
-        new Error("Veuillez saisir votre numéro de téléphone !")
-      );
-    }
-    const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-    if (!phoneRegex.test(value.replace(/[\s\-\(\)]/g, ""))) {
-      return Promise.reject(
-        new Error("Veuillez saisir un numéro de téléphone valide !")
-      );
-    }
-    return Promise.resolve();
-  };
+  // const validatePhone = (_: any, value: string) => {
+  //   if (!value) {
+  //     return Promise.reject(
+  //       new Error("Veuillez saisir votre numéro de téléphone !")
+  //     );
+  //   }
+  //   const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+  //   if (!phoneRegex.test(value.replace(/[\s\-\(\)]/g, ""))) {
+  //     return Promise.reject(
+  //       new Error("Veuillez saisir un numéro de téléphone valide !")
+  //     );
+  //   }
+  //   return Promise.resolve();
+  // };
 
   return (
     <div
@@ -122,7 +122,7 @@ const RegisterPage: React.FC = () => {
           autoComplete="off"
           size="large"
         >
-          <Form.Item
+          {/*<Form.Item
             label={
               <span
                 style={{
@@ -196,7 +196,7 @@ const RegisterPage: React.FC = () => {
                 border: "1px solid #d1d5db",
               }}
             />
-          </Form.Item>
+          </Form.Item>*/}
 
           <Form.Item
             label={
@@ -235,7 +235,7 @@ const RegisterPage: React.FC = () => {
             />
           </Form.Item>
 
-          <Form.Item
+          {/* <Form.Item
             label={
               <span
                 style={{
@@ -265,7 +265,7 @@ const RegisterPage: React.FC = () => {
                 border: "1px solid #d1d5db",
               }}
             />
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item
             label={
@@ -313,7 +313,7 @@ const RegisterPage: React.FC = () => {
             />
           </Form.Item>
 
-          <Form.Item
+          {/* <Form.Item
             label={
               <span
                 style={{
@@ -358,7 +358,7 @@ const RegisterPage: React.FC = () => {
                 border: "1px solid #d1d5db",
               }}
             />
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item style={{ marginBottom: "24px", marginTop: "24px" }}>
             <Button

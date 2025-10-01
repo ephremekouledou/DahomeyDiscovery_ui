@@ -211,9 +211,7 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
   // Get user initials for avatar
   const getUserInitials = () => {
     if (!user) return "";
-    return `${user.first_name.charAt(0)}${user.last_name.charAt(
-      0
-    )}`.toUpperCase();
+    return `${user.email.charAt(0)}`.toUpperCase();
   };
 
   const renderDesktopNavItem = (item: NavItem) => {
@@ -708,7 +706,8 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
                         >
                           <Avatar
                             style={{
-                              backgroundColor: "#F59F00",
+                              backgroundColor: "#fff",
+                              borderColor: "#F59F00",
                               color: "black",
                               cursor: "pointer",
                               fontFamily: "GeneralSans",
