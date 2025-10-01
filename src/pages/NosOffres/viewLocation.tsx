@@ -368,13 +368,13 @@ const ViewLocation = () => {
           type: "location",
           lien: pathname,
         };
-        ClientsAPI.AddToClientHistory(newElement)
-          .then((_) => {
-            console.log("History added");
-          })
-          .catch((err) => {
-            console.error("History added not added", err);
-          });
+        ClientsAPI.AddToClientHistoryLocal(newElement);
+          // .then((_) => {
+          //   console.log("History added");
+          // })
+          // .catch((err) => {
+          //   console.error("History added not added", err);
+          // });
       })
       .catch((err) => {
         console.error("Error fetching vehicule:", err);
@@ -406,7 +406,7 @@ const ViewLocation = () => {
   }, []);
 
   useEffect(() => {
-    ClientsAPI.ListClientHistory()
+    ClientsAPI.ListClientHistory(ClientsAPI.GetClientHistoryLocal())
       .then((data) => {
         setHistory(data.history);
         console.log("History fetched", data.history);

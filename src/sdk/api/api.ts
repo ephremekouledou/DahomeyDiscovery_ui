@@ -9,6 +9,7 @@ export const fedaKey = "pk_sandbox_54Ed8w4N0dOVTST7OHwVWzHR"; // Public key
 
 export const lsUserTokenKey = "Authorization";
 export const lsUserKey = "user";
+export const IsUserHistory = "history";
 
 const token = localStorage.getItem(lsUserTokenKey);
 

@@ -398,13 +398,13 @@ const ViewHebergement: React.FC = () => {
           type: "hebergement",
           lien: pathname,
         };
-        ClientsAPI.AddToClientHistory(newElement)
-          .then((_) => {
-            console.log("History added");
-          })
-          .catch((err) => {
-            console.error("History added not added", err);
-          });
+        ClientsAPI.AddToClientHistoryLocal(newElement);
+        // .then((_) => {
+        //   console.log("History added");
+        // })
+        // .catch((err) => {
+        //   console.error("History added not added", err);
+        // });
       })
       .catch((err) => {
         console.error("Error fetching accommodation:", err);
@@ -448,7 +448,7 @@ const ViewHebergement: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    ClientsAPI.ListClientHistory()
+    ClientsAPI.ListClientHistory(ClientsAPI.GetClientHistoryLocal())
       .then((data) => {
         setHistory(data.history);
         console.log("History fetched", data.history);

@@ -10,7 +10,10 @@ import {
   lsUserTokenKey,
   axiosSiteDataConfig,
   handleErr,
+  IsUserHistory,
 } from "./api";
+
+const MAX_HISTORY_SIZE = 5;
 
 export class ClientsAPI {
   static getBaseURL() {
@@ -234,11 +237,11 @@ export class ClientsAPI {
     });
   }
 
-  static ListClientHistory(): Promise<IClient> {
-    var url = this.getBaseURL() + "/history";
+  static ListClientHistory(data: IClientHistory[]): Promise<IClient> {
+    var url = this.getBaseURL() + "/history/get";
     return new Promise((resolve, reject) => {
       axiosSiteData
-        .get(url, axiosSiteDataConfig)
+        .post(url, data, axiosSiteDataConfig)
         .then((response: any) => {
           const data: IClient = response.data;
           resolve(data);
@@ -247,5 +250,50 @@ export class ClientsAPI {
           reject(handleErr(err));
         });
     });
+  }
+
+  static GetClientHistoryLocal(): IClientHistory[] {
+    // 🔄 récupérer l'historique existant ou [] par défaut
+    const history = localStorage.getItem(IsUserHistory);
+    const userHistory: IClientHistory[] = history ? JSON.parse(history) : [];
+
+    return userHistory;
+  }
+
+  static AddToClientHistoryLocal(data: IClientHistory): void {
+    // 🔄 récupérer l'historique existant ou [] par défaut
+    const history = localStorage.getItem(IsUserHistory);
+    const userHistory: IClientHistory[] = history ? JSON.parse(history) : [];
+
+    // ➕ ajouter la nouvelle entrée avec ta fonction utilitaire
+    const updatedHistory = addToHistory(userHistory, data);
+
+    // 💾 sauvegarder dans localStorage
+    localStorage.setItem(IsUserHistory, JSON.stringify(updatedHistory));
+  }
+
+  static ListClientHistoryLocal(): IClientHistory | null {
+    const history = localStorage.getItem(IsUserHistory);
+    if (history) {
+      return JSON.parse(history);
+    }
+
+    return null;
+  }
+}
+
+function addToHistory(
+  history: IClientHistory[],
+  entry: IClientHistory
+): IClientHistory[] {
+  // Vérifier si déjà présent
+  if (history.some((h) => h._id === entry._id)) {
+    return history; // on ne fait rien
+  }
+
+  if (history.length >= MAX_HISTORY_SIZE) {
+    return [...history.slice(1), entry]; // supprime le premier et ajoute en fin
+  } else {
+    return [...history, entry]; // ajoute simplement
   }
 }

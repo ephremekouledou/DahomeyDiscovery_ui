@@ -51,13 +51,13 @@ const AttractionDetailPage = () => {
           type: "attraction",
           lien: pathname,
         };
-        ClientsAPI.AddToClientHistory(newElement)
-          .then((_) => {
-            console.log("History added");
-          })
-          .catch((err) => {
-            console.error("History added not added", err);
-          });
+        ClientsAPI.AddToClientHistoryLocal(newElement);
+          // .then((_) => {
+          //   console.log("History added");
+          // })
+          // .catch((err) => {
+          //   console.error("History added not added", err);
+          // });
         // Sélectionner automatiquement la première tarification si disponible
         if (data.price && data.price.length > 0) {
           setSelectedTarification(data.price[0]._id);
@@ -92,7 +92,7 @@ const AttractionDetailPage = () => {
   }, []);
 
   useEffect(() => {
-    ClientsAPI.ListClientHistory()
+    ClientsAPI.ListClientHistory(ClientsAPI.GetClientHistoryLocal())
       .then((data) => {
         setHistory(data.history);
         console.log("History fetched", data.history);
