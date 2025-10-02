@@ -349,11 +349,13 @@ const Attractions = () => {
                         {attraction.tag}
                       </div>
                     )}
-                    <div className="absolute bottom-4 right-4 bg-white bg-opacity-90 backdrop-blur-sm px-3 py-1 rounded-full">
-                      <span className="font-bold">
-                        {attraction.price[0].price} FCFA
-                      </span>
-                    </div>
+                    {!attraction.free && (
+                      <div className="absolute bottom-4 right-4 bg-white bg-opacity-90 backdrop-blur-sm px-3 py-1 rounded-full">
+                        <span className="font-bold">
+                          {attraction.price[0].price} FCFA
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="p-6">
@@ -379,14 +381,18 @@ const Attractions = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-1 text-gray-500">
-                        <Clock className="w-4 h-4" />
-                        <span className="text-sm">{attraction.duration}</span>
-                      </div>
+                      {attraction.duration != "" && (
+                        <div className="flex items-center gap-1 text-gray-500">
+                          <Clock className="w-4 h-4" />
+                          <span className="text-sm">{attraction.duration}</span>
+                        </div>
+                      )}
                     </div>
 
                     <button className="w-full bg-[#f59f00] text-white py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer">
-                      Réserver maintenant
+                      {attraction.free
+                        ? "Découvrer maintenant"
+                        : "Réserver maintenant"}
                     </button>
                   </div>
                 </div>

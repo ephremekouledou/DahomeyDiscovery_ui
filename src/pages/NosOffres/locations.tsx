@@ -23,8 +23,8 @@ import {
   Droplets,
 } from "lucide-react";
 import { Element, scroller } from "react-scroll";
-import voitureFront from "/images/voitureFront.webp";
-import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
+import voitureFront from "/images/voitureFront2.jpg";
+// import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
 import Footer from "../../components/footer/footer";
 import { Button, Flex, Rate, Typography } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -36,7 +36,7 @@ import { ICarRentalData } from "../../sdk/models/vehicules";
 import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
 import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { PageSettings } from "../../sdk/api/pageMedias";
-import { useScreenSizeResponsive } from "../../components/CircuitView/Timeline";
+// import { useScreenSizeResponsive } from "../../components/CircuitView/Timeline";
 
 const ServicesSection = () => {
   const services = [
@@ -775,7 +775,7 @@ const Locations = () => {
   const { pathname } = useLocation();
   const { setTransaction } = useTransaction();
   const navigate = useNavigate();
-  const screenSize = useScreenSizeResponsive();
+  // const screenSize = useScreenSizeResponsive();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -1025,7 +1025,7 @@ const Locations = () => {
                 </Typography.Title>
                 <Typography.Text
                   style={{
-                    color: "#563800",
+                    // color: "#563800",
                     fontSize: isMobile ? "24px" : "22px",
                     lineHeight: "1",
                     marginTop: "0",
@@ -1442,7 +1442,7 @@ const Locations = () => {
       </Flex>
 
       {/* Galerie d'images - Responsive */}
-      {!loading && (
+      {/* {!loading && (
         <section
           style={{
             height: screenSize.isMobile
@@ -1462,7 +1462,7 @@ const Locations = () => {
               />
             )}
         </section>
-      )}
+      )} */}
 
       {/* Footer */}
       <Footer />

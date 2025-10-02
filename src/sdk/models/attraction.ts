@@ -1,5 +1,5 @@
 import { InclusList } from "./circuits";
-import { IDefault, MultiAppFile, WhoTypes } from "./models";
+import { IDefault, WhoTypes, MultiAppFile } from "./models";
 import { v4 } from "uuid";
 
 export interface TimeSlot {
@@ -44,6 +44,8 @@ export interface IAttraction extends IDefault {
   images: MultiAppFile[];
   timeSlots: TimeSlot[];
   tag?: string;
+  free: boolean;
+  format: string;
 }
 
 export const emptyIAttraction = (): IAttraction => ({
@@ -77,6 +79,8 @@ export const emptyIAttraction = (): IAttraction => ({
   images: [],
   timeSlots: [],
   tag: "",
+  free: false,
+  format: "",
 });
 
 export interface IAddUpdateAttraction {
@@ -97,6 +101,8 @@ export interface IAddUpdateAttraction {
   images: MultiAppFile[];
   timeSlots: TimeSlot[];
   tag?: string;
+  free: boolean;
+  format: string;
 }
 
 export const emptyIAddUpdateAttraction = (): IAddUpdateAttraction => ({
@@ -117,4 +123,6 @@ export const emptyIAddUpdateAttraction = (): IAddUpdateAttraction => ({
   images: [],
   timeSlots: [],
   tag: "",
+  free: false,
+  format: "",
 });
