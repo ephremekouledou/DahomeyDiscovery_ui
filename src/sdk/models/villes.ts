@@ -1,5 +1,5 @@
 import { InclusList, ITimeline } from "./circuits";
-import { IDefault, MultiAppFile, WhoTypes } from "./models";
+import { IDefault, WhoTypes, MultiAppFile } from "./models";
 
 export interface IVilleActivity {
   image: MultiAppFile[];
@@ -17,6 +17,7 @@ export interface IVille extends IDefault {
   name: string;
   description: string;
   image: MultiAppFile[];
+  video: MultiAppFile[];
   full_description: string;
   timeline: ITimeline[];
   inclus: InclusList[];
@@ -42,6 +43,7 @@ export const emptyIVille = (): IVille => ({
   name: "",
   description: "",
   image: [],
+  video: [],
   full_description: "",
   timeline: [],
   inclus: [],
@@ -54,6 +56,7 @@ export interface IAddUpdateVilleData {
   name: string;
   description: string;
   image: MultiAppFile[];
+  video: MultiAppFile[];
   full_description: string;
   timeline: ITimeline[];
   inclus: InclusList[];
@@ -66,6 +69,7 @@ export const emptyIVilleForm = (): IAddUpdateVilleData => ({
   name: "",
   description: "",
   image: [],
+  video: [],
   full_description: "",
   timeline: [],
   inclus: [],
@@ -78,6 +82,7 @@ export interface JsonVilleStructure extends IDefault {
   name: string;
   description: string;
   image: MultiAppFile[];
+  video: MultiAppFile[];
   full_description: string;
   timeline: {
     _id: string;
@@ -109,6 +114,7 @@ export function jsonVilleToIAddUpdateVilleData(
     name: json.name,
     description: json.description,
     image: json.image,
+    video: json.video,
     full_description: json.full_description,
     timeline: json.timeline.map((tl) => ({
       _id: tl._id,
@@ -156,6 +162,14 @@ export function iAddUpdateVilleDataToJsonVille(
     name: circuit.name,
     description: circuit.description,
     image: circuit.image.map((img) => ({
+      id: img.id,
+      file: img.file,
+      name: img.name,
+      contentType: img.contentType,
+      size: img.size,
+      date: img.date,
+    })),
+    video: circuit.video.map((img) => ({
       id: img.id,
       file: img.file,
       name: img.name,

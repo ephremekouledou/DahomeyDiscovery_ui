@@ -53,6 +53,7 @@ export class VillesAPI {
 
     return new Promise((resolve, reject) => {
       let villeImagePromise: Promise<void> | undefined;
+      let villeVideoPromise: Promise<void> | undefined;
       let activitiesPromises: Promise<void>[] = [];
 
       // Upload de l'image principale de la ville
@@ -62,6 +63,20 @@ export class VillesAPI {
             villeImagePromise = FileAPI.Upload(file.file, "villes", file.name)
               .then((id: string) => {
                 data.image[index].file = id;
+              })
+              .catch((err: any) => {
+                throw handleErr(err);
+              });
+          }
+        });
+      }
+
+      if (data.video.length > 0) {
+        data.video.map((file, index) => {
+          if (file.file instanceof File) {
+            villeVideoPromise = FileAPI.Upload(file.file, "villes", file.name)
+              .then((id: string) => {
+                data.video[index].file = id;
               })
               .catch((err: any) => {
                 throw handleErr(err);
@@ -91,12 +106,21 @@ export class VillesAPI {
       }
 
       // Attendre que tous les uploads soient terminés
-      Promise.all([villeImagePromise, ...activitiesPromises].filter(Boolean))
+      Promise.all(
+        [villeImagePromise, villeVideoPromise, ...activitiesPromises].filter(
+          Boolean
+        )
+      )
         .then(() => {
           // Nettoyage des valeurs null
           data.image.map((_, index) => {
             data.image[index].file =
               data.image[index].file === null ? "" : data.image[index].file;
+          });
+
+          data.video.map((_, index) => {
+            data.video[index].file =
+              data.video[index].file === null ? "" : data.video[index].file;
           });
 
           if (data.timeline !== undefined) {
@@ -133,6 +157,7 @@ export class VillesAPI {
     var url = this.getBaseURL() + "/" + id;
     return new Promise((resolve, reject) => {
       let villeImagePromise: Promise<void> | undefined;
+      let villeVideoPromise: Promise<void> | undefined;
       let activitiesPromises: Promise<void>[] = [];
 
       // Upload de l'image principale de la ville
@@ -142,6 +167,20 @@ export class VillesAPI {
             villeImagePromise = FileAPI.Upload(file.file, "villes", file.name)
               .then((id: string) => {
                 data.image[index].file = id;
+              })
+              .catch((err: any) => {
+                throw handleErr(err);
+              });
+          }
+        });
+      }
+
+      if (data.video.length > 0) {
+        data.video.map((file, index) => {
+          if (file.file instanceof File) {
+            villeVideoPromise = FileAPI.Upload(file.file, "villes", file.name)
+              .then((id: string) => {
+                data.video[index].file = id;
               })
               .catch((err: any) => {
                 throw handleErr(err);
@@ -171,12 +210,21 @@ export class VillesAPI {
       }
 
       // Attendre que tous les uploads soient terminés
-      Promise.all([villeImagePromise, ...activitiesPromises].filter(Boolean))
+      Promise.all(
+        [villeImagePromise, villeVideoPromise, ...activitiesPromises].filter(
+          Boolean
+        )
+      )
         .then(() => {
           // Nettoyage des valeurs null
           data.image.map((_, index) => {
             data.image[index].file =
               data.image[index].file === null ? "" : data.image[index].file;
+          });
+
+          data.video.map((_, index) => {
+            data.video[index].file =
+              data.video[index].file === null ? "" : data.video[index].file;
           });
 
           if (data.timeline !== undefined) {

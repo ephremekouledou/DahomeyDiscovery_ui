@@ -229,7 +229,7 @@ export const CircuitCarteView = () => {
       </div>
 
       {/* Section héros - Responsive */}
-      {!loadingSettgins && (
+      {!loadingSettgins && !loading && (
         <Flex
           vertical
           style={{
@@ -261,9 +261,7 @@ export const CircuitCarteView = () => {
             }}
           >
             <source
-              src={HandleGetFileLink(
-                settings.thematique_reel[0].file as string
-              )}
+              src={HandleGetFileLink(ville.video[0].file as string)}
               type="video/mp4"
             />
             Your browser does not support the video tag.
