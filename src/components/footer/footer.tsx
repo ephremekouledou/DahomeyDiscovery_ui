@@ -80,8 +80,8 @@ function Footer() {
   const contactItems = [
     {
       icon: PhoneOutlined,
-      label: "+229 01 95 20 20 20",
-      link: "tel:+2290195202020",
+      label: "+229 01 67 11 02 20",
+      link: "tel:+2290167110220",
     },
     {
       icon: MailOutlined,

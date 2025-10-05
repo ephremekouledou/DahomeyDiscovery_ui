@@ -21,6 +21,7 @@ import { IClientHistory } from "../../sdk/models/clients";
 import CrossSelling from "../../components/dededed/crossSelling";
 import { VillesAPI } from "../../sdk/api/villes";
 import SimilarSelling from "../../components/dededed/similarSelling";
+import ItemLocation from "../../components/dededed/Map";
 
 interface ViewHebergementContentProps {
   accommodation: IAccommodationData;
@@ -623,6 +624,7 @@ const ViewHebergement: React.FC = () => {
         >
           <ViewHebergementContent accommodation={accommodation} />
         </Flex>
+        <ItemLocation item={{ id: accommodation._id, name: accommodation.name, latitude: accommodation.latitude, longitude: accommodation.longitude }} />
         <SimilarSelling items={hebergements} type="hebergement" maxItems={4} />
         <CrossSelling history={history} maxItems={5} />
       </Flex>

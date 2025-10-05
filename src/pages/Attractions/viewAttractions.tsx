@@ -28,6 +28,7 @@ import SimilarSelling from "../../components/dededed/similarSelling";
 import CrossSelling from "../../components/dededed/crossSelling";
 import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { PageSettings } from "../../sdk/api/pageMedias";
+import ItemLocation from "../../components/dededed/Map";
 
 const AttractionDetailPage = () => {
   const { id } = useParams();
@@ -460,6 +461,11 @@ const AttractionDetailPage = () => {
                       </div>
                     </>
                   )}
+                </div>
+
+                {/* Map */}
+                <div className="bg-white rounded-2xl mt-8 shadow-sm">
+                  <ItemLocation item={{ id: attraction._id, name: attraction.title, latitude: attraction.latitude, longitude: attraction.longitude }} />
                 </div>
               </div>
 

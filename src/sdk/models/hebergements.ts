@@ -1,4 +1,5 @@
 import { IDefault, MultiAppFile, WhoTypes } from "./models";
+import { v4 } from "uuid";
 
 export interface IAmenity {
   name: string;
@@ -222,7 +223,7 @@ export interface IAccommodationOption {
 }
 
 export const emptyIAccommodationOption = (): IAccommodationOption => ({
-  _id: "",
+  _id: v4(),
   name: "",
   description: "",
   photo: [],
@@ -274,6 +275,8 @@ export interface IAccommodationData extends IDefault, IAccommodationEquipment {
   has_options: boolean;
   options?: IAccommodationOption[];
   owner: boolean;
+  latitude: number;
+  longitude: number;
 }
 
 // Fonction helper pour créer un objet vide d'équipements
@@ -453,6 +456,8 @@ export const emptyIAccommodationData = (): IAccommodationData => ({
   amenities: "",
   options: [],
   owner: false,
+  latitude: 0,
+  longitude: 0,
   has_options: false,
   ...emptyIAccommodationEquipment(),
 });
@@ -472,6 +477,8 @@ export interface IAddUpdateAccommodationData extends IAccommodationEquipment {
   has_options: boolean;
   options?: IAccommodationOption[];
   owner: boolean;
+  latitude: number;
+  longitude: number;
 }
 
 export const emptyIAccommodationForm = (): IAddUpdateAccommodationData => ({
@@ -487,6 +494,8 @@ export const emptyIAccommodationForm = (): IAddUpdateAccommodationData => ({
   amenities: "",
   options: [],
   owner: false,
+  latitude: 0,
+  longitude: 0,
   has_options: false,
   ...emptyIAccommodationEquipment(),
 });

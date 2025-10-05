@@ -46,6 +46,8 @@ export interface IAttraction extends IDefault {
   tag?: string;
   free: boolean;
   format: string;
+  latitude: number;
+  longitude: number;
 }
 
 export const emptyIAttraction = (): IAttraction => ({
@@ -81,6 +83,8 @@ export const emptyIAttraction = (): IAttraction => ({
   tag: "",
   free: false,
   format: "",
+  latitude: 0,
+  longitude: 0,
 });
 
 export interface IAddUpdateAttraction {
@@ -103,6 +107,8 @@ export interface IAddUpdateAttraction {
   tag?: string;
   free: boolean;
   format: string;
+  latitude: number;
+  longitude: number;
 }
 
 export const emptyIAddUpdateAttraction = (): IAddUpdateAttraction => ({
@@ -125,4 +131,6 @@ export const emptyIAddUpdateAttraction = (): IAddUpdateAttraction => ({
   tag: "",
   free: false,
   format: "",
+  latitude: 0,
+  longitude: 0,
 });

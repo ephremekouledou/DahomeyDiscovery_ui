@@ -19,6 +19,7 @@ import { CircuitsAPI } from "../../sdk/api/circuits";
 import { HandleGetFileLink } from "../../pages/Circuits/CircuitsCartes";
 import { PageSettings } from "../../sdk/api/pageMedias";
 import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
+import MapItineraire from "../dededed/MapItineraire";
 
 interface CircuitCardOtherProps {
   circuit: ICircuitPresenter;
@@ -874,11 +875,19 @@ export const CircuitView = () => {
           </Flex>
 
           {/* Timeline */}
-          <Flex style={{ width: "100%" }}>
+          <Flex vertical style={{ width: "100%" }}>
             <DetailedTimeline
               timelineData={circuitInfos.timeline}
               screenSize={screenSize}
             />
+            {circuitInfos.stops && (
+              <MapItineraire
+                accommodations={circuitInfos.stops}
+                initialZoom={6}
+                showRoute={true} // false par défaut, l'utilisateur peut activer via le bouton
+                routeColor="#2600ffff" // Couleur de l'itinéraire (orange par défaut)
+              />
+            )}
           </Flex>
 
           {/* Bouton de réservation */}
