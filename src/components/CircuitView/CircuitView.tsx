@@ -881,12 +881,15 @@ export const CircuitView = () => {
               screenSize={screenSize}
             />
             {circuitInfos.stops && (
-              <MapItineraire
-                accommodations={circuitInfos.stops}
-                initialZoom={6}
-                showRoute={true} // false par défaut, l'utilisateur peut activer via le bouton
-                routeColor="#2600ffff" // Couleur de l'itinéraire (orange par défaut)
-              />
+              <>
+                <MapItineraire
+                  accommodations={circuitInfos.stops}
+                  initialZoom={6}
+                  showRoute={true} // false par défaut, l'utilisateur peut activer via le bouton
+                  routeColor="#2600ffff" // Couleur de l'itinéraire (orange par défaut)
+                />
+                {/* <StoryMapEmbed url="https://storymaps.arcgis.com/stories/37999c82885142c7842d9e8bf98a09ba" /> */}
+              </>
             )}
           </Flex>
 
