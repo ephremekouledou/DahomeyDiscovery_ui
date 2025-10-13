@@ -39,6 +39,10 @@ const Transferts: React.FC = () => {
   const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     PageSettings.List()
       .then((data) => {
         console.log("the settings are:", data);
@@ -1197,7 +1201,7 @@ const Transferts: React.FC = () => {
           </Button>
         </Flex>
       </Flex>
-      
+
       {/* Footer */}
       <Footer />
     </Flex>

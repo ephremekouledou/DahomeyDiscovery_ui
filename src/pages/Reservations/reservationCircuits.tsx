@@ -55,6 +55,10 @@ const ReservationCircuit = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const totalPages = 2; // Modifié pour 2 pages
 
+  useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
+
   // Add responsive window width tracking
   useEffect(() => {
     const handleResize = () => {

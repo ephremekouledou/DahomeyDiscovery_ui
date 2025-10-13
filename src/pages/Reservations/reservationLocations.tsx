@@ -42,6 +42,10 @@ const ReservationLocation = () => {
   const totalPages = 3; // Modifié pour 3 pages maintenant
   const { transaction } = useTransaction();
 
+  useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
+
   // Add responsive window width tracking
   useEffect(() => {
     const handleResize = () => {

@@ -79,6 +79,10 @@ const Attractions = () => {
   ];
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     PageSettings.List()
       .then((data) => {
         console.log("the settings are:", data);

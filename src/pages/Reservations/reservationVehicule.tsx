@@ -60,6 +60,10 @@ const ReservationVehicule = () => {
   const [_, setIsPaymentModalVisible] = useState(false);
   const { transaction } = useTransaction();
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Add responsive window width tracking
   useEffect(() => {
     const handleResize = () => {

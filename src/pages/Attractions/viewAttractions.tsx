@@ -48,6 +48,10 @@ const AttractionDetailPage = () => {
   const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  useEffect(() => {
     PageSettings.List()
       .then((data) => {
         console.log("the settings are:", data);
@@ -465,7 +469,14 @@ const AttractionDetailPage = () => {
 
                 {/* Map */}
                 <div className="bg-white rounded-2xl mt-8 shadow-sm">
-                  <ItemLocation item={{ id: attraction._id, name: attraction.title, latitude: attraction.latitude, longitude: attraction.longitude }} />
+                  <ItemLocation
+                    item={{
+                      id: attraction._id,
+                      name: attraction.title,
+                      latitude: attraction.latitude,
+                      longitude: attraction.longitude,
+                    }}
+                  />
                 </div>
               </div>
 
