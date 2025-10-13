@@ -23,6 +23,9 @@ import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
 import { VillesAPI } from "../../sdk/api/villes";
 import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { PageSettings } from "../../sdk/api/pageMedias";
+import CrossSelling from "../../components/dededed/crossSelling";
+import { IClientHistory } from "../../sdk/models/clients";
+import { ClientsAPI } from "../../sdk/api/clients";
 
 // Liste des villes disponibles
 export const CITIES = [
@@ -152,151 +155,154 @@ export interface BalancedAmenities {
   rightColumn: [string, Amenity[]][];
 }
 
-const AccommodationCard: React.FC<AccommodationCardProps> = React.memo(({
-  accommodation,
-  className = "",
-}) => {
-  const navigate = useNavigate();
-  const [isHovered, setIsHovered] = useState<boolean>(false);
-  const [isMobile, setIsMobile] = useState<boolean>(false);
+const AccommodationCard: React.FC<AccommodationCardProps> = React.memo(
+  ({ accommodation, className = "" }) => {
+    const navigate = useNavigate();
+    const [isHovered, setIsHovered] = useState<boolean>(false);
+    const [isMobile, setIsMobile] = useState<boolean>(false);
 
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+    useEffect(() => {
+      const checkMobile = () => {
+        setIsMobile(window.innerWidth < 768);
+      };
+      checkMobile();
+      window.addEventListener("resize", checkMobile);
+      return () => window.removeEventListener("resize", checkMobile);
+    }, []);
 
-  const getPriceDisplay = useCallback((): string => {
-    if (accommodation.options && accommodation.options.length > 0) {
-      const prices = accommodation.options.map((option: any) => option.price);
-      const minPrice = Math.min(...prices);
-      const maxPrice = Math.max(...prices);
+    const getPriceDisplay = useCallback((): string => {
+      if (accommodation.options && accommodation.options.length > 0) {
+        const prices = accommodation.options.map((option: any) => option.price);
+        const minPrice = Math.min(...prices);
+        const maxPrice = Math.max(...prices);
 
-      if (minPrice === maxPrice) {
-        return `${minPrice} FCFA`;
+        if (minPrice === maxPrice) {
+          return `${minPrice} FCFA`;
+        }
+        return `${minPrice} FCFA - ${maxPrice} FCFA`;
       }
-      return `${minPrice} FCFA - ${maxPrice} FCFA`;
-    }
-    return `${accommodation.price} FCFA`;
-  }, [accommodation.options, accommodation.price]);
+      return `${accommodation.price} FCFA`;
+    }, [accommodation.options, accommodation.price]);
 
-  const getTypeLabel = useCallback((type: string): string => {
-    const typeObj = ACCOMMODATION_TYPES.find(t => t.value === type);
-    return typeObj ? typeObj.label : type;
-  }, []);
+    const getTypeLabel = useCallback((type: string): string => {
+      const typeObj = ACCOMMODATION_TYPES.find((t) => t.value === type);
+      return typeObj ? typeObj.label : type;
+    }, []);
 
-  const handleNavigate = useCallback(() => {
-    navigate("/hebergements/" + accommodation._id);
-  }, [navigate, accommodation._id]);
+    const handleNavigate = useCallback(() => {
+      navigate("/hebergements/" + accommodation._id);
+    }, [navigate, accommodation._id]);
 
-  const handleMouseEnter = useCallback(() => setIsHovered(true), []);
-  const handleMouseLeave = useCallback(() => setIsHovered(false), []);
+    const handleMouseEnter = useCallback(() => setIsHovered(true), []);
+    const handleMouseLeave = useCallback(() => setIsHovered(false), []);
 
-  const mainImageUrl = useMemo(() => {
-    return accommodation.main_image?.[0]?.file 
-      ? HandleGetFileLink(accommodation.main_image[0].file as string)
-      : '';
-  }, [accommodation.main_image]);
+    const mainImageUrl = useMemo(() => {
+      return accommodation.main_image?.[0]?.file
+        ? HandleGetFileLink(accommodation.main_image[0].file as string)
+        : "";
+    }, [accommodation.main_image]);
 
-  return (
-    <div
-      key={accommodation._id}
-      className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 ${
-        isMobile ? "w-full max-w-sm mx-auto" : "max-w-sm"
-      } ${className}`}
-    >
-      <div className="relative">
-        {mainImageUrl && (
-          <img
-            src={mainImageUrl}
-            alt={accommodation.name}
-            className={`w-full object-cover ${isMobile ? "h-40" : "h-48"}`}
-          />
-        )}
-        <div className="absolute top-3 left-3 bg-white bg-opacity-90 rounded-full px-3 py-1">
-          <span className="text-xs font-semibold text-gray-700 flex items-center gap-1">
-            <MapPin size={12} />
-            {accommodation.ville}
-          </span>
+    return (
+      <div
+        key={accommodation._id}
+        className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 ${
+          isMobile ? "w-full max-w-sm mx-auto" : "max-w-sm"
+        } ${className}`}
+      >
+        <div className="relative">
+          {mainImageUrl && (
+            <img
+              src={mainImageUrl}
+              alt={accommodation.name}
+              className={`w-full object-cover ${isMobile ? "h-40" : "h-48"}`}
+            />
+          )}
+          <div className="absolute top-3 left-3 bg-white bg-opacity-90 rounded-full px-3 py-1">
+            <span className="text-xs font-semibold text-gray-700 flex items-center gap-1">
+              <MapPin size={12} />
+              {accommodation.ville}
+            </span>
+          </div>
+          <div className="absolute top-3 right-3 bg-blue-500 bg-opacity-90 rounded-full px-3 py-1">
+            <span className="text-xs font-semibold text-white flex items-center gap-1">
+              <Building size={12} />
+              {getTypeLabel(accommodation.type)}
+            </span>
+          </div>
         </div>
-        <div className="absolute top-3 right-3 bg-blue-500 bg-opacity-90 rounded-full px-3 py-1">
-          <span className="text-xs font-semibold text-white flex items-center gap-1">
-            <Building size={12} />
-            {getTypeLabel(accommodation.type)}
-          </span>
-        </div>
-      </div>
 
-      <div className={`${isMobile ? "p-3" : "p-4"}`}>
-        <Flex vertical justify="space-between">
-          <Flex vertical>
-            <h3
-              className={`font-bold text-gray-800 mb-2 line-clamp-2 ${
-                isMobile ? "text-base" : "text-lg"
-              }`}
-            >
-              {accommodation.name}
-            </h3>
-
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center space-x-1">
-                <Rate allowHalf disabled defaultValue={accommodation.rating} />
-                <span
-                  className={`text-gray-600 ml-2 ${
-                    isMobile ? "text-xs" : "text-sm"
-                  }`}
-                >
-                  ({accommodation.review_count} avis)
-                </span>
-              </div>
-            </div>
-          </Flex>
-          <Flex
-            justify="space-between"
-            align="center"
-            style={{ width: "100%" }}
-            className="mt-4"
-          >
-            <div>
-              <span
-                className={`font-bold text-gray-800 ${
-                  isMobile ? "text-xl" : "text-lg"
+        <div className={`${isMobile ? "p-3" : "p-4"}`}>
+          <Flex vertical justify="space-between">
+            <Flex vertical>
+              <h3
+                className={`font-bold text-gray-800 mb-2 line-clamp-2 ${
+                  isMobile ? "text-base" : "text-lg"
                 }`}
               >
-                {getPriceDisplay()}
-              </span>
-            </div>
+                {accommodation.name}
+              </h3>
 
-            <Button
-              type="primary"
-              size={isMobile ? "middle" : "large"}
-              style={{
-                backgroundColor: isHovered ? "#ff3100" : "#F59F00",
-                color: isHovered ? "white" : "black",
-                borderRadius: "7px",
-                border: "none",
-                fontFamily: "GeneralSans",
-                transition: "all 0.3s ease",
-                fontSize: isMobile ? "14px" : "16px",
-                height: isMobile ? "35px" : "40px",
-                padding: isMobile ? "0 16px" : "0 20px",
-                fontWeight: "bold",
-              }}
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
-              onClick={handleNavigate}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-1">
+                  <Rate
+                    allowHalf
+                    disabled
+                    defaultValue={accommodation.rating}
+                  />
+                  <span
+                    className={`text-gray-600 ml-2 ${
+                      isMobile ? "text-xs" : "text-sm"
+                    }`}
+                  >
+                    ({accommodation.review_count} avis)
+                  </span>
+                </div>
+              </div>
+            </Flex>
+            <Flex
+              justify="space-between"
+              align="center"
+              style={{ width: "100%" }}
+              className="mt-4"
             >
-              Détails
-            </Button>
+              <div>
+                <span
+                  className={`font-bold text-gray-800 ${
+                    isMobile ? "text-xl" : "text-lg"
+                  }`}
+                >
+                  {getPriceDisplay()}
+                </span>
+              </div>
+
+              <Button
+                type="primary"
+                size={isMobile ? "middle" : "large"}
+                style={{
+                  backgroundColor: isHovered ? "#ff3100" : "#F59F00",
+                  color: isHovered ? "white" : "black",
+                  borderRadius: "7px",
+                  border: "none",
+                  fontFamily: "GeneralSans",
+                  transition: "all 0.3s ease",
+                  fontSize: isMobile ? "14px" : "16px",
+                  height: isMobile ? "35px" : "40px",
+                  padding: isMobile ? "0 16px" : "0 20px",
+                  fontWeight: "bold",
+                }}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                onClick={handleNavigate}
+              >
+                Détails
+              </Button>
+            </Flex>
           </Flex>
-        </Flex>
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
 
 AccommodationCard.displayName = "AccommodationCard";
 
@@ -317,314 +323,333 @@ interface FilterSectionProps {
   isMobile: boolean;
 }
 
-const FilterSection: React.FC<FilterSectionProps> = React.memo(({
-  filters,
-  setFilters,
-  accommodations,
-  isMobile,
-}) => {
-  const [openSections, setOpenSections] = useState({
-    type: true,
-    cities: true,
-    accommodationTypes: true,
-    price: true,
-    rating: true,
-    amenities: false,
-    search: true,
-  });
-
-  const toggleSection = useCallback((section: string) => {
-    setOpenSections((prev) => ({
-      ...prev,
-      [section]: !prev[section as keyof typeof prev],
-    }));
-  }, []);
-
-  const priceRange = useMemo(() => {
-    const prices: number[] = [];
-    accommodations.forEach((acc) => {
-      if (acc.options && acc.options.length > 0) {
-        acc.options.forEach((option: any) => prices.push(option.price));
-      } else if (acc.price) {
-        prices.push(acc.price);
-      }
+const FilterSection: React.FC<FilterSectionProps> = React.memo(
+  ({ filters, setFilters, accommodations, isMobile }) => {
+    const [openSections, setOpenSections] = useState({
+      type: true,
+      cities: true,
+      accommodationTypes: true,
+      price: true,
+      rating: true,
+      amenities: false,
+      search: true,
     });
-    return prices.length > 0 ? [0, Math.max(...prices)] : [0, 500];
-  }, [accommodations]);
 
-  const handlePriceChange = useCallback((index: number, value: number) => {
-    setFilters((prev) => {
-      const newPriceRange: [number, number] = [...prev.priceRange] as [number, number];
-      newPriceRange[index] = value;
-      return { ...prev, priceRange: newPriceRange };
-    });
-  }, [setFilters]);
+    const toggleSection = useCallback((section: string) => {
+      setOpenSections((prev) => ({
+        ...prev,
+        [section]: !prev[section as keyof typeof prev],
+      }));
+    }, []);
 
-  const handleCityToggle = useCallback((city: City) => {
-    setFilters((prev) => {
-      const newCities = prev.selectedCities.includes(city)
-        ? prev.selectedCities.filter((c) => c !== city)
-        : [...prev.selectedCities, city];
-      return { ...prev, selectedCities: newCities };
-    });
-  }, [setFilters]);
+    const priceRange = useMemo(() => {
+      const prices: number[] = [];
+      accommodations.forEach((acc) => {
+        if (acc.options && acc.options.length > 0) {
+          acc.options.forEach((option: any) => prices.push(option.price));
+        } else if (acc.price) {
+          prices.push(acc.price);
+        }
+      });
+      return prices.length > 0 ? [0, Math.max(...prices)] : [0, 500];
+    }, [accommodations]);
 
-  const handleTypeToggle = useCallback((type: AccommodationType) => {
-    setFilters((prev) => {
-      const newTypes = prev.selectedTypes.includes(type)
-        ? prev.selectedTypes.filter((t) => t !== type)
-        : [...prev.selectedTypes, type];
-      return { ...prev, selectedTypes: newTypes };
-    });
-  }, [setFilters]);
+    const handlePriceChange = useCallback(
+      (index: number, value: number) => {
+        setFilters((prev) => {
+          const newPriceRange: [number, number] = [...prev.priceRange] as [
+            number,
+            number
+          ];
+          newPriceRange[index] = value;
+          return { ...prev, priceRange: newPriceRange };
+        });
+      },
+      [setFilters]
+    );
 
-  const clearFilters = useCallback(() => {
-    setFilters({
-      priceRange: [priceRange[0], priceRange[1]] as [number, number],
-      minRating: 0,
-      selectedAmenities: [],
-      accommodationType: "all",
-      searchTerm: "",
-      selectedCities: [],
-      selectedTypes: [],
-    });
-  }, [setFilters, priceRange]);
+    const handleCityToggle = useCallback(
+      (city: City) => {
+        setFilters((prev) => {
+          const newCities = prev.selectedCities.includes(city)
+            ? prev.selectedCities.filter((c) => c !== city)
+            : [...prev.selectedCities, city];
+          return { ...prev, selectedCities: newCities };
+        });
+      },
+      [setFilters]
+    );
 
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setFilters((prev) => ({ ...prev, searchTerm: e.target.value }));
-  }, [setFilters]);
+    const handleTypeToggle = useCallback(
+      (type: AccommodationType) => {
+        setFilters((prev) => {
+          const newTypes = prev.selectedTypes.includes(type)
+            ? prev.selectedTypes.filter((t) => t !== type)
+            : [...prev.selectedTypes, type];
+          return { ...prev, selectedTypes: newTypes };
+        });
+      },
+      [setFilters]
+    );
 
-  const handleRatingChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setFilters((prev) => ({
-      ...prev,
-      minRating: parseFloat(e.target.value),
-    }));
-  }, [setFilters]);
+    const clearFilters = useCallback(() => {
+      setFilters({
+        priceRange: [priceRange[0], priceRange[1]] as [number, number],
+        minRating: 0,
+        selectedAmenities: [],
+        accommodationType: "all",
+        searchTerm: "",
+        selectedCities: [],
+        selectedTypes: [],
+      });
+    }, [setFilters, priceRange]);
 
-  const cityCountMap = useMemo(() => {
-    const map = new Map<string, number>();
-    accommodations.forEach((acc) => {
-      const count = map.get(acc.ville) || 0;
-      map.set(acc.ville, count + 1);
-    });
-    return map;
-  }, [accommodations]);
+    const handleSearchChange = useCallback(
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFilters((prev) => ({ ...prev, searchTerm: e.target.value }));
+      },
+      [setFilters]
+    );
 
-  const typeCountMap = useMemo(() => {
-    const map = new Map<string, number>();
-    accommodations.forEach((acc) => {
-      const count = map.get(acc.type) || 0;
-      map.set(acc.type, count + 1);
-    });
-    return map;
-  }, [accommodations]);
+    const handleRatingChange = useCallback(
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFilters((prev) => ({
+          ...prev,
+          minRating: parseFloat(e.target.value),
+        }));
+      },
+      [setFilters]
+    );
 
-  return (
-    <div className={`bg-white h-fit ${isMobile ? "w-full p-4" : "w-80 p-6"}`}>
-      <div className="flex items-center justify-between mb-6">
-        <h2
-          className={`font-bold text-gray-800 flex items-center gap-2 ${
-            isMobile ? "text-lg" : "text-xl"
-          }`}
-        >
-          <Filter size={isMobile ? 18 : 20} />
-          Filtres
-        </h2>
-        <button
-          onClick={clearFilters}
-          className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
-        >
-          <X size={16} />
-          Effacer
-        </button>
-      </div>
+    const cityCountMap = useMemo(() => {
+      const map = new Map<string, number>();
+      accommodations.forEach((acc) => {
+        const count = map.get(acc.ville) || 0;
+        map.set(acc.ville, count + 1);
+      });
+      return map;
+    }, [accommodations]);
 
-      <div className="mb-6">
-        <button
-          onClick={() => toggleSection("search")}
-          className="flex items-center justify-between w-full text-left font-semibold text-gray-700 mb-3"
-        >
-          Recherche
-          {openSections.search ? (
-            <ChevronUp size={16} />
-          ) : (
-            <ChevronDown size={16} />
+    const typeCountMap = useMemo(() => {
+      const map = new Map<string, number>();
+      accommodations.forEach((acc) => {
+        const count = map.get(acc.type) || 0;
+        map.set(acc.type, count + 1);
+      });
+      return map;
+    }, [accommodations]);
+
+    return (
+      <div className={`bg-white h-fit ${isMobile ? "w-full p-4" : "w-80 p-6"}`}>
+        <div className="flex items-center justify-between mb-6">
+          <h2
+            className={`font-bold text-gray-800 flex items-center gap-2 ${
+              isMobile ? "text-lg" : "text-xl"
+            }`}
+          >
+            <Filter size={isMobile ? 18 : 20} />
+            Filtres
+          </h2>
+          <button
+            onClick={clearFilters}
+            className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+          >
+            <X size={16} />
+            Effacer
+          </button>
+        </div>
+
+        <div className="mb-6">
+          <button
+            onClick={() => toggleSection("search")}
+            className="flex items-center justify-between w-full text-left font-semibold text-gray-700 mb-3"
+          >
+            Recherche
+            {openSections.search ? (
+              <ChevronUp size={16} />
+            ) : (
+              <ChevronDown size={16} />
+            )}
+          </button>
+          {openSections.search && (
+            <input
+              type="text"
+              placeholder="Rechercher un hébergement..."
+              value={filters.searchTerm}
+              onChange={handleSearchChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+            />
           )}
-        </button>
-        {openSections.search && (
-          <input
-            type="text"
-            placeholder="Rechercher un hébergement..."
-            value={filters.searchTerm}
-            onChange={handleSearchChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-          />
-        )}
-      </div>
+        </div>
 
-      <div className="mb-6">
-        <button
-          onClick={() => toggleSection("cities")}
-          className="flex items-center justify-between w-full text-left font-semibold text-gray-700 mb-3"
-        >
-          <span className="flex items-center gap-2">
-            <MapPin size={16} />
-            Villes
-          </span>
-          {openSections.cities ? (
-            <ChevronUp size={16} />
-          ) : (
-            <ChevronDown size={16} />
-          )}
-        </button>
-        {openSections.cities && (
-          <div className="space-y-2 max-h-60 overflow-y-auto">
-            {CITIES.map((city) => (
-              <label key={`city-${city}`} className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={filters.selectedCities.includes(city)}
-                  onChange={() => handleCityToggle(city)}
-                  className="mr-2 text-orange-500"
-                />
-                <span className="text-sm text-gray-700">{city}</span>
-                <span className="text-xs text-gray-500 ml-auto">
-                  ({cityCountMap.get(city) || 0})
-                </span>
-              </label>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="mb-6">
-        <button
-          onClick={() => toggleSection("accommodationTypes")}
-          className="flex items-center justify-between w-full text-left font-semibold text-gray-700 mb-3"
-        >
-          <span className="flex items-center gap-2">
-            <Building size={16} />
-            Types d'hébergement
-          </span>
-          {openSections.accommodationTypes ? (
-            <ChevronUp size={16} />
-          ) : (
-            <ChevronDown size={16} />
-          )}
-        </button>
-        {openSections.accommodationTypes && (
-          <div className="space-y-2">
-            {ACCOMMODATION_TYPES.map((type) => (
-              <label key={`type-${type.value}`} className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={filters.selectedTypes.includes(type.value)}
-                  onChange={() => handleTypeToggle(type.value)}
-                  className="mr-2 text-orange-500"
-                />
-                <span className="text-sm text-gray-700">{type.label}</span>
-                <span className="text-xs text-gray-500 ml-auto">
-                  ({typeCountMap.get(type.value) || 0})
-                </span>
-              </label>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="mb-6">
-        <button
-          onClick={() => toggleSection("price")}
-          className="flex items-center justify-between w-full text-left font-semibold text-gray-700 mb-3"
-        >
-          Prix par nuit
-          {openSections.price ? (
-            <ChevronUp size={16} />
-          ) : (
-            <ChevronDown size={16} />
-          )}
-        </button>
-        {openSections.price && (
-          <div className="space-y-4">
-            <div className="flex gap-2">
-              <div>
-                <label className="block text-xs text-gray-600 mb-1">Min</label>
-                <input
-                  type="number"
-                  value={filters.priceRange[0]}
-                  onChange={(e) =>
-                    handlePriceChange(0, parseInt(e.target.value) || 0)
-                  }
-                  className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-600 mb-1">Max</label>
-                <input
-                  type="number"
-                  value={filters.priceRange[1]}
-                  onChange={(e) =>
-                    handlePriceChange(1, parseInt(e.target.value) || 0)
-                  }
-                  className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                />
-              </div>
-            </div>
-            <div className="text-xs text-gray-600">
-              {filters.priceRange[0]} FCFA - {filters.priceRange[1]} FCFA
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="mb-6">
-        <button
-          onClick={() => toggleSection("rating")}
-          className="flex items-center justify-between w-full text-left font-semibold text-gray-700 mb-3"
-        >
-          Note minimum
-          {openSections.rating ? (
-            <ChevronUp size={16} />
-          ) : (
-            <ChevronDown size={16} />
-          )}
-        </button>
-        {openSections.rating && (
-          <div className="space-y-2">
-            {[0, 3, 4, 4.5].map((rating) => (
-              <label key={`rating-${rating}`} className="flex items-center">
-                <input
-                  type="radio"
-                  name="minRating"
-                  value={rating}
-                  checked={filters.minRating === rating}
-                  onChange={handleRatingChange}
-                  className="mr-2 text-orange-500"
-                />
-                <div className="flex items-center gap-1">
-                  <span className="text-sm text-gray-700">
-                    {rating === 0 ? "Toutes" : `${rating}+`}
+        <div className="mb-6">
+          <button
+            onClick={() => toggleSection("cities")}
+            className="flex items-center justify-between w-full text-left font-semibold text-gray-700 mb-3"
+          >
+            <span className="flex items-center gap-2">
+              <MapPin size={16} />
+              Villes
+            </span>
+            {openSections.cities ? (
+              <ChevronUp size={16} />
+            ) : (
+              <ChevronDown size={16} />
+            )}
+          </button>
+          {openSections.cities && (
+            <div className="space-y-2 max-h-60 overflow-y-auto">
+              {CITIES.map((city) => (
+                <label key={`city-${city}`} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={filters.selectedCities.includes(city)}
+                    onChange={() => handleCityToggle(city)}
+                    className="mr-2 text-orange-500"
+                  />
+                  <span className="text-sm text-gray-700">{city}</span>
+                  <span className="text-xs text-gray-500 ml-auto">
+                    ({cityCountMap.get(city) || 0})
                   </span>
-                  {rating > 0 && (
-                    <div className="flex">
-                      {Array.from({ length: Math.floor(rating) }, (_, i) => (
-                        <Star
-                          key={`star-${rating}-${i}`}
-                          size={12}
-                          className="fill-yellow-400 text-yellow-400"
-                        />
-                      ))}
-                    </div>
-                  )}
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="mb-6">
+          <button
+            onClick={() => toggleSection("accommodationTypes")}
+            className="flex items-center justify-between w-full text-left font-semibold text-gray-700 mb-3"
+          >
+            <span className="flex items-center gap-2">
+              <Building size={16} />
+              Types d'hébergement
+            </span>
+            {openSections.accommodationTypes ? (
+              <ChevronUp size={16} />
+            ) : (
+              <ChevronDown size={16} />
+            )}
+          </button>
+          {openSections.accommodationTypes && (
+            <div className="space-y-2">
+              {ACCOMMODATION_TYPES.map((type) => (
+                <label key={`type-${type.value}`} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={filters.selectedTypes.includes(type.value)}
+                    onChange={() => handleTypeToggle(type.value)}
+                    className="mr-2 text-orange-500"
+                  />
+                  <span className="text-sm text-gray-700">{type.label}</span>
+                  <span className="text-xs text-gray-500 ml-auto">
+                    ({typeCountMap.get(type.value) || 0})
+                  </span>
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="mb-6">
+          <button
+            onClick={() => toggleSection("price")}
+            className="flex items-center justify-between w-full text-left font-semibold text-gray-700 mb-3"
+          >
+            Prix par nuit
+            {openSections.price ? (
+              <ChevronUp size={16} />
+            ) : (
+              <ChevronDown size={16} />
+            )}
+          </button>
+          {openSections.price && (
+            <div className="space-y-4">
+              <div className="flex gap-2">
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">
+                    Min
+                  </label>
+                  <input
+                    type="number"
+                    value={filters.priceRange[0]}
+                    onChange={(e) =>
+                      handlePriceChange(0, parseInt(e.target.value) || 0)
+                    }
+                    className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                  />
                 </div>
-              </label>
-            ))}
-          </div>
-        )}
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">
+                    Max
+                  </label>
+                  <input
+                    type="number"
+                    value={filters.priceRange[1]}
+                    onChange={(e) =>
+                      handlePriceChange(1, parseInt(e.target.value) || 0)
+                    }
+                    className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                  />
+                </div>
+              </div>
+              <div className="text-xs text-gray-600">
+                {filters.priceRange[0]} FCFA - {filters.priceRange[1]} FCFA
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="mb-6">
+          <button
+            onClick={() => toggleSection("rating")}
+            className="flex items-center justify-between w-full text-left font-semibold text-gray-700 mb-3"
+          >
+            Note minimum
+            {openSections.rating ? (
+              <ChevronUp size={16} />
+            ) : (
+              <ChevronDown size={16} />
+            )}
+          </button>
+          {openSections.rating && (
+            <div className="space-y-2">
+              {[0, 3, 4, 4.5].map((rating) => (
+                <label key={`rating-${rating}`} className="flex items-center">
+                  <input
+                    type="radio"
+                    name="minRating"
+                    value={rating}
+                    checked={filters.minRating === rating}
+                    onChange={handleRatingChange}
+                    className="mr-2 text-orange-500"
+                  />
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm text-gray-700">
+                      {rating === 0 ? "Toutes" : `${rating}+`}
+                    </span>
+                    {rating > 0 && (
+                      <div className="flex">
+                        {Array.from({ length: Math.floor(rating) }, (_, i) => (
+                          <Star
+                            key={`star-${rating}-${i}`}
+                            size={12}
+                            className="fill-yellow-400 text-yellow-400"
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
 
 FilterSection.displayName = "FilterSection";
 
@@ -635,6 +660,7 @@ const Hebergements: React.FC = () => {
   const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
+  const [history, setHistory] = useState<IClientHistory[]>([]);
 
   const realPriceRange = useMemo((): [number, number] => {
     if (hebergements.length === 0) return [0, 1000000];
@@ -693,7 +719,11 @@ const Hebergements: React.FC = () => {
       }
 
       if (filters.selectedTypes.length > 0) {
-        if (!filters.selectedTypes.includes(accommodation.type as AccommodationType)) {
+        if (
+          !filters.selectedTypes.includes(
+            accommodation.type as AccommodationType
+          )
+        ) {
           return false;
         }
       }
@@ -784,6 +814,17 @@ const Hebergements: React.FC = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    ClientsAPI.ListClientHistory(ClientsAPI.GetClientHistoryLocal())
+      .then((data) => {
+        setHistory(data.history);
+        console.log("History fetched", data.history);
+      })
+      .catch((err) => {
+        console.error("History added not added", err);
+      });
+  }, []);
+
   const getGridColumns = useCallback((): number => {
     if (isMobile) return 1;
     if (isTablet) return 2;
@@ -802,22 +843,29 @@ const Hebergements: React.FC = () => {
     });
   }, []);
 
-  const handleBooking = useCallback((acc: IAccommodationData) => {
-    setTransaction({
-      id: acc._id,
-      title: acc.name,
-      amount:
-        acc.options && acc.options.length > 0
-          ? Math.min(...acc.options.map((opt: any) => opt.price))
-          : (typeof acc.price === "number" ? acc.price : 0),
-      tarification: []
-    });
-    navigate("/reservations-locations");
-  }, [setTransaction, navigate]);
+  const handleBooking = useCallback(
+    (acc: IAccommodationData) => {
+      setTransaction({
+        id: acc._id,
+        title: acc.name,
+        amount:
+          acc.options && acc.options.length > 0
+            ? Math.min(...acc.options.map((opt: any) => opt.price))
+            : typeof acc.price === "number"
+            ? acc.price
+            : 0,
+        tarification: [],
+      });
+      navigate("/reservations-locations");
+    },
+    [setTransaction, navigate]
+  );
 
   const carouselImages = useMemo(() => {
-    if (settings.hebergements_carrousel?.length > 0 &&
-        settings.hebergements_carrousel[0].file !== null) {
+    if (
+      settings.hebergements_carrousel?.length > 0 &&
+      settings.hebergements_carrousel[0].file !== null
+    ) {
       return settings.hebergements_carrousel.map((item) =>
         HandleGetFileLink(item.file as string)
       );
@@ -827,9 +875,11 @@ const Hebergements: React.FC = () => {
 
   const backgroundImageUrl = useMemo(() => {
     if (settings.hebergements_background?.[0]?.file) {
-      return HandleGetFileLink(settings.hebergements_background[0].file as string);
+      return HandleGetFileLink(
+        settings.hebergements_background[0].file as string
+      );
     }
-    return '';
+    return "";
   }, [settings.hebergements_background]);
 
   return (
@@ -999,9 +1049,14 @@ const Hebergements: React.FC = () => {
                 {filters.selectedTypes.length > 0 && (
                   <span>
                     {" "}
-                    - {filters.selectedTypes.map(type => 
-                      ACCOMMODATION_TYPES.find(t => t.value === type)?.label || type
-                    ).join(", ")}
+                    -{" "}
+                    {filters.selectedTypes
+                      .map(
+                        (type) =>
+                          ACCOMMODATION_TYPES.find((t) => t.value === type)
+                            ?.label || type
+                      )
+                      .join(", ")}
                   </span>
                 )}
               </div>
@@ -1072,12 +1127,12 @@ const Hebergements: React.FC = () => {
         </div>
       </div>
 
+      <CrossSelling history={history} maxItems={5} />
+
       <section
         style={{ height: isMobile ? "25vh" : isTablet ? "35vh" : "45vw" }}
       >
-        {carouselImages.length > 0 && (
-          <ImageCarousel images={carouselImages} />
-        )}
+        {carouselImages.length > 0 && <ImageCarousel images={carouselImages} />}
       </section>
 
       <Footer />

@@ -8,7 +8,7 @@ import {
   ArrowRight,
   CheckCircle,
 } from "lucide-react";
-import { Flex, Typography } from "antd";
+import { Button, Flex, Typography } from "antd";
 import BeginningButton from "../../components/dededed/BeginingButton";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
@@ -1143,7 +1143,61 @@ const Transferts: React.FC = () => {
           </div>
         </div>
       </div>
-
+      {/* Section Devis sur mesure */}
+      <Flex
+        style={{
+          backgroundColor: "#FF3100",
+          width: "100%",
+          padding: "30px 0",
+        }}
+      >
+        <Flex
+          style={{
+            maxWidth: "1050px",
+            width: "100%",
+            margin: "0 auto",
+          }}
+          justify="space-between"
+          align="center"
+        >
+          <Typography.Title
+            level={1}
+            style={{
+              color: "white",
+              fontSize: isMobile ? "44px" : "65px",
+              fontWeight: "bold",
+              lineHeight: "1",
+              letterSpacing: "0.03em",
+              marginTop: "20px",
+              marginBottom: "15px",
+              fontFamily: "DragonAngled",
+              textTransform: "uppercase",
+            }}
+          >
+            Besoin d'un devis sur mesure ?
+          </Typography.Title>
+          <Button
+            type="primary"
+            size="large"
+            style={{
+              backgroundColor: "#F59F00",
+              color: "black",
+              borderRadius: "7px",
+              border: "none",
+              fontFamily: "GeneralSans",
+              transition: "all 0.3s ease",
+              fontSize: "26px",
+              height: "40px",
+              padding: "35px 20px",
+              fontWeight: "bold",
+              width: "fit-content",
+            }}
+          >
+            Contactez-nous
+          </Button>
+        </Flex>
+      </Flex>
+      
       {/* Footer */}
       <Footer />
     </Flex>

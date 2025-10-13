@@ -14,6 +14,8 @@ import { emptyIVille, IVille } from "../../sdk/models/villes";
 import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { PageSettings } from "../../sdk/api/pageMedias";
 import { HandleGetFileLink } from "../../pages/Circuits/CircuitsCartes";
+import CrossSelling, { IClientHistory } from "../dededed/crossSelling";
+import { ClientsAPI } from "../../sdk/api/clients";
 
 interface VilleCardOtherProps {
   ville: IVille;
@@ -126,6 +128,7 @@ export const CircuitCarteView = () => {
   const screenSize = useScreenSize();
   const [loadingSettgins, setLoadingSettgins] = useState<boolean>(true);
   const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
+  const [history, setHistory] = useState<IClientHistory[]>([]);
 
   const circuitCardStyles = useMemo(() => {
     if (screenSize.isMobile) {
@@ -219,6 +222,17 @@ export const CircuitCarteView = () => {
         console.error("Error fetching ville:", err);
       });
   }, []);
+
+  useEffect(() => {
+    ClientsAPI.ListClientHistory(ClientsAPI.GetClientHistoryLocal())
+      .then((data) => {
+        setHistory(data.history);
+        console.log("History fetched", data.history);
+      })
+      .catch((err) => {
+        console.error("History added not added", err);
+      });
+  }, [id]);
 
   return (
     <Flex justify="center" vertical>
@@ -451,6 +465,8 @@ export const CircuitCarteView = () => {
           </Flex>
         </Flex>
       )}
+
+      <CrossSelling history={history} maxItems={5} />
 
       {/* Section autres circuits - Responsive */}
       <Flex style={{ backgroundColor: "#411E1C" }}>

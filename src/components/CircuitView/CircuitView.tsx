@@ -20,6 +20,8 @@ import { HandleGetFileLink } from "../../pages/Circuits/CircuitsCartes";
 import { PageSettings } from "../../sdk/api/pageMedias";
 import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import MapItineraire from "../dededed/MapItineraire";
+import CrossSelling, { IClientHistory } from "../dededed/crossSelling";
+import { ClientsAPI } from "../../sdk/api/clients";
 
 interface CircuitCardOtherProps {
   circuit: ICircuitPresenter;
@@ -544,6 +546,7 @@ export const CircuitView = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingSettgins, setLoadingSettgins] = useState<boolean>(true);
   const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
+  const [history, setHistory] = useState<IClientHistory[]>([]);
 
   const circuitCardStyles = useMemo(() => {
     if (screenSize.isMobile) {
@@ -584,6 +587,17 @@ export const CircuitView = () => {
       };
     }
   }, [screenSize]);
+
+  useEffect(() => {
+    ClientsAPI.ListClientHistory(ClientsAPI.GetClientHistoryLocal())
+      .then((data) => {
+        setHistory(data.history);
+        console.log("History fetched", data.history);
+      })
+      .catch((err) => {
+        console.error("History added not added", err);
+      });
+  }, [id]);
 
   useEffect(() => {
     PageSettings.List()
@@ -932,6 +946,8 @@ export const CircuitView = () => {
           </Flex>
         </Flex>
       )}
+
+      <CrossSelling history={history} maxItems={5} />
 
       {/* Section autres circuits - Responsive */}
       <Flex style={{ backgroundColor: "#411E1C" }}>

@@ -16,8 +16,9 @@ import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { CircuitsAPI } from "../../sdk/api/circuits";
 import { HandleGetFileLink } from "./CircuitsCartes";
 import { PageSettings } from "../../sdk/api/pageMedias";
-
-
+import CrossSelling from "../../components/dededed/crossSelling";
+import { IClientHistory } from "../../sdk/models/clients";
+import { ClientsAPI } from "../../sdk/api/clients";
 
 // Optimisation: Hook personnalisé pour la détection de la taille d'écran
 const useScreenSize = () => {
@@ -55,6 +56,7 @@ const CircuitsSignature = () => {
   const [circuitInfos, setCircuitInfos] = useState<ICircuit>(emptyICircuit());
   const [loading, setLoading] = useState<boolean>(true);
   const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
+  const [history, setHistory] = useState<IClientHistory[]>([]);
 
   // Optimisation: Mémorisation des styles responsifs
   const heroStyles = useMemo(() => {
@@ -153,6 +155,17 @@ const CircuitsSignature = () => {
       })
       .catch((err) => {
         console.error("Error fetching circuit:", err);
+      });
+  }, []);
+
+  useEffect(() => {
+    ClientsAPI.ListClientHistory(ClientsAPI.GetClientHistoryLocal())
+      .then((data) => {
+        setHistory(data.history);
+        console.log("History fetched", data.history);
+      })
+      .catch((err) => {
+        console.error("History added not added", err);
       });
   }, []);
 
@@ -410,6 +423,8 @@ const CircuitsSignature = () => {
           />
         </Flex>
       </Flex>
+
+      <CrossSelling history={history} maxItems={5} />
 
       {/* Galerie d'images - Responsive */}
       <section
