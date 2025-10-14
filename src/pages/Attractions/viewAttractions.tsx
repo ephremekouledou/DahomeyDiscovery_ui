@@ -12,7 +12,6 @@ import {
   X,
   Info,
   Globe,
-  Zap,
 } from "lucide-react";
 import { useLocation, useParams } from "react-router-dom";
 import { AttractionsAPI } from "../../sdk/api/attraction";
@@ -28,7 +27,7 @@ import SimilarSelling from "../../components/dededed/similarSelling";
 import CrossSelling from "../../components/dededed/crossSelling";
 import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { PageSettings } from "../../sdk/api/pageMedias";
-import ItemLocation from "../../components/dededed/Map";
+import ItemLocation, { MapItem } from "../../components/dededed/Map";
 
 const AttractionDetailPage = () => {
   const { id } = useParams();
@@ -37,7 +36,7 @@ const AttractionDetailPage = () => {
   const [selectedDate, setSelectedDate] = useState("2024-12-15");
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>("");
   const [selectedTarification, setSelectedTarification] = useState<string>("");
-  const [participants, setParticipants] = useState(2);
+  const [participants, setParticipants] = useState(1);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const [attraction, setAttraction] = useState<IAttraction>(emptyIAttraction());
@@ -46,6 +45,13 @@ const AttractionDetailPage = () => {
 
   const [loading, setLoading] = useState<boolean>(true);
   const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
+
+  const [mapItem, setMapItem] = useState<MapItem>({
+    id: "",
+    name: "",
+    latitude: 0,
+    longitude: 0,
+  });
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -66,6 +72,12 @@ const AttractionDetailPage = () => {
   useEffect(() => {
     AttractionsAPI.GetByID(id as string)
       .then((data) => {
+        setMapItem({
+          id: data._id,
+          name: data.title,
+          latitude: data.latitude,
+          longitude: data.longitude,
+        });
         setAttraction(data);
         const newElement: IClientHistory = {
           _id: data._id,
@@ -327,7 +339,7 @@ const AttractionDetailPage = () => {
                 {/* Description */}
                 <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
                   <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                    <Zap className="w-5 h-5 text-yellow-500" />
+                    <Info className="w-5 h-5 text-yellow-500" />
                     Description
                   </h3>
                   <div className="text-gray-700 whitespace-pre-line">
@@ -469,14 +481,7 @@ const AttractionDetailPage = () => {
 
                 {/* Map */}
                 <div className="bg-white rounded-2xl mt-8 shadow-sm">
-                  <ItemLocation
-                    item={{
-                      id: attraction._id,
-                      name: attraction.title,
-                      latitude: attraction.latitude,
-                      longitude: attraction.longitude,
-                    }}
-                  />
+                  <ItemLocation item={mapItem} />
                 </div>
               </div>
 
