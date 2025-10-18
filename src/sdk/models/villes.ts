@@ -13,6 +13,13 @@ export const emptyIVilleActivity = (): IVilleActivity => ({
   description: "",
 });
 
+export interface IVilleVehiculeTarification {
+  _id: string;
+  from: number;
+  to: number;
+  price: number;
+}
+
 export interface IVille extends IDefault {
   name: string;
   description: string;
@@ -24,6 +31,7 @@ export interface IVille extends IDefault {
   exclus: InclusList[];
   price: number;
   price_supp: number;
+  vehicule_tarification: IVilleVehiculeTarification[];
 }
 
 export const emptyIVille = (): IVille => ({
@@ -50,6 +58,7 @@ export const emptyIVille = (): IVille => ({
   exclus: [],
   price: 0,
   price_supp: 0,
+  vehicule_tarification: [],
 });
 
 export interface IAddUpdateVilleData {
@@ -63,6 +72,7 @@ export interface IAddUpdateVilleData {
   exclus: InclusList[];
   price: number;
   price_supp: number;
+  vehicule_tarification: IVilleVehiculeTarification[];
 }
 
 export const emptyIVilleForm = (): IAddUpdateVilleData => ({
@@ -76,6 +86,7 @@ export const emptyIVilleForm = (): IAddUpdateVilleData => ({
   exclus: [],
   price: 0,
   price_supp: 0,
+  vehicule_tarification: [],
 });
 
 export interface JsonVilleStructure extends IDefault {
@@ -105,6 +116,7 @@ export interface JsonVilleStructure extends IDefault {
   }[];
   price: number;
   price_supp: number;
+  vehicule_tarification: IVilleVehiculeTarification[];
 }
 
 export function jsonVilleToIAddUpdateVilleData(
@@ -139,6 +151,7 @@ export function jsonVilleToIAddUpdateVilleData(
     })),
     price: json.price,
     price_supp: json.price_supp,
+    vehicule_tarification: json.vehicule_tarification,
   };
 }
 
@@ -216,5 +229,6 @@ export function iAddUpdateVilleDataToJsonVille(
         }))
       )
       .flat(), // Le champ times du JSON semble être séparé et pourrait nécessiter une logique particulière
+    vehicule_tarification: circuit.vehicule_tarification,
   };
 }

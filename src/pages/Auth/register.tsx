@@ -7,6 +7,7 @@ import {
   // PhoneOutlined,
   EyeTwoTone,
   EyeInvisibleOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import { ClientsAPI } from "../../sdk/api/clients";
 
@@ -122,7 +123,7 @@ const RegisterPage: React.FC = () => {
           autoComplete="off"
           size="large"
         >
-          {/*<Form.Item
+          <Form.Item
             label={
               <span
                 style={{
@@ -196,7 +197,7 @@ const RegisterPage: React.FC = () => {
                 border: "1px solid #d1d5db",
               }}
             />
-          </Form.Item>*/}
+          </Form.Item>
 
           <Form.Item
             label={

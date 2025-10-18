@@ -211,7 +211,7 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
   // Get user initials for avatar
   const getUserInitials = () => {
     if (!user) return "";
-    return `${user.email.charAt(0)}`.toUpperCase();
+    return `${user.first_name.charAt(0)}`.toUpperCase() + `${user.last_name.charAt(0)}`.toUpperCase();
   };
 
   const renderDesktopNavItem = (item: NavItem) => {

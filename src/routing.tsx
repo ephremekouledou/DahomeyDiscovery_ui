@@ -23,6 +23,7 @@ import AttractionDetailPage from "./pages/Attractions/viewAttractions";
 import Transferts from "./pages/Transfers/transferts";
 import LoginPage from "./pages/Auth/login";
 import RegisterPage from "./pages/Auth/register";
+import { paiementLoader } from "./loaders/paiements";
 
 const router = createBrowserRouter([
   {
@@ -131,16 +132,19 @@ const router = createBrowserRouter([
     path: "/reservations-circuits",
     element: <ReservationCircuit />,
     errorElement: <NotFound />,
+    loader: paiementLoader,
   },
   {
     path: "/reservations-locations",
     element: <ReservationLocation />,
     errorElement: <NotFound />,
+    loader: paiementLoader,
   },
   {
     path: "/reservations-vehicules",
     element: <ReservationVehicule />,
     errorElement: <NotFound />,
+    loader: paiementLoader,
   },
 ]);
 
