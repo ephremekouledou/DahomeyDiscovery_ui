@@ -1,16 +1,6 @@
 import { useState, useEffect } from "react";
-import {
-  Button,
-  Card,
-  Typography,
-  message,
-  InputNumber,
-  Flex,
-} from "antd";
-import {
-  DeleteOutlined,
-  ClockCircleOutlined,
-} from "@ant-design/icons";
+import { Button, Card, Typography, message, InputNumber, Flex } from "antd";
+import { DeleteOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { useTransaction } from "../../context/transactionContext";
 import { ClientsAPI } from "../../sdk/api/clients";
 import { IClient } from "../../sdk/models/clients";
@@ -18,6 +8,9 @@ import { IPaiementRequest } from "../../sdk/models/paiement";
 import { PaiementAPI } from "../../sdk/api/paiements";
 import { ReservationsAPI } from "../../sdk/api/reservations";
 import { IAddUpdateReservation } from "../../sdk/models/reservations";
+import BeginningButton from "../../components/dededed/BeginingButton";
+import NavBar from "../../components/navBar/navBar";
+import Footer from "../../components/footer/footer";
 
 const { Title } = Typography;
 
@@ -115,7 +108,7 @@ const ReservationLocation = () => {
     try {
       setIsSubmitting(true);
       const totalAmount = calculateTotalAmount();
-      
+
       if (!transaction) {
         messageApi.error("Informations de location manquantes");
         return;
@@ -151,7 +144,7 @@ const ReservationLocation = () => {
 
       const reservationResponse = await ReservationsAPI.Add(reservation);
       console.log("Reservation created:", reservationResponse);
-      
+
       // Redirect to payment page
       window.location.href = paymentResponse.data.checkout_url;
     } catch (error: any) {
@@ -167,7 +160,7 @@ const ReservationLocation = () => {
 
   const submitForm = () => {
     let isValid = true;
-    
+
     formPages.forEach((page) => {
       page.fields.forEach((field) => {
         if (field.required && !formValues[field.name]) {
@@ -241,15 +234,20 @@ const ReservationLocation = () => {
   };
 
   return (
-    <>
+    <Flex justify="center" vertical>
+      <BeginningButton />
+      {/* Header avec NavBar */}
+      <div className="relative z-20 flex items-center justify-center">
+        <NavBar menu="" />
+      </div>
       <Flex
         justify="center"
         align="center"
         vertical
         style={{
           backgroundColor: "#F9FAFB",
-          minHeight: "100vh",
-          paddingTop: "80px",
+          // minHeight: "100vh",
+          paddingTop: "30px",
           width: "100%",
         }}
       >
@@ -309,7 +307,7 @@ const ReservationLocation = () => {
                 marginBottom: isMobile ? "16px" : "24px",
               }}
             >
-              Réservation de Location
+              Réservation d'hébergement
             </Title>
 
             <div
@@ -319,8 +317,6 @@ const ReservationLocation = () => {
               }}
             >
               <div style={{ padding: isMobile ? "4px" : "8px" }}>
-                
-
                 {/* Display location info */}
                 {transaction && (
                   <Card
@@ -338,11 +334,14 @@ const ReservationLocation = () => {
                         Location de {transaction.title}
                       </Title>
                       <p style={{ fontSize: "14px", color: "#666", margin: 0 }}>
-                        Prix par jour: {transaction.amount.toLocaleString("fr-FR")} FCFA
+                        Prix par jour:{" "}
+                        {transaction.amount.toLocaleString("fr-FR")} FCFA
                       </p>
                     </div>
                   </Card>
                 )}
+
+                {renderFormFields()}
 
                 {/* Display total amount only after number of days is entered */}
                 {formValues.nombreJours && (
@@ -370,15 +369,14 @@ const ReservationLocation = () => {
                         >
                           {calculateTotalAmount().toLocaleString("fr-FR")} FCFA
                         </p>
-                        <p style={{ fontSize: "14px", color: "#666" }}>
-                          {transaction?.amount.toLocaleString("fr-FR")} FCFA × {formValues.nombreJours} jour(s)
-                        </p>
+                        {/* <p style={{ fontSize: "14px", color: "#666" }}>
+                          {transaction?.amount.toLocaleString("fr-FR")} FCFA ×{" "}
+                          {formValues.nombreJours} jour(s)
+                        </p> */}
                       </div>
                     </div>
                   </Card>
                 )}
-
-                {renderFormFields()}
               </div>
 
               <div style={buttonContainerStyle}>
@@ -434,7 +432,9 @@ const ReservationLocation = () => {
           </Card>
         </div>
       </Flex>
-    </>
+      {/* Footer */}
+      <Footer />
+    </Flex>
   );
 };
 

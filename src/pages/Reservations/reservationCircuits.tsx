@@ -14,7 +14,6 @@ import {
 } from "antd";
 import {
   DeleteOutlined,
-  ContactsOutlined,
   CalendarOutlined,
   TeamOutlined,
   EnvironmentOutlined,
@@ -28,6 +27,9 @@ import { IClient } from "../../sdk/models/clients";
 import { IPaiementRequest } from "../../sdk/models/paiement";
 import { PaiementAPI } from "../../sdk/api/paiements";
 import { ReservationsAPI } from "../../sdk/api/reservations";
+import BeginningButton from "../../components/dededed/BeginingButton";
+import NavBar from "../../components/navBar/navBar";
+import Footer from "../../components/footer/footer";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -246,15 +248,6 @@ const ReservationCircuit = () => {
           prefix: <TeamOutlined />,
           type: "number",
           min: 1,
-        },
-        {
-          name: "phone",
-          label: "Numéro de téléphone",
-          required: true,
-          errorMsg: "Veuillez entrer votre numéro de téléphone",
-          placeholder: "+33612345678",
-          prefix: <ContactsOutlined />,
-          type: "text",
         },
       ],
     },
@@ -629,15 +622,20 @@ const ReservationCircuit = () => {
   };
 
   return (
-    <>
+    <Flex justify="center" vertical>
+      <BeginningButton />
+      {/* Header avec NavBar */}
+      <div className="relative z-20 flex items-center justify-center">
+        <NavBar menu="" />
+      </div>
       <Flex
         justify="center"
         align="center"
         vertical
         style={{
           backgroundColor: "#F9FAFB",
-          minHeight: "100vh",
-          paddingTop: "80px",
+          // minHeight: "100vh",
+          paddingTop: "30px",
           width: "100%",
         }}
       >
@@ -697,7 +695,7 @@ const ReservationCircuit = () => {
                 marginBottom: isMobile ? "16px" : "24px",
               }}
             >
-              Réservation de Circuit
+              Réservation de circuit
             </Title>
 
             <div
@@ -707,15 +705,7 @@ const ReservationCircuit = () => {
               }}
             >
               <div style={{ padding: isMobile ? "4px" : "8px" }}>
-                <Title
-                  level={5}
-                  style={{
-                    marginBottom: isMobile ? "16px" : "24px",
-                    fontSize: isMobile ? "16px" : "18px",
-                  }}
-                >
-                  {formPages[0].title}
-                </Title>
+                {renderFormFields()}
 
                 {/* Display total amount */}
                 {formValues.circuit &&
@@ -748,7 +738,7 @@ const ReservationCircuit = () => {
                             {calculateTotalAmount().toLocaleString("fr-FR")}{" "}
                             FCFA
                           </p>
-                          {formValues.circuit === "circuit-a-la-carte" ? (
+                          {/* {formValues.circuit === "circuit-a-la-carte" ? (
                             <p style={{ fontSize: "14px", color: "#666" }}>
                               {formValues.villesSelectionnees.length} ville(s)
                               sélectionnée(s) • {formValues.nombreParticipants}{" "}
@@ -762,13 +752,11 @@ const ReservationCircuit = () => {
                               FCFA × {formValues.nombreParticipants}{" "}
                               participant(s)
                             </p>
-                          )}
+                          )} */}
                         </div>
                       </div>
                     </Card>
                   )}
-
-                {renderFormFields()}
               </div>
 
               <div style={buttonContainerStyle}>
@@ -824,7 +812,10 @@ const ReservationCircuit = () => {
           </Card>
         </div>
       </Flex>
-    </>
+
+      {/* Footer */}
+      <Footer />
+    </Flex>
   );
 };
 

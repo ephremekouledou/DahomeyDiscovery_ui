@@ -9,10 +9,7 @@ import {
   InputNumber,
   Flex,
 } from "antd";
-import {
-  DeleteOutlined,
-  ClockCircleOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { useTransaction } from "../../context/transactionContext";
 import { ClientsAPI } from "../../sdk/api/clients";
 import { IClient } from "../../sdk/models/clients";
@@ -20,6 +17,9 @@ import { IPaiementRequest } from "../../sdk/models/paiement";
 import { PaiementAPI } from "../../sdk/api/paiements";
 import { ReservationsAPI } from "../../sdk/api/reservations";
 import { IAddUpdateReservation } from "../../sdk/models/reservations";
+import Footer from "../../components/footer/footer";
+import NavBar from "../../components/navBar/navBar";
+import BeginningButton from "../../components/dededed/BeginingButton";
 
 const { Title } = Typography;
 
@@ -86,20 +86,20 @@ const ReservationVehicule = () => {
     const days = Number(formValues.nombreJours) || 0;
     if (!transaction?.tarification || !Array.isArray(transaction.tarification))
       return null;
-    
+
     const found = transaction.tarification.find(
       (t: any) => days >= t.from && days <= t.to
     );
-    
+
     if (found) return found;
-    
+
     if (
       transaction.tarification.length > 0 &&
       days > transaction.tarification[transaction.tarification.length - 1].to
     ) {
       return transaction.tarification[transaction.tarification.length - 1];
     }
-    
+
     return null;
   };
 
@@ -166,7 +166,7 @@ const ReservationVehicule = () => {
     try {
       setIsSubmitting(true);
       const totalAmount = calculateTotalAmount();
-      
+
       if (!transaction) {
         messageApi.error("Informations de véhicule manquantes");
         return;
@@ -176,9 +176,9 @@ const ReservationVehicule = () => {
       const paymentRequest: IPaiementRequest = {
         amount: totalAmount,
         currency: "XOF",
-        description: `Location de ${transaction.title} - ${data.nombreJours} jour(s)${
-          data.chauffeur === "true" ? " avec chauffeur" : ""
-        }`,
+        description: `Location de ${transaction.title} - ${
+          data.nombreJours
+        } jour(s)${data.chauffeur === "true" ? " avec chauffeur" : ""}`,
         return_url: "https://dahomeydiscovery.com/locations",
         customer: {
           email: user ? user.email : "",
@@ -205,7 +205,7 @@ const ReservationVehicule = () => {
 
       const reservationResponse = await ReservationsAPI.Add(reservation);
       console.log("Reservation created:", reservationResponse);
-      
+
       // Redirect to payment page
       window.location.href = paymentResponse.data.checkout_url;
     } catch (error: any) {
@@ -221,7 +221,7 @@ const ReservationVehicule = () => {
 
   const submitForm = () => {
     let isValid = true;
-    
+
     formPages.forEach((page) => {
       page.fields.forEach((field) => {
         if (field.required) {
@@ -274,9 +274,7 @@ const ReservationVehicule = () => {
               <Radio.Group
                 options={field.options}
                 value={formValues[field.name]}
-                onChange={(e) =>
-                  handleInputChange(field.name, e.target.value)
-                }
+                onChange={(e) => handleInputChange(field.name, e.target.value)}
                 buttonStyle="solid"
                 style={{
                   display: "flex",
@@ -287,9 +285,7 @@ const ReservationVehicule = () => {
             ) : field.type === "number" ? (
               <InputNumber
                 value={formValues[field.name]}
-                onChange={(value) =>
-                  handleInputChange(field.name, value)
-                }
+                onChange={(value) => handleInputChange(field.name, value)}
                 placeholder={field.placeholder}
                 size={isMobile ? "middle" : "large"}
                 style={{ width: "100%" }}
@@ -330,15 +326,20 @@ const ReservationVehicule = () => {
   };
 
   return (
-    <>
+    <Flex justify="center" vertical>
+      <BeginningButton />
+      {/* Header avec NavBar */}
+      <div className="relative z-20 flex items-center justify-center">
+        <NavBar menu="" />
+      </div>
       <Flex
         justify="center"
         align="center"
         vertical
         style={{
           backgroundColor: "#F9FAFB",
-          minHeight: "100vh",
-          paddingTop: "80px",
+          // minHeight: "100vh",
+          paddingTop: "30px",
           width: "100%",
         }}
       >
@@ -398,7 +399,7 @@ const ReservationVehicule = () => {
                 marginBottom: isMobile ? "16px" : "24px",
               }}
             >
-              Réservation de Véhicule
+              Réservation de véhicule
             </Title>
 
             <div
@@ -408,15 +409,6 @@ const ReservationVehicule = () => {
               }}
             >
               <div style={{ padding: isMobile ? "4px" : "8px" }}>
-                <Title
-                  level={5}
-                  style={{
-                    marginBottom: isMobile ? "16px" : "24px",
-                    fontSize: isMobile ? "16px" : "18px",
-                  }}
-                >
-                  {formPages[0].title}
-                </Title>
 
                 {/* Display vehicle info */}
                 {transaction && (
@@ -437,6 +429,8 @@ const ReservationVehicule = () => {
                     </div>
                   </Card>
                 )}
+
+                {renderFormFields()}
 
                 {/* Display total amount */}
                 {formValues.nombreJours && formValues.chauffeur && (
@@ -464,7 +458,7 @@ const ReservationVehicule = () => {
                         >
                           {calculateTotalAmount().toLocaleString("fr-FR")} FCFA
                         </p>
-                        <p style={{ fontSize: "14px", color: "#666" }}>
+                        {/* <p style={{ fontSize: "14px", color: "#666" }}>
                           {formValues.chauffeur === "true"
                             ? getTarificationForDays()?.price_driver.toLocaleString(
                                 "fr-FR"
@@ -473,7 +467,7 @@ const ReservationVehicule = () => {
                                 "fr-FR"
                               )}{" "}
                           FCFA × {formValues.nombreJours} jour(s)
-                        </p>
+                        </p> */}
                         {formValues.chauffeur === "true" && (
                           <p style={{ fontSize: "12px", color: "#f59f00" }}>
                             Avec chauffeur inclus
@@ -483,8 +477,6 @@ const ReservationVehicule = () => {
                     </div>
                   </Card>
                 )}
-
-                {renderFormFields()}
               </div>
 
               <div style={buttonContainerStyle}>
@@ -540,7 +532,9 @@ const ReservationVehicule = () => {
           </Card>
         </div>
       </Flex>
-    </>
+      {/* Footer */}
+      <Footer />
+    </Flex>
   );
 };
 
