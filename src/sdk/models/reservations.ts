@@ -9,6 +9,7 @@ export interface IReservation extends IDefault {
   item: string;
   number: number;
   villes: string[];
+  chauffeur?: boolean;
 }
 
 export interface IAddUpdateReservation {
@@ -20,4 +21,5 @@ export interface IAddUpdateReservation {
   item: string;
   number: number;
   villes: string[];
+  chauffeur?: boolean;
 }
