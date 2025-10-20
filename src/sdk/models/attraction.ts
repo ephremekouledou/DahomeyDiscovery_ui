@@ -17,6 +17,7 @@ export interface IAttractionTarification {
   price: number;
   title: string;
   description: string;
+  groupPrice: boolean;
 }
 
 export const emptyAttractionTarification = (): IAttractionTarification => ({
@@ -24,6 +25,7 @@ export const emptyAttractionTarification = (): IAttractionTarification => ({
   price: 0,
   title: "",
   description: "",
+  groupPrice: false,
 });
 
 export interface IAttraction extends IDefault {

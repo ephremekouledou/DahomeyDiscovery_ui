@@ -8,7 +8,7 @@ import {
   ArrowRight,
   CheckCircle,
 } from "lucide-react";
-import { Button, Flex, Typography } from "antd";
+import { Button, Flex, message, Typography } from "antd";
 import BeginningButton from "../../components/dededed/BeginingButton";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
@@ -19,8 +19,15 @@ import {
 } from "../../sdk/models/pagesMedias";
 import { PageSettings } from "../../sdk/api/pageMedias";
 import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
+import { IPaiementRequest } from "../../sdk/models/paiement";
+import { IClient } from "../../sdk/models/clients";
+import { ClientsAPI } from "../../sdk/api/clients";
+import { PaiementAPI } from "../../sdk/api/paiements";
+import { ReservationsAPI } from "../../sdk/api/reservations";
+import { IAddUpdateReservation } from "../../sdk/models/reservations";
 
 const Transferts: React.FC = () => {
+  const [messageApi] = message.useMessage();
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const [selectedDestination, setSelectedDestination] = useState<string>("");
@@ -37,9 +44,16 @@ const Transferts: React.FC = () => {
   const [bookingConfirmed, setBookingConfirmed] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
+  const [user, setUser] = useState<IClient | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, []);
+
+  // Check for logged in user
+  useEffect(() => {
+    const loggedUser = ClientsAPI.GetUser();
+    setUser(loggedUser);
   }, []);
 
   useEffect(() => {
@@ -98,217 +112,6 @@ const Transferts: React.FC = () => {
     return Math.round(destination.distance * (vehicle?.price ?? 0));
   };
 
-  // Prix par département (en FCFA)
-  // const destinations: Destination[] = [
-  //   // Littoral
-  //   {
-  //     id: "1",
-  //     name: "Cotonou Centre-ville",
-  //     department: "Littoral",
-  //     price: 5000,
-  //   },
-  //   {
-  //     id: "2",
-  //     name: "Fidjrossè",
-  //     department: "Littoral",
-  //     price: 5000,
-  //   },
-  //   {
-  //     id: "3",
-  //     name: "Godomey",
-  //     department: "Littoral",
-  //     price: 5000,
-  //   },
-
-  //   // Ouémé
-  //   {
-  //     id: "4",
-  //     name: "Porto-Novo",
-  //     department: "Ouémé",
-  //     price: 8000,
-  //   },
-  //   {
-  //     id: "5",
-  //     name: "Sèmè-Kpodji",
-  //     department: "Ouémé",
-  //     price: 8000,
-  //   },
-  //   {
-  //     id: "6",
-  //     name: "Adjarra",
-  //     department: "Ouémé",
-  //     price: 8000,
-  //   },
-
-  //   // Atlantique
-  //   {
-  //     id: "7",
-  //     name: "Allada",
-  //     department: "Atlantique",
-  //     price: 7000,
-  //   },
-  //   {
-  //     id: "8",
-  //     name: "Ouidah",
-  //     department: "Atlantique",
-  //     price: 7000,
-  //   },
-  //   {
-  //     id: "9",
-  //     name: "Abomey-Calavi",
-  //     department: "Atlantique",
-  //     price: 7000,
-  //   },
-
-  //   // Zou
-  //   {
-  //     id: "10",
-  //     name: "Bohicon",
-  //     department: "Zou",
-  //     price: 12000,
-  //   },
-  //   {
-  //     id: "11",
-  //     name: "Abomey",
-  //     department: "Zou",
-  //     price: 12000,
-  //   },
-
-  //   // Collines
-  //   {
-  //     id: "12",
-  //     name: "Savalou",
-  //     department: "Collines",
-  //     price: 15000,
-  //   },
-  //   {
-  //     id: "13",
-  //     name: "Dassa-Zoumé",
-  //     department: "Collines",
-  //     price: 15000,
-  //   },
-
-  //   // Plateau
-  //   {
-  //     id: "14",
-  //     name: "Pobè",
-  //     department: "Plateau",
-  //     price: 10000,
-  //   },
-  //   {
-  //     id: "15",
-  //     name: "Kétou",
-  //     department: "Plateau",
-  //     price: 10000,
-  //   },
-
-  //   // Mono
-  //   {
-  //     id: "16",
-  //     name: "Lokossa",
-  //     department: "Mono",
-  //     price: 13000,
-  //   },
-  //   {
-  //     id: "17",
-  //     name: "Comè",
-  //     department: "Mono",
-  //     price: 13000,
-  //   },
-
-  //   // Couffo
-  //   {
-  //     id: "18",
-  //     name: "Aplahoué",
-  //     department: "Couffo",
-  //     price: 14000,
-  //   },
-  //   {
-  //     id: "19",
-  //     name: "Dogbo",
-  //     department: "Couffo",
-  //     price: 14000,
-  //   },
-
-  //   // Borgou
-  //   {
-  //     id: "20",
-  //     name: "Parakou",
-  //     department: "Borgou",
-  //     price: 25000,
-  //   },
-  //   {
-  //     id: "21",
-  //     name: "Nikki",
-  //     department: "Borgou",
-  //     price: 25000,
-  //   },
-
-  //   // Alibori
-  //   {
-  //     id: "22",
-  //     name: "Kandi",
-  //     department: "Alibori",
-  //     price: 30000,
-  //   },
-  //   {
-  //     id: "23",
-  //     name: "Malanville",
-  //     department: "Alibori",
-  //     price: 30000,
-  //   },
-
-  //   // Atacora
-  //   {
-  //     id: "24",
-  //     name: "Natitingou",
-  //     department: "Atacora",
-  //     price: 28000,
-  //   },
-  //   {
-  //     id: "25",
-  //     name: "Tanguiéta",
-  //     department: "Atacora",
-  //     price: 28000,
-  //   },
-
-  //   // Donga
-  //   {
-  //     id: "26",
-  //     name: "Djougou",
-  //     department: "Donga",
-  //     price: 22000,
-  //   },
-  //   {
-  //     id: "27",
-  //     name: "Copargo",
-  //     department: "Donga",
-  //     price: 22000,
-  //   },
-  // ];
-
-  // const vehicleTypes = [
-  //   {
-  //     id: "standard",
-  //     name: "Véhicule Standard",
-  //     multiplier: 1,
-  //     capacity: "1-4 passagers",
-  //   },
-  //   {
-  //     id: "comfort",
-  //     name: "Véhicule Confort",
-  //     multiplier: 1.3,
-  //     capacity: "1-4 passagers",
-  //   },
-  //   {
-  //     id: "minibus",
-  //     name: "Minibus",
-  //     multiplier: 1.8,
-  //     capacity: "5-8 passagers",
-  //   },
-  //   { id: "bus", name: "Bus", multiplier: 2.5, capacity: "9+ passagers" },
-  // ];
-
   useEffect(() => {
     PageSettings.List()
       .then((data) => {
@@ -337,20 +140,6 @@ const Transferts: React.FC = () => {
     setDate(today);
   }, []);
 
-  // const getSelectedDestination = (): Destination | undefined => {
-  //   return destinations.find((dest) => dest.id === selectedDestination);
-  // };
-
-  // const calculatePrice = (): number => {
-  //   const destination = getSelectedDestination();
-  //   if (!destination) return 0;
-
-  //   const vehicle = vehicleTypes.find((v) => v.id === vehicleType);
-  //   const multiplier = vehicle?.multiplier || 1;
-
-  //   return Math.round(destination.price * multiplier);
-  // };
-
   const handleBooking = () => {
     if (!selectedDestination || !date || !time) {
       alert("Veuillez remplir tous les champs obligatoires");
@@ -371,8 +160,61 @@ const Transferts: React.FC = () => {
   };
 
   const confirmBooking = () => {
-    setBookingConfirmed(true);
-    setShowBookingForm(false);
+    // setBookingConfirmed(true);
+    // setShowBookingForm(false);
+
+    // we initiate the payment process
+    const paymentRequest: IPaiementRequest = {
+      amount: calculatePrice(),
+      currency: "XOF",
+      description: "Réservation Dahomey Discovery",
+      return_url: "https://dahomeydiscovery.com/transferts",
+      customer: {
+        email: user ? user.email : "",
+        first_name: user ? user.first_name : "",
+        last_name: user ? user.last_name : "",
+      },
+    };
+
+    PaiementAPI.Initiate(paymentRequest)
+      .then((data) => {
+        console.log("the response is:", data);
+
+        // we create the reservation here
+        const reservation: IAddUpdateReservation = {
+          date: new Date(),
+          customer: user ? user._id : "guest",
+          status: "pending",
+          transaction_id: data.data.id,
+          type: "transfert",
+          transfert_infos: {
+            transfer_type: transferType,
+            location: selectedDestination,
+            pick_up_date: new Date(date + "T" + time),
+            passenger_count: passengers,
+            pick_up_time: time,
+            vehicle_type: vehicleType,
+            flight_number: flightNumber,
+            phone_number: phoneNumber,
+          },
+        };
+
+        ReservationsAPI.Add(reservation)
+          .then((res) => {
+            console.log("Reservation created:", res);
+            // Redirect to payment page
+            window.location.href = data.data.checkout_url;
+          })
+          .catch((err) => {
+            console.error("Error creating reservation:", err);
+            messageApi.error(
+              "Erreur lors de la création de la réservation. Veuillez réessayer."
+            );
+          });
+      })
+      .catch((err) => {
+        console.error("Error fetching attractions:", err);
+      });
   };
 
   if (bookingConfirmed) {
@@ -633,9 +475,9 @@ const Transferts: React.FC = () => {
                 Confirmer votre réservation
               </h2>
 
-              <div className="bg-blue-50 p-6 rounded-lg mb-6">
+              <div className="bg-[#fff7ed] p-6 rounded-lg mb-6">
                 <div className="flex items-center mb-4">
-                  <MapPin className="w-5 h-5 text-blue-600 mr-2" />
+                  <MapPin className="w-5 h-5 text-[#f59f00] mr-2" />
                   {transferType === "airport-to-destination" ? (
                     <>
                       <span className="font-semibold">
@@ -684,7 +526,7 @@ const Transferts: React.FC = () => {
                 </div>
               </div>
 
-              <div className="mb-6">
+              {/* <div className="mb-6">
                 <h3 className="text-lg font-semibold mb-4">
                   Détails de la réservation
                 </h3>
@@ -720,12 +562,12 @@ const Transferts: React.FC = () => {
                     />
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               <div className="bg-gray-50 p-4 rounded-lg mb-6">
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold">Prix total</span>
-                  <span className="text-2xl font-bold text-blue-600">
+                  <span className="text-2xl font-bold text-[#f59f00]">
                     {calculatePrice().toLocaleString()} FCFA
                   </span>
                 </div>
@@ -740,7 +582,7 @@ const Transferts: React.FC = () => {
                 </button>
                 <button
                   onClick={confirmBooking}
-                  className="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors"
+                  className="flex-1 bg-[#f59f00] text-white py-3 rounded-lg hover:bg-[#ff3100] transition-colors"
                 >
                   Confirmer la réservation
                 </button>
@@ -1076,7 +918,7 @@ const Transferts: React.FC = () => {
 
               {/* Récapitulatif du prix */}
               {selectedDestination && (
-                <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                <div className="mt-6 p-4 bg-[#fff7ed] rounded-lg">
                   {/* <div className="flex justify-between items-center mb-2">
                     <span className="text-gray-700">Prix de base</span>
                     <span className="font-semibold">
@@ -1099,7 +941,7 @@ const Transferts: React.FC = () => {
                   <hr className="my-2" />
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-bold">Prix total</span>
-                    <span className="text-xl font-bold text-blue-600">
+                    <span className="text-xl font-bold text-[#f59f00]">
                       {calculatePrice().toLocaleString()} FCFA
                     </span>
                   </div>
@@ -1117,7 +959,7 @@ const Transferts: React.FC = () => {
                   (transferType === "destination-to-airport" &&
                     !phoneNumber.trim())
                 }
-                className="w-full mt-6 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="w-full mt-6 bg-[#f59f00] text-white py-3 rounded-lg hover:bg-[#ff3100] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 Réserver maintenant
               </button>

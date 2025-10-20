@@ -17,21 +17,26 @@ import { useLocation, useParams } from "react-router-dom";
 import { AttractionsAPI } from "../../sdk/api/attraction";
 import { emptyIAttraction, IAttraction } from "../../sdk/models/attraction";
 import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
-import { Flex, Typography } from "antd";
+import { Flex, message, Typography } from "antd";
 import BeginningButton from "../../components/dededed/BeginingButton";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
-import { IClientHistory } from "../../sdk/models/clients";
+import { IClient, IClientHistory } from "../../sdk/models/clients";
 import { ClientsAPI } from "../../sdk/api/clients";
 import SimilarSelling from "../../components/dededed/similarSelling";
 import CrossSelling from "../../components/dededed/crossSelling";
 import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { PageSettings } from "../../sdk/api/pageMedias";
 import ItemLocation, { MapItem } from "../../components/dededed/Map";
+import { IPaiementRequest } from "../../sdk/models/paiement";
+import { PaiementAPI } from "../../sdk/api/paiements";
+import { IAddUpdateReservation } from "../../sdk/models/reservations";
+import { ReservationsAPI } from "../../sdk/api/reservations";
 
 const AttractionDetailPage = () => {
   const { id } = useParams();
   const { pathname } = useLocation();
+  const [messageApi] = message.useMessage();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedDate, setSelectedDate] = useState("2024-12-15");
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>("");
@@ -42,6 +47,7 @@ const AttractionDetailPage = () => {
   const [attraction, setAttraction] = useState<IAttraction>(emptyIAttraction());
   const [history, setHistory] = useState<IClientHistory[]>([]);
   const [attractions, setAttractions] = useState<IAttraction[]>([]);
+  const [user, setUser] = useState<IClient | null>(null);
 
   const [loading, setLoading] = useState<boolean>(true);
   const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
@@ -56,6 +62,12 @@ const AttractionDetailPage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
+
+  // Check for logged in user
+  useEffect(() => {
+    const loggedUser = ClientsAPI.GetUser();
+    setUser(loggedUser);
+  }, []);
 
   useEffect(() => {
     PageSettings.List()
@@ -85,12 +97,6 @@ const AttractionDetailPage = () => {
           lien: pathname,
         };
         ClientsAPI.AddToClientHistoryLocal(newElement);
-        // .then((_) => {
-        //   console.log("History added");
-        // })
-        // .catch((err) => {
-        //   console.error("History added not added", err);
-        // });
         // Sélectionner automatiquement la première tarification si disponible
         if (data.price && data.price.length > 0) {
           setSelectedTarification(data.price[0]._id);
@@ -145,22 +151,82 @@ const AttractionDetailPage = () => {
     );
   };
 
-  // Calculer le prix actuel basé sur la tarification sélectionnée
-  const getCurrentPrice = (): number => {
-    if (!selectedTarification || !attraction.price.length) return 0;
-    const selectedTarif = attraction.price.find(
-      (tarif) => tarif._id === selectedTarification
-    );
-    return selectedTarif ? selectedTarif.price : attraction.price[0].price;
+  // Obtenir la tarification sélectionnée
+  const getSelectedTarif = () => {
+    if (!selectedTarification || !attraction.price.length) return null;
+    return attraction.price.find((tarif) => tarif._id === selectedTarification);
   };
 
-  // Calculer le prix total
-  const totalPrice = getCurrentPrice() * participants;
+  // Calculer le prix actuel basé sur la tarification sélectionnée
+  const getCurrentPrice = (): number => {
+    const selectedTarif = getSelectedTarif();
+    return selectedTarif
+      ? selectedTarif.price
+      : attraction.price[0]?.price || 0;
+  };
+
+  // Vérifier si la tarification est un prix de groupe
+  const isGroupPrice = (): boolean => {
+    const selectedTarif = getSelectedTarif();
+    return selectedTarif ? selectedTarif.groupPrice : false;
+  };
+
+  // Calculer le prix total en tenant compte du groupPrice
+  const totalPrice = isGroupPrice()
+    ? getCurrentPrice()
+    : getCurrentPrice() * participants;
 
   // Obtenir le prix minimum pour l'affichage principal
   const getMinPrice = (): number => {
     if (!attraction.price.length) return 0;
     return Math.min(...attraction.price.map((tarif) => tarif.price));
+  };
+
+  const handlePost = async () => {
+    // we initiate the payment process
+    const paymentRequest: IPaiementRequest = {
+      amount: totalPrice,
+      currency: "XOF",
+      description: "Réservation Dahomey Discovery",
+      return_url: "https://dahomeydiscovery.com/attractions",
+      customer: {
+        email: user ? user.email : "",
+        first_name: user ? user.first_name : "",
+        last_name: user ? user.last_name : "",
+      },
+    };
+
+    PaiementAPI.Initiate(paymentRequest)
+      .then((data) => {
+        console.log("the response is:", data);
+
+        // we create the reservation here
+        const reservation: IAddUpdateReservation = {
+          date: new Date(),
+          customer: user ? user._id : "guest",
+          status: "pending",
+          transaction_id: data.data.id,
+          type: "attraction",
+          item: attraction._id,
+          number: participants,
+        };
+
+        ReservationsAPI.Add(reservation)
+          .then((res) => {
+            console.log("Reservation created:", res);
+            // Redirect to payment page
+            window.location.href = data.data.checkout_url;
+          })
+          .catch((err) => {
+            console.error("Error creating reservation:", err);
+            messageApi.error(
+              "Erreur lors de la création de la réservation. Veuillez réessayer."
+            );
+          });
+      })
+      .catch((err) => {
+        console.error("Error fetching attractions:", err);
+      });
   };
 
   return (
@@ -184,7 +250,7 @@ const AttractionDetailPage = () => {
             paddingBottom: isMobile ? "12vw" : isTablet ? "10vw" : "8vw",
           }}
         >
-          {/* Gradient overlay - de la couleur beige/crème vers transparent */}
+          {/* Gradient overlay */}
           <div
             className="absolute inset-0"
             style={{
@@ -485,7 +551,7 @@ const AttractionDetailPage = () => {
                 </div>
               </div>
 
-              {/* Sidebar de réservation - Affichée seulement si attraction.free === false */}
+              {/* Sidebar de réservation */}
               {!attraction.free && (
                 <div className="lg:col-span-1">
                   <div className="bg-white rounded-2xl p-6 shadow-lg sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto">
@@ -525,11 +591,21 @@ const AttractionDetailPage = () => {
                                       {tarif.description}
                                     </p>
                                   )}
+                                  {tarif.groupPrice && (
+                                    <span className="inline-block mt-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                                      Prix de groupe
+                                    </span>
+                                  )}
                                 </div>
                                 <div className="text-right ml-3">
                                   <span className="font-bold text-lg text-blue-600">
                                     {tarif.price} FCFA
                                   </span>
+                                  {tarif.groupPrice && (
+                                    <p className="text-xs text-gray-500 mt-1">
+                                      pour le groupe
+                                    </p>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -607,14 +683,26 @@ const AttractionDetailPage = () => {
                     {/* Prix total */}
                     {selectedTarification && (
                       <div className="border-t pt-4 mb-6">
-                        <div className="flex justify-between items-center mb-2">
-                          <span>Prix par personne</span>
-                          <span>{getCurrentPrice()} FCFA</span>
-                        </div>
-                        <div className="flex justify-between items-center mb-2">
-                          <span>Participants × {participants}</span>
-                          <span>{totalPrice} FCFA</span>
-                        </div>
+                        {!isGroupPrice() ? (
+                          <>
+                            <div className="flex justify-between items-center mb-2">
+                              <span>Prix par personne</span>
+                              <span>{getCurrentPrice()} FCFA</span>
+                            </div>
+                            <div className="flex justify-between items-center mb-2">
+                              <span>Participants × {participants}</span>
+                              <span>{totalPrice} FCFA</span>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="flex justify-between items-center mb-2">
+                            <span>
+                              Prix du groupe ({participants} personne
+                              {participants > 1 ? "s" : ""})
+                            </span>
+                            <span>{totalPrice} FCFA</span>
+                          </div>
+                        )}
                         <div className="flex justify-between items-center font-bold text-lg border-t pt-2">
                           <span>Total</span>
                           <span className="text-blue-600">
@@ -636,6 +724,7 @@ const AttractionDetailPage = () => {
                           ? "bg-[#f59f00] text-white hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl"
                           : "bg-gray-200 text-gray-500 cursor-not-allowed"
                       }`}
+                      onClick={handlePost}
                     >
                       {!selectedTarification
                         ? "Sélectionnez une tarification"
