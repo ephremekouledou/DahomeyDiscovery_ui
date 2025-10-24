@@ -2,12 +2,6 @@ import { useState, useEffect } from "react";
 import { Button, Card, Typography, message, InputNumber, Flex } from "antd";
 import { DeleteOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { useTransaction } from "../../context/transactionContext";
-import { ClientsAPI } from "../../sdk/api/clients";
-import { IClient } from "../../sdk/models/clients";
-import { IPaiementRequest } from "../../sdk/models/paiement";
-import { PaiementAPI } from "../../sdk/api/paiements";
-import { ReservationsAPI } from "../../sdk/api/reservations";
-import { IAddUpdateReservation } from "../../sdk/models/reservations";
 import BeginningButton from "../../components/dededed/BeginingButton";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
@@ -36,8 +30,7 @@ const ReservationLocation = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [user, setUser] = useState<IClient | null>(null);
+  const [isSubmitting, _] = useState(false);
   const { transaction } = useTransaction();
 
   useEffect(() => {
@@ -56,12 +49,6 @@ const ReservationLocation = () => {
 
   useEffect(() => {
     document.title = "Réservation de Location";
-  }, []);
-
-  // Check for logged in user
-  useEffect(() => {
-    const loggedUser = ClientsAPI.GetUser();
-    setUser(loggedUser);
   }, []);
 
   // Calculate total amount based on days
@@ -104,58 +91,58 @@ const ReservationLocation = () => {
     setFormValues({});
   };
 
-  const handlePost = async (data: any) => {
-    try {
-      setIsSubmitting(true);
-      const totalAmount = calculateTotalAmount();
+  const handlePost = async (_: any) => {
+    // try {
+    //   setIsSubmitting(true);
+    //   const totalAmount = calculateTotalAmount();
 
-      if (!transaction) {
-        messageApi.error("Informations de location manquantes");
-        return;
-      }
+    //   if (!transaction) {
+    //     messageApi.error("Informations de location manquantes");
+    //     return;
+    //   }
 
-      // We initiate the payment process
-      const paymentRequest: IPaiementRequest = {
-        amount: totalAmount,
-        currency: "XOF",
-        description: `Location de ${transaction.title} - ${data.nombreJours} jour(s)`,
-        return_url: "https://dahomeydiscovery.com/hebergements",
-        customer: {
-          email: user?.email || "",
-          first_name: user?.first_name || "",
-          last_name: user?.last_name || "",
-        },
-      };
+    //   // We initiate the payment process
+    //   const paymentRequest: IPaiementRequest = {
+    //     amount: totalAmount,
+    //     currency: "XOF",
+    //     description: `Location de ${transaction.title} - ${data.nombreJours} jour(s)`,
+    //     return_url: "https://dahomeydiscovery.com/hebergements",
+    //     customer: {
+    //       email: user?.email || "",
+    //       first_name: user?.first_name || "",
+    //       last_name: user?.last_name || "",
+    //     },
+    //   };
 
-      const paymentResponse = await PaiementAPI.Initiate(paymentRequest);
-      console.log("Payment response:", paymentResponse);
+    //   const paymentResponse = await PaiementAPI.Initiate(paymentRequest);
+    //   console.log("Payment response:", paymentResponse);
 
-      // We create the reservation here
-      const reservation: IAddUpdateReservation = {
-        date: new Date(),
-        customer: user ? user._id : "guest",
-        status: "pending",
-        transaction_id: paymentResponse.data.id,
-        type: "hebergement",
-        item: transaction.id || transaction.title,
-        number: data.nombreJours,
-        villes: [],
-      };
+    //   // We create the reservation here
+    //   const reservation: IAddUpdateReservation = {
+    //     date: new Date(),
+    //     customer: user ? user._id : "guest",
+    //     status: "pending",
+    //     transaction_id: paymentResponse.data.id,
+    //     type: "hebergement",
+    //     item: transaction.id || transaction.title,
+    //     number: data.nombreJours,
+    //     villes: [],
+    //   };
 
-      const reservationResponse = await ReservationsAPI.Add(reservation);
-      console.log("Reservation created:", reservationResponse);
+    //   const reservationResponse = await ReservationsAPI.Add(reservation);
+    //   console.log("Reservation created:", reservationResponse);
 
-      // Redirect to payment page
-      window.location.href = paymentResponse.data.checkout_url;
-    } catch (error: any) {
-      console.error("Form submission error:", error);
-      const errorMessage =
-        error?.response?.data?.message ||
-        "Erreur inconnue. Veuillez réessayer.";
-      messageApi.error(`Echec du paiement! ${errorMessage}`);
-    } finally {
-      setIsSubmitting(false);
-    }
+    //   // Redirect to payment page
+    //   window.location.href = paymentResponse.data.checkout_url;
+    // } catch (error: any) {
+    //   console.error("Form submission error:", error);
+    //   const errorMessage =
+    //     error?.response?.data?.message ||
+    //     "Erreur inconnue. Veuillez réessayer.";
+    //   messageApi.error(`Echec du paiement! ${errorMessage}`);
+    // } finally {
+    //   setIsSubmitting(false);
+    // }
   };
 
   const submitForm = () => {

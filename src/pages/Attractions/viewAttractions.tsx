@@ -17,28 +17,33 @@ import { useLocation, useParams } from "react-router-dom";
 import { AttractionsAPI } from "../../sdk/api/attraction";
 import { emptyIAttraction, IAttraction } from "../../sdk/models/attraction";
 import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
-import { Flex, message, Typography } from "antd";
+import { DatePicker, Flex, Typography } from "antd";
 import BeginningButton from "../../components/dededed/BeginingButton";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
 import { IClient, IClientHistory } from "../../sdk/models/clients";
+import { usePanier } from "../../context/panierContext";
+import {
+  PanierAttractionInfos,
+  addAttraction,
+  emptyPanier,
+} from "../../sdk/models/panier";
+import dayjs, { Dayjs } from "dayjs";
+import PaniersAPI from "../../sdk/api/panier";
+import { v4 } from "uuid";
 import { ClientsAPI } from "../../sdk/api/clients";
 import SimilarSelling from "../../components/dededed/similarSelling";
 import CrossSelling from "../../components/dededed/crossSelling";
 import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { PageSettings } from "../../sdk/api/pageMedias";
 import ItemLocation, { MapItem } from "../../components/dededed/Map";
-import { IPaiementRequest } from "../../sdk/models/paiement";
-import { PaiementAPI } from "../../sdk/api/paiements";
-import { IAddUpdateReservation } from "../../sdk/models/reservations";
-import { ReservationsAPI } from "../../sdk/api/reservations";
+import { CalendarOutlined } from "@ant-design/icons";
 
 const AttractionDetailPage = () => {
   const { id } = useParams();
   const { pathname } = useLocation();
-  const [messageApi] = message.useMessage();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [selectedDate, setSelectedDate] = useState("2024-12-15");
+  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>("");
   const [selectedTarification, setSelectedTarification] = useState<string>("");
   const [participants, setParticipants] = useState(1);
@@ -48,6 +53,7 @@ const AttractionDetailPage = () => {
   const [history, setHistory] = useState<IClientHistory[]>([]);
   const [attractions, setAttractions] = useState<IAttraction[]>([]);
   const [user, setUser] = useState<IClient | null>(null);
+  const { panier, addAttractionToPanier } = usePanier();
 
   const [loading, setLoading] = useState<boolean>(true);
   const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
@@ -183,50 +189,39 @@ const AttractionDetailPage = () => {
   };
 
   const handlePost = async () => {
-    // we initiate the payment process
-    const paymentRequest: IPaiementRequest = {
-      amount: totalPrice,
-      currency: "XOF",
-      description: "Réservation Dahomey Discovery",
-      return_url: "https://dahomeydiscovery.com/attractions",
-      customer: {
-        email: user ? user.email : "",
-        first_name: user ? user.first_name : "",
-        last_name: user ? user.last_name : "",
-      },
-    };
+    try {
+      // Build panier attraction infos and add to panier before reservation
+      const tarif = getSelectedTarif();
+      const price = tarif ? tarif.price : getCurrentPrice();
+      const panierItem: PanierAttractionInfos = {
+        _id: v4(),
+        attraction_id: attraction._id,
+        option_id: tarif ? tarif._id : "",
+        price: price,
+        date: selectedDate!.toDate(),
+        time: selectedTimeSlot,
+        participants: participants,
+      };
 
-    PaiementAPI.Initiate(paymentRequest)
-      .then((data) => {
-        console.log("the response is:", data);
+      try {
+        addAttractionToPanier(panierItem);
+      } catch (e) {
+        console.error("Error adding attraction to panier (local):", e);
+      }
 
-        // we create the reservation here
-        const reservation: IAddUpdateReservation = {
-          date: new Date(),
-          customer: user ? user._id : "guest",
-          status: "pending",
-          transaction_id: data.data.id,
-          type: "attraction",
-          item: attraction._id,
-          number: participants,
-        };
-
-        ReservationsAPI.Add(reservation)
-          .then((res) => {
-            console.log("Reservation created:", res);
-            // Redirect to payment page
-            window.location.href = data.data.checkout_url;
-          })
-          .catch((err) => {
-            console.error("Error creating reservation:", err);
-            messageApi.error(
-              "Erreur lors de la création de la réservation. Veuillez réessayer."
-            );
-          });
-      })
-      .catch((err) => {
-        console.error("Error fetching attractions:", err);
-      });
+      try {
+        const toSend = addAttraction(panier ?? emptyPanier(), panierItem);
+        await PaniersAPI.Add(
+          toSend,
+          (ClientsAPI.GetUser()?._id as string) || ""
+        );
+        console.log("Attraction added to panier and persisted");
+      } catch (e) {
+        console.error("Error persisting attraction to panier:", e);
+      }
+    } catch (err) {
+      console.error("Error fetching attractions:", err);
+    }
   };
 
   return (
@@ -621,11 +616,21 @@ const AttractionDetailPage = () => {
                       </label>
                       <div className="relative">
                         <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                        <input
-                          type="date"
+                        <DatePicker
                           value={selectedDate}
-                          onChange={(e) => setSelectedDate(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          onChange={(date) => setSelectedDate(date)}
+                          format="DD/MM/YYYY"
+                          placeholder="Sélectionnez une date"
+                          suffixIcon={
+                            <CalendarOutlined style={{ color: "#BF2500" }} />
+                          }
+                          // style={formStyles.input}
+                          size="large"
+                          style={{ width: "100%" }}
+                          disabled={user === null}
+                          disabledDate={(current) => {
+                            return current && current < dayjs().startOf("day");
+                          }}
                         />
                       </div>
                     </div>

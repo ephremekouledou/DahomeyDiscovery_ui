@@ -1,8 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { useLocation, useParams } from "react-router-dom";
 import { CarRentalCardProps } from "./locations";
 import Footer from "../../components/footer/footer";
-import { Button, Flex, Image as AntdImage, Typography, Rate } from "antd";
+import {
+  Button,
+  Flex,
+  Image as AntdImage,
+  Typography,
+  Rate,
+  DatePicker,
+  Switch,
+  InputNumber,
+} from "antd";
 import NavBar from "../../components/navBar/navBar";
 import {
   Car,
@@ -13,27 +22,117 @@ import {
   Users,
   Zap,
 } from "lucide-react";
-import { useTransaction } from "../../context/transactionContext";
+import { usePanier } from "../../context/panierContext";
+import {
+  addVehicule,
+  PanierVehiculeInfos,
+  emptyPanier,
+} from "../../sdk/models/panier";
+import { v4 } from "uuid";
+import PaniersAPI from "../../sdk/api/panier";
+
 import BeginningButton from "../../components/dededed/BeginingButton";
 import { ICarRentalData } from "../../sdk/models/vehicules";
 import { VehiculesAPI } from "../../sdk/api/vehicules";
 import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
 import { EquipmentModal, TarificationModal } from "./locationsModal";
-import { DollarCircleFilled } from "@ant-design/icons";
-import { IClientHistory } from "../../sdk/models/clients";
+import {
+  CalendarOutlined,
+  DollarCircleFilled,
+  LockOutlined,
+} from "@ant-design/icons";
+import dayjs, { Dayjs } from "dayjs";
+import { IClient, IClientHistory } from "../../sdk/models/clients";
 import { ClientsAPI } from "../../sdk/api/clients";
 import SimilarSelling from "../../components/dededed/similarSelling";
 import CrossSelling from "../../components/dededed/crossSelling";
+import { useScreenSize } from "../../components/CircuitView/Timeline";
 
 const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
-  const { setTransaction } = useTransaction();
-  const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
+  const { panier, setPanier, addVehiculeToPanier } = usePanier();
+  const screenSize = useScreenSize();
+  // local preview of panier can be accessed from context directly when needed
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
+  // form states
+  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
+  const [days, setDays] = useState<number>(1);
+  const [chauffeur, setChauffeur] = useState<boolean>(false);
   const [showEquipmentModal, setShowEquipmentModal] = useState(false);
   const [showTarificationModal, setShowTarificationModal] = useState(false);
   const [_, setImageHeights] = useState<number[]>([]);
   const [maxHeight, setMaxHeight] = useState<number>(400); // hauteur par défaut augmentée
+  const [user, setUser] = useState<IClient | null>(null);
+
+  // Vérifier si le formulaire est valide
+  const isFormValid =
+    selectedDate !== null &&
+    chauffeur !== null &&
+    days !== null &&
+    days > 0 &&
+    user !== null;
+
+  // Calculer le prix total en fonction des tranches de tarification
+  const totalPrice = useMemo(() => {
+    // days must be a positive integer
+    const nbrDays = Math.max(1, Math.floor(days || 1));
+
+    // If there is a tarification table, try to find a matching tranche
+    if (car.tarification && car.tarification.length > 0) {
+      // Find tranche where from <= nbrDays <= to
+      const matched = car.tarification.find((t) => {
+        // some tranches might have to === 0 meaning unlimited upper bound
+        const from = typeof t.from === "number" ? t.from : 0;
+        const to = typeof t.to === "number" && t.to > 0 ? t.to : Infinity;
+        return nbrDays >= from && nbrDays <= to;
+      });
+
+      // Use matched per-day price if found, otherwise fallback to price_per_day
+      const perDay = matched
+        ? chauffeur
+          ? matched.price_driver
+          : matched.price
+        : car.price_per_day;
+      return perDay * nbrDays;
+    }
+
+    // Fallback: use car.price_per_day
+    return (car.price_per_day || 0) * nbrDays;
+  }, [days, chauffeur, car.tarification, car.price_per_day]);
+
+  const formStyles = useMemo(
+    () => ({
+      container: {
+        backgroundColor: "#f8f9fa",
+        border: "1px solid #e0e0e0",
+        borderRadius: "12px",
+        padding: screenSize.isMobile ? "20px" : "30px",
+        marginBottom: screenSize.isMobile ? "20px" : "30px",
+        position: "relative" as const,
+      },
+      label: {
+        fontSize: screenSize.isMobile ? "14px" : "16px",
+        fontFamily: "GeneralSans",
+        fontWeight: "500",
+        color: "#311715",
+        marginBottom: "8px",
+      },
+      input: {
+        width: "100%",
+        height: screenSize.isMobile ? "45px" : "50px",
+        borderRadius: "8px",
+        fontSize: screenSize.isMobile ? "14px" : "16px",
+        fontFamily: "GeneralSans",
+      },
+    }),
+    [screenSize]
+  );
+
+  // Check for logged in user
+  useEffect(() => {
+    const loggedUser = ClientsAPI.GetUser();
+    setUser(loggedUser);
+  }, []);
 
   // Fonction pour charger les images et déterminer la hauteur max
   useEffect(() => {
@@ -304,7 +403,254 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
           </div>
         </div> */}
 
-        {/* Bouton de location */}
+        {/* Login banner when not authenticated */}
+        {!ClientsAPI.GetUser()?._id && (
+          <Flex
+            align="center"
+            gap={12}
+            style={{
+              backgroundColor: "#fff3e0",
+              border: "2px solid #F59F00",
+              borderRadius: "12px",
+              padding: screenSize.isMobile ? "16px" : "20px",
+              marginBottom: "20px",
+            }}
+          >
+            <LockOutlined
+              style={{
+                fontSize: screenSize.isMobile ? "24px" : "28px",
+                color: "#BF2500",
+              }}
+            />
+            <Flex vertical gap={4} style={{ flex: 1 }}>
+              <Typography.Text
+                style={{
+                  fontSize: screenSize.isMobile ? "16px" : "18px",
+                  fontFamily: "GeneralSans",
+                  fontWeight: "600",
+                  color: "#BF2500",
+                  margin: 0,
+                }}
+              >
+                Connexion requise
+              </Typography.Text>
+              <Typography.Text
+                style={{
+                  fontSize: screenSize.isMobile ? "13px" : "14px",
+                  fontFamily: "GeneralSans",
+                  color: "#311715",
+                  margin: 0,
+                }}
+              >
+                Veuillez vous connecter pour effectuer une réservation
+              </Typography.Text>
+            </Flex>
+          </Flex>
+        )}
+
+        {/* Reservation form */}
+        <Flex
+          vertical
+          style={{
+            ...formStyles.container,
+            opacity: user === null ? 0.7 : 1,
+            pointerEvents: user === null ? "none" : "auto",
+            cursor: user === null ? "not-allowed" : "default",
+          }}
+        >
+          {/* Overlay pour le formulaire désactivé */}
+          {user === null && (
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(255, 255, 255, 0.5)",
+                zIndex: 1,
+                borderRadius: "12px",
+                cursor: "not-allowed",
+              }}
+            />
+          )}
+
+          <Typography.Title
+            level={3}
+            style={{
+              fontSize: screenSize.isMobile ? "20px" : "24px",
+              fontFamily: "GeneralSans",
+              fontWeight: "600",
+              color: "#BF2500",
+              marginBottom: screenSize.isMobile ? "15px" : "20px",
+              borderLeft: "4px solid #BF2500",
+              paddingLeft: "15px",
+            }}
+          >
+            Réserver le véhicule
+          </Typography.Title>
+
+          <Flex
+            vertical={screenSize.isMobile}
+            gap={screenSize.isMobile ? 15 : 20}
+          >
+            {/* Date */}
+            <Flex vertical style={{ flex: 1 }}>
+              <Typography.Text style={formStyles.label}>Date:</Typography.Text>
+              <DatePicker
+                value={selectedDate}
+                onChange={(date) => setSelectedDate(date)}
+                format="DD/MM/YYYY"
+                placeholder="Sélectionnez une date"
+                suffixIcon={<CalendarOutlined style={{ color: "#BF2500" }} />}
+                style={formStyles.input}
+                size="large"
+                disabled={user === null}
+                disabledDate={(current) => {
+                  return current && current < dayjs().startOf("day");
+                }}
+              />
+            </Flex>
+
+            {/* Nombre de jours */}
+            <Flex vertical style={{ flex: 1 }}>
+              <Typography.Text style={formStyles.label}>
+                Nombre de jours:
+              </Typography.Text>
+              <InputNumber
+                min={1}
+                max={30}
+                value={days}
+                onChange={(value) =>
+                  setDays(typeof value === "number" ? value : 1)
+                }
+                style={formStyles.input}
+                size="large"
+                placeholder="Nombre de jours"
+                disabled={user === null}
+              />
+            </Flex>
+          </Flex>
+
+          {/* Chauffeur */}
+          <Flex vertical style={{ marginTop: 10 }}>
+            <Typography.Text style={formStyles.label}>
+              Chauffeur:
+            </Typography.Text>
+            <Switch
+              style={{ width: "fit-content" }}
+              checked={chauffeur}
+              onChange={(v: boolean) => setChauffeur(v)}
+            />
+          </Flex>
+
+          {/* Prix total */}
+          {days && days > 0 && (
+            <Flex
+              justify="space-between"
+              align="center"
+              style={{
+                marginTop: "20px",
+                padding: "15px 20px",
+                backgroundColor: "#fff3e0",
+                borderRadius: "8px",
+                border: "2px solid #F59F00",
+              }}
+            >
+              <Typography.Text
+                style={{
+                  fontSize: screenSize.isMobile ? "16px" : "18px",
+                  fontFamily: "GeneralSans",
+                  fontWeight: "600",
+                  color: "#311715",
+                }}
+              >
+                Prix total:
+              </Typography.Text>
+              <Typography.Text
+                style={{
+                  fontSize: screenSize.isMobile ? "20px" : "24px",
+                  fontFamily: "GeneralSans",
+                  fontWeight: "700",
+                  color: "#BF2500",
+                }}
+              >
+                {totalPrice.toLocaleString("fr-FR")} CFA
+              </Typography.Text>
+            </Flex>
+          )}
+
+          {/* Bouton de réservation */}
+          <Flex justify="center" style={{ marginTop: "25px" }}>
+            <Button
+              type="primary"
+              size="large"
+              disabled={!isFormValid}
+              style={{
+                backgroundColor: !isFormValid
+                  ? "#d9d9d9"
+                  : isHovered
+                  ? "#ff3100"
+                  : "#F59F00",
+                color: !isFormValid ? "#999" : isHovered ? "white" : "black",
+                borderRadius: "25px",
+                border: "none",
+                fontFamily: "GeneralSans",
+                transition: "all 0.3s ease",
+                fontSize: screenSize.isMobile ? "16px" : "17px",
+                fontWeight: "200",
+                padding: screenSize.isMobile ? "8px 24px" : "12px 32px",
+                height: "auto",
+                width: screenSize.isMobile ? "100%" : "auto",
+                minWidth: "200px",
+                cursor: !isFormValid ? "not-allowed" : "pointer",
+                opacity: !isFormValid ? 0.6 : 1,
+              }}
+              onMouseEnter={() => isFormValid && setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+              onClick={() => {
+                // Build PanierVehiculeInfos
+                const vehInfo: PanierVehiculeInfos = {
+                  _id: v4(),
+                  vehicule_id: car._id,
+                  price: car.price_per_day,
+                  chauffeur: chauffeur,
+                  date: (selectedDate || dayjs()).toDate(),
+                  jour: days,
+                };
+
+                // Add locally to context
+                try {
+                  addVehiculeToPanier(vehInfo);
+                } catch (e) {
+                  console.error("Error adding vehicle to panier (local):", e);
+                }
+
+                // Persist to backend
+                const toSend = addVehicule(panier ?? emptyPanier(), vehInfo);
+                PaniersAPI.Add(
+                  toSend,
+                  (ClientsAPI.GetUser()?._id as string) || ""
+                )
+                  .then((data) => {
+                    console.log("Panier updated with vehicle", data);
+                    setPanier(data);
+                    // we clear form
+                    setSelectedDate(null);
+                    setDays(1);
+                    setChauffeur(false);
+                  })
+                  .catch((err) => {
+                    console.error("Error updating panier with vehicle", err);
+                  });
+              }}
+            >
+              RÉSERVER
+            </Button>
+          </Flex>
+        </Flex>
+
+        {/* Bouton de location
         <div className="mt-8 pt-6 border-t">
           <Button
             type="primary"
@@ -326,21 +672,44 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             onClick={() => {
-              setTransaction({
-                id: car._id,
-                title: car.name,
-                amount: car.price_per_day,
-                tarification: car.tarification,
-              });
-              // we redirect to the payment page
-              navigate("/reservations-vehicules");
+              // Build PanierVehiculeInfos
+              const vehInfo: PanierVehiculeInfos = {
+                _id: v4(),
+                vehicule_id: car._id,
+                price: car.price_per_day,
+                chauffeur: chauffeur,
+                date: (selectedDate || dayjs()).toDate(),
+                jour: days,
+              };
+
+              // Add locally to context
+              try {
+                addVehiculeToPanier(vehInfo);
+              } catch (e) {
+                console.error("Error adding vehicle to panier (local):", e);
+              }
+
+              // Persist to backend
+              const toSend = addVehicule(panier ?? emptyPanier(), vehInfo);
+              PaniersAPI.Add(
+                toSend,
+                (ClientsAPI.GetUser()?._id as string) || ""
+              )
+                .then((data) => {
+                  console.log("Panier updated with vehicle", data);
+                  setPanier(data);
+                  navigate("/reservations-vehicules");
+                })
+                .catch((err) => {
+                  console.error("Error updating panier with vehicle", err);
+                });
             }}
           >
             {car.availability
               ? "Réserver maintenant"
               : "Véhicule non disponible"}
           </Button>
-        </div>
+        </div> */}
       </div>
     </div>
   );
@@ -369,12 +738,12 @@ const ViewLocation = () => {
           lien: pathname,
         };
         ClientsAPI.AddToClientHistoryLocal(newElement);
-          // .then((_) => {
-          //   console.log("History added");
-          // })
-          // .catch((err) => {
-          //   console.error("History added not added", err);
-          // });
+        // .then((_) => {
+        //   console.log("History added");
+        // })
+        // .catch((err) => {
+        //   console.error("History added not added", err);
+        // });
       })
       .catch((err) => {
         console.error("Error fetching vehicule:", err);

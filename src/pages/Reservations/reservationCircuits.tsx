@@ -21,12 +21,8 @@ import {
 import dayjs from "dayjs";
 import { CircuitsAPI } from "../../sdk/api/circuits";
 import { VillesAPI } from "../../sdk/api/villes";
-import { IAddUpdateReservation } from "../../sdk/models/reservations";
 import { ClientsAPI } from "../../sdk/api/clients";
 import { IClient } from "../../sdk/models/clients";
-import { IPaiementRequest } from "../../sdk/models/paiement";
-import { PaiementAPI } from "../../sdk/api/paiements";
-import { ReservationsAPI } from "../../sdk/api/reservations";
 import BeginningButton from "../../components/dededed/BeginingButton";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
@@ -96,7 +92,7 @@ const ReservationCircuit = () => {
   const [circuits, setCircuits] = useState<ICircuitPresenter[]>([]);
   const [villes, setVilles] = useState<IVille[]>([]);
   const [showVillesSelect, setShowVillesSelect] = useState(false);
-  const [user, setUser] = useState<IClient | null>(null);
+  const [_, setUser] = useState<IClient | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -321,76 +317,76 @@ const ReservationCircuit = () => {
     setShowVillesSelect(false);
   };
 
-  const handlePost = async (data: any) => {
+  const handlePost = async (_: any) => {
     try {
-      setIsSubmitting(true);
-      const totalAmount = calculateTotalAmount();
-      const formattedData = {
-        circuit: data.circuit,
-        dateReservation: data.dateReservation,
-        nombreParticipants: data.nombreParticipants,
-        montantTotal: totalAmount,
-        villesSelectionnees: data.villesSelectionnees || [],
-        customer: {
-          email: data.email,
-          first_name: data.firstName,
-          last_name: data.lastName,
-          phone: data.phone,
-        },
-      };
+      // setIsSubmitting(true);
+      // const totalAmount = calculateTotalAmount();
+      // const formattedData = {
+      //   circuit: data.circuit,
+      //   dateReservation: data.dateReservation,
+      //   nombreParticipants: data.nombreParticipants,
+      //   montantTotal: totalAmount,
+      //   villesSelectionnees: data.villesSelectionnees || [],
+      //   customer: {
+      //     email: data.email,
+      //     first_name: data.firstName,
+      //     last_name: data.lastName,
+      //     phone: data.phone,
+      //   },
+      // };
 
       // we initiate the payment process
-      const paymentRequest: IPaiementRequest = {
-        amount: totalAmount,
-        currency: "XOF",
-        description: "Réservation Dahomey Discovery",
-        return_url: "https://dahomeydiscovery.com/circuits-thematiques",
-        customer: {
-          email: user ? user.email : formattedData.customer.email || "",
-          first_name: user
-            ? user.first_name
-            : formattedData.customer.first_name || "",
-          last_name: user
-            ? user.last_name
-            : formattedData.customer.last_name || "",
-        },
-      };
+      // const paymentRequest: IPaiementRequest = {
+      //   amount: totalAmount,
+      //   currency: "XOF",
+      //   description: "Réservation Dahomey Discovery",
+      //   return_url: "https://dahomeydiscovery.com/circuits-thematiques",
+      //   customer: {
+      //     email: user ? user.email : formattedData.customer.email || "",
+      //     first_name: user
+      //       ? user.first_name
+      //       : formattedData.customer.first_name || "",
+      //     last_name: user
+      //       ? user.last_name
+      //       : formattedData.customer.last_name || "",
+      //   },
+      // };
 
-      PaiementAPI.Initiate(paymentRequest)
-        .then((data) => {
-          console.log("the response is:", data);
+      // PaiementAPI.Initiate(paymentRequest)
+      //   .then((data) => {
+      //     console.log("the response is:", data);
 
-          // we create the reservation here
-          const reservationDate = new Date(
-            `${formattedData.dateReservation}T15:04:05Z`
-          );
-          const reservation: IAddUpdateReservation = {
-            date: reservationDate,
-            customer: user ? user._id : "guest",
-            status: "pending",
-            transaction_id: data.data.id,
-            type: "circuit",
-            item: formattedData.circuit,
-            number: formattedData.nombreParticipants,
-            villes: formattedData.villesSelectionnees,
-          };
+      //     // we create the reservation here
+      //     const reservationDate = new Date(
+      //       `${formattedData.dateReservation}T15:04:05Z`
+      //     );
+      //     const reservation: IAddUpdateReservation = {
+      //       date: reservationDate,
+      //       customer: user ? user._id : "guest",
+      //       status: "pending",
+      //       transaction_id: data.data.id,
+      //       type: "circuit",
+      //       item: formattedData.circuit,
+      //       number: formattedData.nombreParticipants,
+      //       villes: formattedData.villesSelectionnees,
+      //     };
 
-          ReservationsAPI.Add(reservation)
-            .then((res) => {
-              console.log("Reservation created:", res);
-              // Redirect to payment page
-              window.location.href = data.data.checkout_url;
-            })
-            .catch((err) => {
-              console.error("Error creating reservation:", err);
-              messageApi.error(
-                "Erreur lors de la création de la réservation. Veuillez réessayer."
-              );
-            });
-        })
-        .catch((err) => {
-          console.error("Error fetching attractions:", err);
-        });
+      //     ReservationsAPI.Add(reservation)
+      //       .then((res) => {
+      //         console.log("Reservation created:", res);
+      //         // Redirect to payment page
+      //         window.location.href = data.data.checkout_url;
+      //       })
+      //       .catch((err) => {
+      //         console.error("Error creating reservation:", err);
+      //         messageApi.error(
+      //           "Erreur lors de la création de la réservation. Veuillez réessayer."
+      //         );
+      //       });
+      //   })
+      //   .catch((err) => {
+      //     console.error("Error fetching attractions:", err);
+      //   });
 
       // console.log("Formatted data to be sent:", formattedData);
     } catch (error: any) {

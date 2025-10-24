@@ -11,12 +11,6 @@ import {
 } from "antd";
 import { DeleteOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { useTransaction } from "../../context/transactionContext";
-import { ClientsAPI } from "../../sdk/api/clients";
-import { IClient } from "../../sdk/models/clients";
-import { IPaiementRequest } from "../../sdk/models/paiement";
-import { PaiementAPI } from "../../sdk/api/paiements";
-import { ReservationsAPI } from "../../sdk/api/reservations";
-import { IAddUpdateReservation } from "../../sdk/models/reservations";
 import Footer from "../../components/footer/footer";
 import NavBar from "../../components/navBar/navBar";
 import BeginningButton from "../../components/dededed/BeginingButton";
@@ -53,8 +47,7 @@ const ReservationVehicule = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [formValues, setFormValues] = useState<FormValues>({});
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [user, setUser] = useState<IClient | null>(null);
+  const [isSubmitting, _] = useState(false);
   const { transaction } = useTransaction();
 
   useEffect(() => {
@@ -73,12 +66,6 @@ const ReservationVehicule = () => {
 
   useEffect(() => {
     document.title = "Réservation de Véhicule";
-  }, []);
-
-  // Check for logged in user
-  useEffect(() => {
-    const loggedUser = ClientsAPI.GetUser();
-    setUser(loggedUser);
   }, []);
 
   // Helper to get the correct tarification based on nombreJours
@@ -162,61 +149,61 @@ const ReservationVehicule = () => {
     setFormValues({});
   };
 
-  const handlePost = async (data: any) => {
-    try {
-      setIsSubmitting(true);
-      const totalAmount = calculateTotalAmount();
+  const handlePost = async (_: any) => {
+    // try {
+    //   setIsSubmitting(true);
+    //   const totalAmount = calculateTotalAmount();
 
-      if (!transaction) {
-        messageApi.error("Informations de véhicule manquantes");
-        return;
-      }
+    //   if (!transaction) {
+    //     messageApi.error("Informations de véhicule manquantes");
+    //     return;
+    //   }
 
-      // We initiate the payment process
-      const paymentRequest: IPaiementRequest = {
-        amount: totalAmount,
-        currency: "XOF",
-        description: `Location de ${transaction.title} - ${
-          data.nombreJours
-        } jour(s)${data.chauffeur === "true" ? " avec chauffeur" : ""}`,
-        return_url: "https://dahomeydiscovery.com/locations",
-        customer: {
-          email: user ? user.email : "",
-          first_name: user ? user.first_name : "",
-          last_name: user ? user.last_name : "",
-        },
-      };
+    //   // We initiate the payment process
+    //   const paymentRequest: IPaiementRequest = {
+    //     amount: totalAmount,
+    //     currency: "XOF",
+    //     description: `Location de ${transaction.title} - ${
+    //       data.nombreJours
+    //     } jour(s)${data.chauffeur === "true" ? " avec chauffeur" : ""}`,
+    //     return_url: "https://dahomeydiscovery.com/locations",
+    //     customer: {
+    //       email: user ? user.email : "",
+    //       first_name: user ? user.first_name : "",
+    //       last_name: user ? user.last_name : "",
+    //     },
+    //   };
 
-      const paymentResponse = await PaiementAPI.Initiate(paymentRequest);
-      console.log("Payment response:", paymentResponse);
+    //   const paymentResponse = await PaiementAPI.Initiate(paymentRequest);
+    //   console.log("Payment response:", paymentResponse);
 
-      // We create the reservation here
-      const reservation: IAddUpdateReservation = {
-        date: new Date(),
-        customer: user ? user._id : "guest",
-        status: "pending",
-        transaction_id: paymentResponse.data.id,
-        type: "vehicule",
-        item: transaction.id || transaction.title,
-        number: data.nombreJours,
-        villes: [],
-        chauffeur: data.chauffeur === "true",
-      };
+    //   // We create the reservation here
+    //   const reservation: IAddUpdateReservation = {
+    //     date: new Date(),
+    //     customer: user ? user._id : "guest",
+    //     status: "pending",
+    //     transaction_id: paymentResponse.data.id,
+    //     type: "vehicule",
+    //     item: transaction.id || transaction.title,
+    //     number: data.nombreJours,
+    //     villes: [],
+    //     chauffeur: data.chauffeur === "true",
+    //   };
 
-      const reservationResponse = await ReservationsAPI.Add(reservation);
-      console.log("Reservation created:", reservationResponse);
+    //   const reservationResponse = await ReservationsAPI.Add(reservation);
+    //   console.log("Reservation created:", reservationResponse);
 
-      // Redirect to payment page
-      window.location.href = paymentResponse.data.checkout_url;
-    } catch (error: any) {
-      console.error("Form submission error:", error);
-      const errorMessage =
-        error?.response?.data?.message ||
-        "Erreur inconnue. Veuillez réessayer.";
-      messageApi.error(`Echec du paiement! ${errorMessage}`);
-    } finally {
-      setIsSubmitting(false);
-    }
+    //   // Redirect to payment page
+    //   window.location.href = paymentResponse.data.checkout_url;
+    // } catch (error: any) {
+    //   console.error("Form submission error:", error);
+    //   const errorMessage =
+    //     error?.response?.data?.message ||
+    //     "Erreur inconnue. Veuillez réessayer.";
+    //   messageApi.error(`Echec du paiement! ${errorMessage}`);
+    // } finally {
+    //   setIsSubmitting(false);
+    // }
   };
 
   const submitForm = () => {

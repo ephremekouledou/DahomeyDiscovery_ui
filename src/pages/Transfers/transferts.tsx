@@ -8,7 +8,7 @@ import {
   ArrowRight,
   CheckCircle,
 } from "lucide-react";
-import { Button, Flex, message, Typography } from "antd";
+import { Button, Flex, Typography } from "antd";
 import BeginningButton from "../../components/dededed/BeginingButton";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
@@ -19,16 +19,23 @@ import {
 } from "../../sdk/models/pagesMedias";
 import { PageSettings } from "../../sdk/api/pageMedias";
 import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
-import { IPaiementRequest } from "../../sdk/models/paiement";
 import { IClient } from "../../sdk/models/clients";
 import { ClientsAPI } from "../../sdk/api/clients";
-import { PaiementAPI } from "../../sdk/api/paiements";
-import { ReservationsAPI } from "../../sdk/api/reservations";
-import { IAddUpdateReservation } from "../../sdk/models/reservations";
+import { usePanier } from "../../context/panierContext";
+import {
+  PanierTransferInfos,
+  addTransfer,
+  emptyPanier,
+} from "../../sdk/models/panier";
+import PaniersAPI from "../../sdk/api/panier";
+import { v4 } from "uuid";
+import { LockOutlined } from "@ant-design/icons";
+import { useScreenSize } from "../../components/CircuitView/Timeline";
 
 const Transferts: React.FC = () => {
-  const [messageApi] = message.useMessage();
+  // const [messageApi] = message.useMessage();
   const [isMobile, setIsMobile] = useState(false);
+  const screenSize = useScreenSize();
   const [isTablet, setIsTablet] = useState(false);
   const [selectedDestination, setSelectedDestination] = useState<string>("");
   const [passengers, setPassengers] = useState<number>(1);
@@ -45,6 +52,7 @@ const Transferts: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
   const [user, setUser] = useState<IClient | null>(null);
+  const { panier, addTransferToPanier } = usePanier();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -158,63 +166,36 @@ const Transferts: React.FC = () => {
 
     setShowBookingForm(true);
   };
-
-  const confirmBooking = () => {
-    // setBookingConfirmed(true);
-    // setShowBookingForm(false);
-
-    // we initiate the payment process
-    const paymentRequest: IPaiementRequest = {
-      amount: calculatePrice(),
-      currency: "XOF",
-      description: "Réservation Dahomey Discovery",
-      return_url: "https://dahomeydiscovery.com/transferts",
-      customer: {
-        email: user ? user.email : "",
-        first_name: user ? user.first_name : "",
-        last_name: user ? user.last_name : "",
-      },
+  const confirmBooking = async () => {
+    // Build panier transfer info and persist to panier before payment
+    const transferInfo: PanierTransferInfos = {
+      _id: v4(),
+      transfer_type: transferType,
+      destination: selectedDestination,
+      passagers: passengers,
+      type_vehicule: vehicleType,
+      price: calculatePrice(),
+      date: new Date(date),
+      time: time,
+      numero_vol: flightNumber,
+      numero_tel: phoneNumber,
     };
 
-    PaiementAPI.Initiate(paymentRequest)
-      .then((data) => {
-        console.log("the response is:", data);
+    // Add locally to context
+    try {
+      addTransferToPanier(transferInfo);
+    } catch (e) {
+      console.error("Error adding transfer to panier (local):", e);
+    }
 
-        // we create the reservation here
-        const reservation: IAddUpdateReservation = {
-          date: new Date(),
-          customer: user ? user._id : "guest",
-          status: "pending",
-          transaction_id: data.data.id,
-          type: "transfert",
-          transfert_infos: {
-            transfer_type: transferType,
-            location: selectedDestination,
-            pick_up_date: new Date(date + "T" + time),
-            passenger_count: passengers,
-            pick_up_time: time,
-            vehicle_type: vehicleType,
-            flight_number: flightNumber,
-            phone_number: phoneNumber,
-          },
-        };
-
-        ReservationsAPI.Add(reservation)
-          .then((res) => {
-            console.log("Reservation created:", res);
-            // Redirect to payment page
-            window.location.href = data.data.checkout_url;
-          })
-          .catch((err) => {
-            console.error("Error creating reservation:", err);
-            messageApi.error(
-              "Erreur lors de la création de la réservation. Veuillez réessayer."
-            );
-          });
-      })
-      .catch((err) => {
-        console.error("Error fetching attractions:", err);
-      });
+    // Persist to backend
+    try {
+      const toSend = addTransfer(panier ?? emptyPanier(), transferInfo);
+      await PaniersAPI.Add(toSend, (ClientsAPI.GetUser()?._id as string) || "");
+      console.log("Transfer added to panier and persisted");
+    } catch (e) {
+      console.error("Error persisting transfer to panier:", e);
+    }
   };
 
   if (bookingConfirmed) {
@@ -573,6 +554,51 @@ const Transferts: React.FC = () => {
                 </div>
               </div>
 
+              {/* Login banner when not authenticated */}
+              {!ClientsAPI.GetUser()?._id && (
+                <Flex
+                  align="center"
+                  gap={12}
+                  style={{
+                    backgroundColor: "#fff3e0",
+                    border: "2px solid #F59F00",
+                    borderRadius: "12px",
+                    padding: screenSize.isMobile ? "16px" : "20px",
+                    marginBottom: "20px",
+                  }}
+                >
+                  <LockOutlined
+                    style={{
+                      fontSize: screenSize.isMobile ? "24px" : "28px",
+                      color: "#BF2500",
+                    }}
+                  />
+                  <Flex vertical gap={4} style={{ flex: 1 }}>
+                    <Typography.Text
+                      style={{
+                        fontSize: screenSize.isMobile ? "16px" : "18px",
+                        fontFamily: "GeneralSans",
+                        fontWeight: "600",
+                        color: "#BF2500",
+                        margin: 0,
+                      }}
+                    >
+                      Connexion requise
+                    </Typography.Text>
+                    <Typography.Text
+                      style={{
+                        fontSize: screenSize.isMobile ? "13px" : "14px",
+                        fontFamily: "GeneralSans",
+                        color: "#311715",
+                        margin: 0,
+                      }}
+                    >
+                      Veuillez vous connecter pour effectuer une réservation
+                    </Typography.Text>
+                  </Flex>
+                </Flex>
+              )}
+
               <div className="flex space-x-4">
                 <button
                   onClick={() => setShowBookingForm(false)}
@@ -582,7 +608,12 @@ const Transferts: React.FC = () => {
                 </button>
                 <button
                   onClick={confirmBooking}
-                  className="flex-1 bg-[#f59f00] text-white py-3 rounded-lg hover:bg-[#ff3100] transition-colors"
+                  disabled={!user}
+                  className={`flex-1 py-3 rounded-lg transition-colors ${
+                    !user
+                      ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                      : "bg-[#f59f00] text-white hover:bg-[#ff3100]"
+                  }`}
                 >
                   Confirmer la réservation
                 </button>

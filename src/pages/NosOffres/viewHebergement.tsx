@@ -364,6 +364,7 @@ const ViewHebergementContent: React.FC<ViewHebergementContentProps> = ({
           isOpen={true}
           onClose={() => setOptionDetailModal(null)}
           optionData={optionDetailModal}
+          hebergementId={accommodation?._id}
           getFileLink={HandleGetFileLink}
         />
       )}

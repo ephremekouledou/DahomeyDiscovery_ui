@@ -1,4 +1,4 @@
-import { Button, Divider, Flex, Typography } from "antd";
+import { Button, DatePicker, Divider, Flex, Select, Typography } from "antd";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import NavBar from "../navBar/navBar";
 import Footer from "../footer/footer";
@@ -22,6 +22,17 @@ import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import MapItineraire from "../dededed/MapItineraire";
 import CrossSelling, { IClientHistory } from "../dededed/crossSelling";
 import { ClientsAPI } from "../../sdk/api/clients";
+import dayjs, { Dayjs } from "dayjs";
+import { IClient } from "../../sdk/models/clients";
+import { usePanier } from "../../context/panierContext";
+import {
+  CalendarOutlined,
+  LockOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import { addCircuit, PanierCircuitInfos } from "../../sdk/models/panier";
+import PaniersAPI from "../../sdk/api/panier";
+import { v4 } from "uuid";
 
 interface CircuitCardOtherProps {
   circuit: ICircuitPresenter;
@@ -548,6 +559,27 @@ export const CircuitView = () => {
   const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
   const [history, setHistory] = useState<IClientHistory[]>([]);
 
+  const { panier, setPanier, addCircuitToPanier } = usePanier();
+  const [user, setUser] = useState<IClient | null>(null);
+  const [panierState, setPanierState] = useState(panier);
+
+  // États pour le formulaire de réservation
+  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
+  const [participants, setParticipants] = useState<number | null>(null);
+
+  // Vérifier si le formulaire est valide
+  const isFormValid =
+    selectedDate !== null &&
+    participants !== null &&
+    participants > 0 &&
+    user !== null;
+
+  // Calculer le prix total
+  const totalPrice = useMemo(() => {
+    if (!participants || !circuitInfos.price) return 0;
+    return circuitInfos.price * participants;
+  }, [participants, circuitInfos.price]);
+
   const circuitCardStyles = useMemo(() => {
     if (screenSize.isMobile) {
       return {
@@ -587,6 +619,44 @@ export const CircuitView = () => {
       };
     }
   }, [screenSize]);
+
+  const formStyles = useMemo(
+    () => ({
+      container: {
+        backgroundColor: "#f8f9fa",
+        border: "1px solid #e0e0e0",
+        borderRadius: "12px",
+        padding: screenSize.isMobile ? "20px" : "30px",
+        marginBottom: screenSize.isMobile ? "20px" : "30px",
+        position: "relative" as const,
+      },
+      label: {
+        fontSize: screenSize.isMobile ? "14px" : "16px",
+        fontFamily: "GeneralSans",
+        fontWeight: "500",
+        color: "#311715",
+        marginBottom: "8px",
+      },
+      input: {
+        width: "100%",
+        height: screenSize.isMobile ? "45px" : "50px",
+        borderRadius: "8px",
+        fontSize: screenSize.isMobile ? "14px" : "16px",
+        fontFamily: "GeneralSans",
+      },
+    }),
+    [screenSize]
+  );
+
+  // Check for logged in user
+  useEffect(() => {
+    const loggedUser = ClientsAPI.GetUser();
+    setUser(loggedUser);
+  }, []);
+
+  useEffect(() => {
+    setPanierState(panier);
+  }, [panier]);
 
   useEffect(() => {
     ClientsAPI.ListClientHistory(ClientsAPI.GetClientHistoryLocal())
@@ -643,6 +713,42 @@ export const CircuitView = () => {
 
   const handleCircuitHover = (circuitId: string) => {
     setSelectedCircuitId(circuitId);
+  };
+
+  const handleReservation = () => {
+    if (isFormValid) {
+      const circuitReservationInfos: PanierCircuitInfos = {
+        _id: v4(),
+        circuit_type: circuitInfos.type,
+        circuit_id: circuitInfos._id,
+        price: circuitInfos.price,
+        date: selectedDate!.toDate(),
+        participants: participants!,
+        villes: [],
+        chauffeur: false,
+      };
+      // setPanier(addCircuit(panier, circuitReservationInfos));
+      // Use context helper to add circuit to panier
+      // addCircuitToPanier(circuitReservationInfos);
+      console.log(
+        "Adding circuit to panier",
+        addCircuit(panierState ?? undefined, circuitReservationInfos)
+      );
+      addCircuitToPanier(circuitReservationInfos);
+
+      // we add the panier
+      PaniersAPI.Add(
+        addCircuit(panierState ?? undefined, circuitReservationInfos),
+        user?._id as string
+      )
+        .then((data) => {
+          console.log("Panier updated with circuit", data);
+          setPanier(data);
+        })
+        .catch((err) => {
+          console.error("Error updating panier with circuit", err);
+        });
+    }
   };
 
   // Configuration centralisée des circuits
@@ -905,6 +1011,211 @@ export const CircuitView = () => {
                 {/* <StoryMapEmbed url="https://storymaps.arcgis.com/stories/37999c82885142c7842d9e8bf98a09ba" /> */}
               </>
             )}
+          </Flex>
+
+          {/* Bannière de connexion requise */}
+          {user === null && (
+            <Flex
+              align="center"
+              gap={12}
+              style={{
+                backgroundColor: "#fff3e0",
+                border: "2px solid #F59F00",
+                borderRadius: "12px",
+                padding: screenSize.isMobile ? "16px" : "20px",
+                marginBottom: "20px",
+              }}
+            >
+              <LockOutlined
+                style={{
+                  fontSize: screenSize.isMobile ? "24px" : "28px",
+                  color: "#BF2500",
+                }}
+              />
+              <Flex vertical gap={4} style={{ flex: 1 }}>
+                <Typography.Text
+                  style={{
+                    fontSize: screenSize.isMobile ? "16px" : "18px",
+                    fontFamily: "GeneralSans",
+                    fontWeight: "600",
+                    color: "#BF2500",
+                    margin: 0,
+                  }}
+                >
+                  Connexion requise
+                </Typography.Text>
+                <Typography.Text
+                  style={{
+                    fontSize: screenSize.isMobile ? "13px" : "14px",
+                    fontFamily: "GeneralSans",
+                    color: "#311715",
+                    margin: 0,
+                  }}
+                >
+                  Veuillez vous connecter pour effectuer une réservation
+                </Typography.Text>
+              </Flex>
+            </Flex>
+          )}
+
+          {/* Formulaire de réservation */}
+          <Flex
+            vertical
+            style={{
+              ...formStyles.container,
+              opacity: user === null ? 0.7 : 1,
+              pointerEvents: user === null ? "none" : "auto",
+              cursor: user === null ? "not-allowed" : "default",
+            }}
+          >
+            {/* Overlay pour le formulaire désactivé */}
+            {user === null && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: "rgba(255, 255, 255, 0.5)",
+                  zIndex: 1,
+                  borderRadius: "12px",
+                  cursor: "not-allowed",
+                }}
+              />
+            )}
+
+            <Typography.Title
+              level={3}
+              style={{
+                fontSize: screenSize.isMobile ? "20px" : "24px",
+                fontFamily: "GeneralSans",
+                fontWeight: "600",
+                color: "#BF2500",
+                marginBottom: screenSize.isMobile ? "15px" : "20px",
+                borderLeft: "4px solid #BF2500",
+                paddingLeft: "15px",
+              }}
+            >
+              Réserver le circuit
+            </Typography.Title>
+
+            <Flex
+              vertical={screenSize.isMobile}
+              gap={screenSize.isMobile ? 15 : 20}
+            >
+              {/* Date */}
+              <Flex vertical style={{ flex: 1 }}>
+                <Typography.Text style={formStyles.label}>
+                  Date:
+                </Typography.Text>
+                <DatePicker
+                  value={selectedDate}
+                  onChange={(date) => setSelectedDate(date)}
+                  format="DD/MM/YYYY"
+                  placeholder="Sélectionnez une date"
+                  suffixIcon={<CalendarOutlined style={{ color: "#BF2500" }} />}
+                  style={formStyles.input}
+                  size="large"
+                  disabled={user === null}
+                  disabledDate={(current) => {
+                    return current && current < dayjs().startOf("day");
+                  }}
+                />
+              </Flex>
+
+              {/* Nombre de participants */}
+              <Flex vertical style={{ flex: 1 }}>
+                <Typography.Text style={formStyles.label}>
+                  Nombre de participants:
+                </Typography.Text>
+                <Select
+                  value={participants}
+                  onChange={(value) => setParticipants(value)}
+                  style={formStyles.input}
+                  size="large"
+                  placeholder="Sélectionnez le nombre"
+                  suffixIcon={<UserOutlined style={{ color: "#BF2500" }} />}
+                  disabled={user === null}
+                >
+                  {[...Array(6)].map((_, i) => (
+                    <Select.Option key={i + 1} value={i + 1}>
+                      {i + 1} {i === 0 ? "participant" : "participants"}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Flex>
+            </Flex>
+
+            {/* Prix total */}
+            {participants && participants > 0 && (
+              <Flex
+                justify="space-between"
+                align="center"
+                style={{
+                  marginTop: "20px",
+                  padding: "15px 20px",
+                  backgroundColor: "#fff3e0",
+                  borderRadius: "8px",
+                  border: "2px solid #F59F00",
+                }}
+              >
+                <Typography.Text
+                  style={{
+                    fontSize: screenSize.isMobile ? "16px" : "18px",
+                    fontFamily: "GeneralSans",
+                    fontWeight: "600",
+                    color: "#311715",
+                  }}
+                >
+                  Prix total:
+                </Typography.Text>
+                <Typography.Text
+                  style={{
+                    fontSize: screenSize.isMobile ? "20px" : "24px",
+                    fontFamily: "GeneralSans",
+                    fontWeight: "700",
+                    color: "#BF2500",
+                  }}
+                >
+                  {totalPrice.toLocaleString("fr-FR")} CFA
+                </Typography.Text>
+              </Flex>
+            )}
+
+            {/* Bouton de réservation */}
+            <Flex justify="center" style={{ marginTop: "25px" }}>
+              <Button
+                type="primary"
+                size="large"
+                disabled={!isFormValid}
+                style={{
+                  backgroundColor: !isFormValid
+                    ? "#d9d9d9"
+                    : isHovered
+                    ? "#ff3100"
+                    : "#F59F00",
+                  color: !isFormValid ? "#999" : isHovered ? "white" : "black",
+                  borderRadius: "25px",
+                  border: "none",
+                  fontFamily: "GeneralSans",
+                  transition: "all 0.3s ease",
+                  fontSize: screenSize.isMobile ? "16px" : "17px",
+                  fontWeight: "200",
+                  padding: screenSize.isMobile ? "8px 24px" : "12px 32px",
+                  height: "auto",
+                  width: screenSize.isMobile ? "100%" : "auto",
+                  minWidth: "200px",
+                  cursor: !isFormValid ? "not-allowed" : "pointer",
+                  opacity: !isFormValid ? 0.6 : 1,
+                }}
+                onMouseEnter={() => isFormValid && setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                onClick={handleReservation}
+              >
+                RÉSERVER
+              </Button>
+            </Flex>
           </Flex>
 
           {/* Bouton de réservation */}

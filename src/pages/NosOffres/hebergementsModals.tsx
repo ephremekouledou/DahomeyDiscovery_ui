@@ -52,9 +52,13 @@ import {
   IAccommodationData,
   IAccommodationOption,
 } from "../../sdk/models/hebergements";
-import { Modal } from "antd";
-import { useTransaction } from "../../context/transactionContext";
-import { useNavigate } from "react-router-dom";
+import { Modal, DatePicker, InputNumber } from "antd";
+import dayjs, { Dayjs } from "dayjs";
+import { usePanier } from "../../context/panierContext";
+import PaniersAPI from "../../sdk/api/panier";
+import { ClientsAPI } from "../../sdk/api/clients";
+import { v4 } from "uuid";
+import { PanierHebergementInfos, addHebergement, emptyPanier } from "../../sdk/models/panier";
 
 interface HotelServicesModalProps {
   accommodation: IAccommodationData;
@@ -605,6 +609,7 @@ interface AccommodationOptionModalProps {
   isOpen: boolean;
   onClose: () => void;
   optionData: IAccommodationOption;
+  hebergementId?: string; // parent hébergement id
   // Fonction pour gérer le lien des fichiers (à adapter selon votre implémentation)
   getFileLink?: (file: string) => string;
 }
@@ -622,11 +627,19 @@ const AccommodationOptionModal: React.FC<AccommodationOptionModalProps> = ({
   isOpen,
   onClose,
   optionData,
+  hebergementId,
   getFileLink = (file: string) => file, // Fonction par défaut
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const { setTransaction } = useTransaction();
-  const navigate = useNavigate();
+  const { panier, addHebergementToPanier } = usePanier();
+
+  // Reservation inputs: date and number of days
+  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
+  const [days, setDays] = useState<number | null>(null);
+
+  const isFormValid =
+    selectedDate !== null && days !== null && typeof days === "number" && days > 0 &&
+    !!ClientsAPI.GetUser()?._id;
 
   if (!isOpen) return null;
 
@@ -1022,17 +1035,64 @@ const AccommodationOptionModal: React.FC<AccommodationOptionModalProps> = ({
               </div>
               <div className="text-sm text-gray-600">par nuit</div>
             </div>
+            <div className="mb-4 grid grid-cols-1 gap-3">
+              <DatePicker
+                value={selectedDate}
+                onChange={(d) => setSelectedDate(d)}
+                format="DD/MM/YYYY"
+                placeholder="Date d'arrivée"
+                size="large"
+                disabledDate={(current) => current && current < dayjs().startOf("day")}
+                style={{ width: "100%" }}
+              />
+
+              <InputNumber
+                min={1}
+                max={365}
+                value={days}
+                onChange={(v) => setDays(typeof v === "number" ? v : 1)}
+                style={{ width: "100%" }}
+                size="large"
+                placeholder="Nombre de nuits"
+              />
+            </div>
+
             <button
-              onClick={() => {
-                setTransaction({
-                  id: optionData._id,
-                  title: optionData.name,
-                  amount: optionData.price,
-                  tarification: []
-                });
-                navigate("/reservations-locations");
+              onClick={async () => {
+                // Build PanierHebergementInfos: hebergement_id is the parent accommodation id,
+                // option_id is the selected option id
+                const panierItem: PanierHebergementInfos = {
+                  _id: v4(),
+                  hebergement_id: hebergementId || optionData._id,
+                  option_id: optionData._id,
+                  price: optionData.price,
+                  date: (selectedDate || dayjs()).toDate(),
+                  jour: days || 1,
+                };
+
+                // Add locally to context
+                try {
+                  addHebergementToPanier(panierItem);
+                } catch (e) {
+                  console.error("Error adding hebergement to panier (local):", e);
+                }
+
+                // Persist to backend if user logged in
+                try {
+                  const userId = (ClientsAPI.GetUser()?._id as string) || "";
+                  if (userId) {
+                    const toSend = addHebergement(panier ?? emptyPanier(), panierItem);
+                    const res = await PaniersAPI.Add(toSend, userId);
+                    // Optionally update local panier with response (if needed elsewhere)
+                    // setPanier is not available here; caller components can refresh if needed
+                    console.log("Panier updated with hebergement", res);
+                  }
+                } catch (err) {
+                  console.error("Error persisting hebergement to panier:", err);
+                }
               }}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors"
+              disabled={!isFormValid}
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-xl transition-colors"
             >
               Sélectionner cette chambre
             </button>

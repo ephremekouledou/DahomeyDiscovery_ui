@@ -24,6 +24,7 @@ import Transferts from "./pages/Transfers/transferts";
 import LoginPage from "./pages/Auth/login";
 import RegisterPage from "./pages/Auth/register";
 import { paiementLoader } from "./loaders/paiements";
+import Reservation from "./pages/Reservations/reservation";
 
 const router = createBrowserRouter([
   {
@@ -126,6 +127,11 @@ const router = createBrowserRouter([
   {
     path: "/actualites",
     element: <Actualites />,
+    errorElement: <NotFound />,
+  },
+  {
+    path: "/reserver",
+    element: <Reservation />,
     errorElement: <NotFound />,
   },
   {
