@@ -441,9 +441,9 @@ const PanierViewer: React.FC<PanierViewerProps> = ({
               <div className="mt-6 flex justify-end">
                 <button
                   onClick={handlePayAll}
-                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg"
+                  className="px-6 py-3 bg-[#f59f00] text-white hover:bg-[#ff3100] text-white font-semibold rounded-lg"
                 >
-                  Payer complètement
+                  Payer
                 </button>
               </div>
             )}
