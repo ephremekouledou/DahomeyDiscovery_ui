@@ -21,7 +21,7 @@ import { DatePicker, Flex, Typography } from "antd";
 import BeginningButton from "../../components/dededed/BeginingButton";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
-import { IClient, IClientHistory } from "../../sdk/models/clients";
+import { IClientHistory } from "../../sdk/models/clients";
 import { usePanier } from "../../context/panierContext";
 import {
   PanierAttractionInfos,
@@ -38,6 +38,7 @@ import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { PageSettings } from "../../sdk/api/pageMedias";
 import ItemLocation, { MapItem } from "../../components/dededed/Map";
 import { CalendarOutlined } from "@ant-design/icons";
+import FloatingCartButton from "../../components/dededed/PanierButton";
 
 const AttractionDetailPage = () => {
   const { id } = useParams();
@@ -52,7 +53,7 @@ const AttractionDetailPage = () => {
   const [attraction, setAttraction] = useState<IAttraction>(emptyIAttraction());
   const [history, setHistory] = useState<IClientHistory[]>([]);
   const [attractions, setAttractions] = useState<IAttraction[]>([]);
-  const [user, setUser] = useState<IClient | null>(null);
+  // anonymous users allowed; backend persistence is guarded at save time
   const { panier, addAttractionToPanier } = usePanier();
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -69,11 +70,7 @@ const AttractionDetailPage = () => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
-  // Check for logged in user
-  useEffect(() => {
-    const loggedUser = ClientsAPI.GetUser();
-    setUser(loggedUser);
-  }, []);
+  // no local UI gating by login required
 
   useEffect(() => {
     PageSettings.List()
@@ -211,11 +208,13 @@ const AttractionDetailPage = () => {
 
       try {
         const toSend = addAttraction(panier ?? emptyPanier(), panierItem);
-        await PaniersAPI.Add(
-          toSend,
-          (ClientsAPI.GetUser()?._id as string) || ""
-        );
-        console.log("Attraction added to panier and persisted");
+        const userId = (ClientsAPI.GetUser()?._id as string) || "";
+        if (userId) {
+          await PaniersAPI.Add(toSend, userId);
+          console.log("Attraction added to panier and persisted");
+        } else {
+          console.log("Anonymous user: skipping panier persistence for attraction");
+        }
       } catch (e) {
         console.error("Error persisting attraction to panier:", e);
       }
@@ -227,6 +226,7 @@ const AttractionDetailPage = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
+      <FloatingCartButton />
       {/* Header avec NavBar */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="ATTRACTION" />
@@ -627,7 +627,6 @@ const AttractionDetailPage = () => {
                           // style={formStyles.input}
                           size="large"
                           style={{ width: "100%" }}
-                          disabled={user === null}
                           disabledDate={(current) => {
                             return current && current < dayjs().startOf("day");
                           }}

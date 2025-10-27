@@ -4,11 +4,7 @@ import Footer from "../../components/footer/footer";
 import { useEffect, useState, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
-import {
-  CalendarOutlined,
-  UserOutlined,
-  LockOutlined,
-} from "@ant-design/icons";
+import { CalendarOutlined, UserOutlined } from "@ant-design/icons";
 import dayjs, { Dayjs } from "dayjs";
 import {
   DetailedTimeline,
@@ -21,12 +17,13 @@ import { CircuitsAPI } from "../../sdk/api/circuits";
 import { HandleGetFileLink } from "./CircuitsCartes";
 import { PageSettings } from "../../sdk/api/pageMedias";
 import CrossSelling from "../../components/dededed/crossSelling";
-import { IClient, IClientHistory } from "../../sdk/models/clients";
+import { IClientHistory } from "../../sdk/models/clients";
 import { ClientsAPI } from "../../sdk/api/clients";
 import { usePanier } from "../../context/panierContext";
 import { addCircuit, PanierCircuitInfos } from "../../sdk/models/panier";
 import { v4 } from "uuid";
 import PaniersAPI from "../../sdk/api/panier";
+import FloatingCartButton from "../../components/dededed/PanierButton";
 
 // Optimisation: Hook personnalisé pour la détection de la taille d'écran
 const useScreenSize = () => {
@@ -66,19 +63,15 @@ const CircuitsSignature = () => {
   const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
   const [history, setHistory] = useState<IClientHistory[]>([]);
   const { panier, setPanier, addCircuitToPanier } = usePanier();
-  const [user, setUser] = useState<IClient | null>(null);
   const [panierState, setPanierState] = useState(panier);
 
   // États pour le formulaire de réservation
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [participants, setParticipants] = useState<number | null>(null);
 
-  // Vérifier si le formulaire est valide
+  // Vérifier si le formulaire est valide (allow anonymous users)
   const isFormValid =
-    selectedDate !== null &&
-    participants !== null &&
-    participants > 0 &&
-    user !== null;
+    selectedDate !== null && participants !== null && participants > 0;
 
   // Calculer le prix total
   const totalPrice = useMemo(() => {
@@ -229,12 +222,6 @@ const CircuitsSignature = () => {
       });
   }, []);
 
-  // Check for logged in user
-  useEffect(() => {
-    const loggedUser = ClientsAPI.GetUser();
-    setUser(loggedUser);
-  }, []);
-
   const handleReservation = () => {
     if (isFormValid) {
       const circuitReservationInfos: PanierCircuitInfos = {
@@ -256,24 +243,30 @@ const CircuitsSignature = () => {
       );
       addCircuitToPanier(circuitReservationInfos);
 
-      // we add the panier
-      PaniersAPI.Add(
-        addCircuit(panierState ?? undefined, circuitReservationInfos),
-        user?._id as string
-      )
-        .then((data) => {
-          console.log("Panier updated with circuit", data);
-          setPanier(data)
-        })
-        .catch((err) => {
-          console.error("Error updating panier with circuit", err);
-        });
+      // persist backend only when user is logged in
+      const toSend = addCircuit(
+        panierState ?? undefined,
+        circuitReservationInfos
+      );
+      const userId = (ClientsAPI.GetUser()?._id as string) || "";
+      if (userId) {
+        PaniersAPI.Add(toSend, userId)
+          .then((data) => {
+            console.log("Panier updated with circuit", data);
+            setPanier(data);
+          })
+          .catch((err) => {
+            console.error("Error updating panier with circuit", err);
+          });
+      }
     }
   };
 
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
+      <FloatingCartButton />
+      <FloatingCartButton />
       {/* Header avec NavBar */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="CIRCUITS" />
@@ -487,7 +480,7 @@ const CircuitsSignature = () => {
         </Flex>
 
         {/* Bannière de connexion requise */}
-        {user === null && (
+        {/* {user === null && (
           <Flex
             align="center"
             gap={12}
@@ -529,35 +522,10 @@ const CircuitsSignature = () => {
               </Typography.Text>
             </Flex>
           </Flex>
-        )}
+        )} */}
 
         {/* Formulaire de réservation */}
-        <Flex
-          vertical
-          style={{
-            ...formStyles.container,
-            opacity: user === null ? 0.7 : 1,
-            pointerEvents: user === null ? "none" : "auto",
-            cursor: user === null ? "not-allowed" : "default",
-          }}
-        >
-          {/* Overlay pour le formulaire désactivé */}
-          {user === null && (
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: "rgba(255, 255, 255, 0.5)",
-                zIndex: 1,
-                borderRadius: "12px",
-                cursor: "not-allowed",
-              }}
-            />
-          )}
-
+        <Flex vertical style={{ ...formStyles.container }}>
           <Typography.Title
             level={3}
             style={{
@@ -588,7 +556,6 @@ const CircuitsSignature = () => {
                 suffixIcon={<CalendarOutlined style={{ color: "#BF2500" }} />}
                 style={formStyles.input}
                 size="large"
-                disabled={user === null}
                 disabledDate={(current) => {
                   return current && current < dayjs().startOf("day");
                 }}
@@ -607,7 +574,6 @@ const CircuitsSignature = () => {
                 size="large"
                 placeholder="Sélectionnez le nombre"
                 suffixIcon={<UserOutlined style={{ color: "#BF2500" }} />}
-                disabled={user === null}
               >
                 {[...Array(6)].map((_, i) => (
                   <Select.Option key={i + 1} value={i + 1}>

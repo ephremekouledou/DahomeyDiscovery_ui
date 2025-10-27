@@ -12,6 +12,7 @@ import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { PageSettings } from "../../sdk/api/pageMedias";
 import { CircuitsAPI } from "../../sdk/api/circuits";
 import { ICircuitPresenter } from "../../sdk/models/circuits";
+import FloatingCartButton from "../../components/dededed/PanierButton";
 
 export const HandleGetFileLink = (id: string) => {
   return FileAPI.Download("villes", id);
@@ -333,6 +334,7 @@ const CircuitsCartes = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
+      <FloatingCartButton />
       {/* Header avec NavBar */}
       <div
         className="relative z-20 flex items-center justify-center"

@@ -637,9 +637,10 @@ const AccommodationOptionModal: React.FC<AccommodationOptionModalProps> = ({
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [days, setDays] = useState<number | null>(null);
 
+  // allow anonymous users to select a room — persistence to backend will be
+  // performed only when a logged-in user exists (checked at call time)
   const isFormValid =
-    selectedDate !== null && days !== null && typeof days === "number" && days > 0 &&
-    !!ClientsAPI.GetUser()?._id;
+    selectedDate !== null && days !== null && typeof days === "number" && days > 0;
 
   if (!isOpen) return null;
 

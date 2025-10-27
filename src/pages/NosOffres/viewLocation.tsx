@@ -39,14 +39,14 @@ import { EquipmentModal, TarificationModal } from "./locationsModal";
 import {
   CalendarOutlined,
   DollarCircleFilled,
-  LockOutlined,
 } from "@ant-design/icons";
 import dayjs, { Dayjs } from "dayjs";
-import { IClient, IClientHistory } from "../../sdk/models/clients";
+import { IClientHistory } from "../../sdk/models/clients";
 import { ClientsAPI } from "../../sdk/api/clients";
 import SimilarSelling from "../../components/dededed/similarSelling";
 import CrossSelling from "../../components/dededed/crossSelling";
 import { useScreenSize } from "../../components/CircuitView/Timeline";
+import FloatingCartButton from "../../components/dededed/PanierButton";
 
 const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -62,15 +62,10 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
   const [showTarificationModal, setShowTarificationModal] = useState(false);
   const [_, setImageHeights] = useState<number[]>([]);
   const [maxHeight, setMaxHeight] = useState<number>(400); // hauteur par défaut augmentée
-  const [user, setUser] = useState<IClient | null>(null);
 
-  // Vérifier si le formulaire est valide
+  // Vérifier si le formulaire est valide (allow anonymous users)
   const isFormValid =
-    selectedDate !== null &&
-    chauffeur !== null &&
-    days !== null &&
-    days > 0 &&
-    user !== null;
+    selectedDate !== null && chauffeur !== null && days !== null && days > 0;
 
   // Calculer le prix total en fonction des tranches de tarification
   const totalPrice = useMemo(() => {
@@ -128,11 +123,8 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
     [screenSize]
   );
 
-  // Check for logged in user
-  useEffect(() => {
-    const loggedUser = ClientsAPI.GetUser();
-    setUser(loggedUser);
-  }, []);
+  // we no longer require a logged-in user to fill the form; backend persistence
+  // will be skipped for anonymous users (ClientsAPI.GetUser() checked at call time)
 
   // Fonction pour charger les images et déterminer la hauteur max
   useEffect(() => {
@@ -403,77 +395,8 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
           </div>
         </div> */}
 
-        {/* Login banner when not authenticated */}
-        {!ClientsAPI.GetUser()?._id && (
-          <Flex
-            align="center"
-            gap={12}
-            style={{
-              backgroundColor: "#fff3e0",
-              border: "2px solid #F59F00",
-              borderRadius: "12px",
-              padding: screenSize.isMobile ? "16px" : "20px",
-              marginBottom: "20px",
-            }}
-          >
-            <LockOutlined
-              style={{
-                fontSize: screenSize.isMobile ? "24px" : "28px",
-                color: "#BF2500",
-              }}
-            />
-            <Flex vertical gap={4} style={{ flex: 1 }}>
-              <Typography.Text
-                style={{
-                  fontSize: screenSize.isMobile ? "16px" : "18px",
-                  fontFamily: "GeneralSans",
-                  fontWeight: "600",
-                  color: "#BF2500",
-                  margin: 0,
-                }}
-              >
-                Connexion requise
-              </Typography.Text>
-              <Typography.Text
-                style={{
-                  fontSize: screenSize.isMobile ? "13px" : "14px",
-                  fontFamily: "GeneralSans",
-                  color: "#311715",
-                  margin: 0,
-                }}
-              >
-                Veuillez vous connecter pour effectuer une réservation
-              </Typography.Text>
-            </Flex>
-          </Flex>
-        )}
-
         {/* Reservation form */}
-        <Flex
-          vertical
-          style={{
-            ...formStyles.container,
-            opacity: user === null ? 0.7 : 1,
-            pointerEvents: user === null ? "none" : "auto",
-            cursor: user === null ? "not-allowed" : "default",
-          }}
-        >
-          {/* Overlay pour le formulaire désactivé */}
-          {user === null && (
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: "rgba(255, 255, 255, 0.5)",
-                zIndex: 1,
-                borderRadius: "12px",
-                cursor: "not-allowed",
-              }}
-            />
-          )}
+        <Flex vertical style={{ ...formStyles.container }}>
 
           <Typography.Title
             level={3}
@@ -505,7 +428,6 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
                 suffixIcon={<CalendarOutlined style={{ color: "#BF2500" }} />}
                 style={formStyles.input}
                 size="large"
-                disabled={user === null}
                 disabledDate={(current) => {
                   return current && current < dayjs().startOf("day");
                 }}
@@ -527,7 +449,6 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
                 style={formStyles.input}
                 size="large"
                 placeholder="Nombre de jours"
-                disabled={user === null}
               />
             </Flex>
           </Flex>
@@ -626,23 +547,28 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
                   console.error("Error adding vehicle to panier (local):", e);
                 }
 
-                // Persist to backend
+                // Persist to backend only if user is logged in
                 const toSend = addVehicule(panier ?? emptyPanier(), vehInfo);
-                PaniersAPI.Add(
-                  toSend,
-                  (ClientsAPI.GetUser()?._id as string) || ""
-                )
-                  .then((data) => {
-                    console.log("Panier updated with vehicle", data);
-                    setPanier(data);
-                    // we clear form
-                    setSelectedDate(null);
-                    setDays(1);
-                    setChauffeur(false);
-                  })
-                  .catch((err) => {
-                    console.error("Error updating panier with vehicle", err);
-                  });
+                const userId = (ClientsAPI.GetUser()?._id as string) || "";
+                if (userId) {
+                  PaniersAPI.Add(toSend, userId)
+                    .then((data) => {
+                      console.log("Panier updated with vehicle", data);
+                      setPanier(data);
+                      // we clear form
+                      setSelectedDate(null);
+                      setDays(1);
+                      setChauffeur(false);
+                    })
+                    .catch((err) => {
+                      console.error("Error updating panier with vehicle", err);
+                    });
+                } else {
+                  // anonymous: skip backend, clear form after local update
+                  setSelectedDate(null);
+                  setDays(1);
+                  setChauffeur(false);
+                }
               }}
             >
               RÉSERVER
@@ -788,6 +714,7 @@ const ViewLocation = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
+      <FloatingCartButton />
       {/* Header avec NavBar - Responsive */}
       <div
         className="relative z-20 flex items-center justify-center"

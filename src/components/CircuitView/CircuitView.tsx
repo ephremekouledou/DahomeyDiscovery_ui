@@ -1,5 +1,5 @@
 import { Button, DatePicker, Divider, Flex, Select, Typography } from "antd";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import NavBar from "../navBar/navBar";
 import Footer from "../footer/footer";
 import React, { useState, useEffect, useMemo } from "react";
@@ -23,16 +23,12 @@ import MapItineraire from "../dededed/MapItineraire";
 import CrossSelling, { IClientHistory } from "../dededed/crossSelling";
 import { ClientsAPI } from "../../sdk/api/clients";
 import dayjs, { Dayjs } from "dayjs";
-import { IClient } from "../../sdk/models/clients";
 import { usePanier } from "../../context/panierContext";
-import {
-  CalendarOutlined,
-  LockOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
+import { CalendarOutlined, UserOutlined } from "@ant-design/icons";
 import { addCircuit, PanierCircuitInfos } from "../../sdk/models/panier";
 import PaniersAPI from "../../sdk/api/panier";
 import { v4 } from "uuid";
+import FloatingCartButton from "../dededed/PanierButton";
 
 interface CircuitCardOtherProps {
   circuit: ICircuitPresenter;
@@ -560,19 +556,15 @@ export const CircuitView = () => {
   const [history, setHistory] = useState<IClientHistory[]>([]);
 
   const { panier, setPanier, addCircuitToPanier } = usePanier();
-  const [user, setUser] = useState<IClient | null>(null);
   const [panierState, setPanierState] = useState(panier);
 
   // États pour le formulaire de réservation
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [participants, setParticipants] = useState<number | null>(null);
 
-  // Vérifier si le formulaire est valide
+  // Vérifier si le formulaire est valide (allow anonymous users)
   const isFormValid =
-    selectedDate !== null &&
-    participants !== null &&
-    participants > 0 &&
-    user !== null;
+    selectedDate !== null && participants !== null && participants > 0;
 
   // Calculer le prix total
   const totalPrice = useMemo(() => {
@@ -647,12 +639,6 @@ export const CircuitView = () => {
     }),
     [screenSize]
   );
-
-  // Check for logged in user
-  useEffect(() => {
-    const loggedUser = ClientsAPI.GetUser();
-    setUser(loggedUser);
-  }, []);
 
   useEffect(() => {
     setPanierState(panier);
@@ -736,18 +722,22 @@ export const CircuitView = () => {
       );
       addCircuitToPanier(circuitReservationInfos);
 
-      // we add the panier
-      PaniersAPI.Add(
-        addCircuit(panierState ?? undefined, circuitReservationInfos),
-        user?._id as string
-      )
-        .then((data) => {
-          console.log("Panier updated with circuit", data);
-          setPanier(data);
-        })
-        .catch((err) => {
-          console.error("Error updating panier with circuit", err);
-        });
+      // persist backend only when user is logged in
+      const toSend = addCircuit(
+        panierState ?? undefined,
+        circuitReservationInfos
+      );
+      const userId = (ClientsAPI.GetUser()?._id as string) || "";
+      if (userId) {
+        PaniersAPI.Add(toSend, userId)
+          .then((data) => {
+            console.log("Panier updated with circuit", data);
+            setPanier(data);
+          })
+          .catch((err) => {
+            console.error("Error updating panier with circuit", err);
+          });
+      }
     }
   };
 
@@ -789,6 +779,7 @@ export const CircuitView = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
+      <FloatingCartButton />
       {/* Header avec NavBar */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="CIRCUITS" />
@@ -1013,78 +1004,8 @@ export const CircuitView = () => {
             )}
           </Flex>
 
-          {/* Bannière de connexion requise */}
-          {user === null && (
-            <Flex
-              align="center"
-              gap={12}
-              style={{
-                backgroundColor: "#fff3e0",
-                border: "2px solid #F59F00",
-                borderRadius: "12px",
-                padding: screenSize.isMobile ? "16px" : "20px",
-                marginBottom: "20px",
-              }}
-            >
-              <LockOutlined
-                style={{
-                  fontSize: screenSize.isMobile ? "24px" : "28px",
-                  color: "#BF2500",
-                }}
-              />
-              <Flex vertical gap={4} style={{ flex: 1 }}>
-                <Typography.Text
-                  style={{
-                    fontSize: screenSize.isMobile ? "16px" : "18px",
-                    fontFamily: "GeneralSans",
-                    fontWeight: "600",
-                    color: "#BF2500",
-                    margin: 0,
-                  }}
-                >
-                  Connexion requise
-                </Typography.Text>
-                <Typography.Text
-                  style={{
-                    fontSize: screenSize.isMobile ? "13px" : "14px",
-                    fontFamily: "GeneralSans",
-                    color: "#311715",
-                    margin: 0,
-                  }}
-                >
-                  Veuillez vous connecter pour effectuer une réservation
-                </Typography.Text>
-              </Flex>
-            </Flex>
-          )}
-
           {/* Formulaire de réservation */}
-          <Flex
-            vertical
-            style={{
-              ...formStyles.container,
-              opacity: user === null ? 0.7 : 1,
-              pointerEvents: user === null ? "none" : "auto",
-              cursor: user === null ? "not-allowed" : "default",
-            }}
-          >
-            {/* Overlay pour le formulaire désactivé */}
-            {user === null && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  backgroundColor: "rgba(255, 255, 255, 0.5)",
-                  zIndex: 1,
-                  borderRadius: "12px",
-                  cursor: "not-allowed",
-                }}
-              />
-            )}
-
+          <Flex vertical style={{ ...formStyles.container }}>
             <Typography.Title
               level={3}
               style={{
@@ -1117,7 +1038,6 @@ export const CircuitView = () => {
                   suffixIcon={<CalendarOutlined style={{ color: "#BF2500" }} />}
                   style={formStyles.input}
                   size="large"
-                  disabled={user === null}
                   disabledDate={(current) => {
                     return current && current < dayjs().startOf("day");
                   }}
@@ -1136,7 +1056,6 @@ export const CircuitView = () => {
                   size="large"
                   placeholder="Sélectionnez le nombre"
                   suffixIcon={<UserOutlined style={{ color: "#BF2500" }} />}
-                  disabled={user === null}
                 >
                   {[...Array(6)].map((_, i) => (
                     <Select.Option key={i + 1} value={i + 1}>
@@ -1218,7 +1137,7 @@ export const CircuitView = () => {
             </Flex>
           </Flex>
 
-          {/* Bouton de réservation */}
+          {/* Bouton de réservation
           <Flex
             justify="center"
             style={{ padding: screenSize.isMobile ? "20px 0" : "0" }}
@@ -1245,7 +1164,7 @@ export const CircuitView = () => {
                 RÉSERVER
               </Button>
             </Link>
-          </Flex>
+          </Flex> */}
 
           {/* Section Inclus/Non Inclus */}
           <Flex style={{ width: "100%", paddingBottom: "60px" }}>

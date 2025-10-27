@@ -33,6 +33,7 @@ import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
 import { FlipWords } from "../../components/ui/flip-words";
 import NavBar from "../../components/navBar/navBar";
+import FloatingCartButton from "../../components/dededed/PanierButton";
 
 const TESTIMONIALS = [
   {
@@ -942,6 +943,7 @@ const Acceuil = () => {
       {/* Contenu principal avec masque */}
       <div id="mask-wrapper" className="absolute z-0 inset-0 origin-center">
         <BeginningButton />
+      <FloatingCartButton />
         <Flex vertical gap={0}>
           {/* Section vidéo - intégrée directement */}
           <section className="one">

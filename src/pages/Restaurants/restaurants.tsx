@@ -11,6 +11,7 @@ import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
 import { PageSettings } from "../../sdk/api/pageMedias";
 import { useLocation } from "react-router-dom";
+import FloatingCartButton from "../../components/dededed/PanierButton";
 
 const RestaurantCard: React.FC<{ restaurant: IRestaurantSettings }> = ({
   restaurant,
@@ -64,6 +65,7 @@ const Restaurants = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
+      <FloatingCartButton />
       {/* Navigation */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="RESTAU" />

@@ -4,6 +4,7 @@ import { usePanier } from "../../context/panierContext";
 import { IClient } from "../../sdk/models/clients";
 import { ClientsAPI } from "../../sdk/api/clients";
 import PaniersAPI from "../../sdk/api/panier";
+import { useNavigate } from "react-router-dom";
 
 export default function FloatingCartButton() {
   // Nombre d'articles dans le panier (calculé depuis le contexte panier)
@@ -42,19 +43,22 @@ export default function FloatingCartButton() {
   // Check for logged in user
   useEffect(() => {
     const loggedUser = ClientsAPI.GetUser();
+    console.log("user:", loggedUser);
     setUser(loggedUser);
   }, []);
 
   // Check for logged in user
   useEffect(() => {
-    // we get the panier
-    PaniersAPI.GetActuelCustomer(user?._id as string)
-      .then((data) => {
-        setPanier(data);
-      })
-      .catch((err) => {
-        console.error("Error fetching current panier", err);
-      });
+    if (user != null) {
+      // we get the panier
+      PaniersAPI.GetActuelCustomer(user?._id as string)
+        .then((data) => {
+          setPanier(data);
+        })
+        .catch((err) => {
+          console.error("Error fetching current panier", err);
+        });
+    }
   }, [user]);
 
   // Recalculate when panier changes
@@ -63,10 +67,13 @@ export default function FloatingCartButton() {
     console.log("Panier button", panier);
   }, [panier]);
 
+  const navigate = useNavigate();
+
   const handleCartClick = () => {
-    // Rediriger vers la page de paiement
-    window.location.href = "/reserver";
-    // Si vous utilisez React Router, utilisez plutôt : navigate('/checkout');
+    // Use React Router navigation to avoid a full page reload which clears
+    // the React context state (anonymous panier). This keeps the in-memory
+    // panier intact when navigating to the reservations page.
+    navigate("/reserver");
   };
 
   return cartItemCount > 0 ? (

@@ -16,6 +16,7 @@ import { PageSettings } from "../../sdk/api/pageMedias";
 import { HandleGetFileLink } from "../../pages/Circuits/CircuitsCartes";
 import CrossSelling, { IClientHistory } from "../dededed/crossSelling";
 import { ClientsAPI } from "../../sdk/api/clients";
+import FloatingCartButton from "../dededed/PanierButton";
 
 interface VilleCardOtherProps {
   ville: IVille;
@@ -237,6 +238,7 @@ export const CircuitCarteView = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
+      <FloatingCartButton />
       {/* Header avec NavBar */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="CIRCUITS" />

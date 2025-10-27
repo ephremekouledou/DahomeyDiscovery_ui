@@ -19,7 +19,7 @@ import {
 } from "../../sdk/models/pagesMedias";
 import { PageSettings } from "../../sdk/api/pageMedias";
 import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
-import { IClient } from "../../sdk/models/clients";
+
 import { ClientsAPI } from "../../sdk/api/clients";
 import { usePanier } from "../../context/panierContext";
 import {
@@ -29,13 +29,12 @@ import {
 } from "../../sdk/models/panier";
 import PaniersAPI from "../../sdk/api/panier";
 import { v4 } from "uuid";
-import { LockOutlined } from "@ant-design/icons";
-import { useScreenSize } from "../../components/CircuitView/Timeline";
+import FloatingCartButton from "../../components/dededed/PanierButton";
+// no UI lock icon needed when anonymous booking is allowed
 
 const Transferts: React.FC = () => {
   // const [messageApi] = message.useMessage();
   const [isMobile, setIsMobile] = useState(false);
-  const screenSize = useScreenSize();
   const [isTablet, setIsTablet] = useState(false);
   const [selectedDestination, setSelectedDestination] = useState<string>("");
   const [passengers, setPassengers] = useState<number>(1);
@@ -51,18 +50,14 @@ const Transferts: React.FC = () => {
   const [bookingConfirmed, setBookingConfirmed] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
-  const [user, setUser] = useState<IClient | null>(null);
+  // We don't require a logged-in user to fill the form or confirm a transfer.
   const { panier, addTransferToPanier } = usePanier();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Check for logged in user
-  useEffect(() => {
-    const loggedUser = ClientsAPI.GetUser();
-    setUser(loggedUser);
-  }, []);
+  // backend persistence will be guarded at the moment of saving (ClientsAPI.GetUser())
 
   useEffect(() => {
     PageSettings.List()
@@ -188,11 +183,16 @@ const Transferts: React.FC = () => {
       console.error("Error adding transfer to panier (local):", e);
     }
 
-    // Persist to backend
+    // Persist to backend only if user is logged in
     try {
       const toSend = addTransfer(panier ?? emptyPanier(), transferInfo);
-      await PaniersAPI.Add(toSend, (ClientsAPI.GetUser()?._id as string) || "");
-      console.log("Transfer added to panier and persisted");
+      const userId = (ClientsAPI.GetUser()?._id as string) || "";
+      if (userId) {
+        await PaniersAPI.Add(toSend, userId);
+        console.log("Transfer added to panier and persisted");
+      } else {
+        console.log("Anonymous user: skipping panier persistence for transfer");
+      }
     } catch (e) {
       console.error("Error persisting transfer to panier:", e);
     }
@@ -202,6 +202,7 @@ const Transferts: React.FC = () => {
     return (
       <Flex justify="center" vertical>
         <BeginningButton />
+        <FloatingCartButton />
         {/* Header avec NavBar */}
         <div className="relative z-20 flex items-center justify-center">
           <NavBar menu="TRANSFERT" />
@@ -360,6 +361,7 @@ const Transferts: React.FC = () => {
     return (
       <Flex justify="center" vertical>
         <BeginningButton />
+        <FloatingCartButton />
         {/* Header avec NavBar */}
         <div className="relative z-20 flex items-center justify-center">
           <NavBar menu="TRANSFERT" />
@@ -554,50 +556,7 @@ const Transferts: React.FC = () => {
                 </div>
               </div>
 
-              {/* Login banner when not authenticated */}
-              {!ClientsAPI.GetUser()?._id && (
-                <Flex
-                  align="center"
-                  gap={12}
-                  style={{
-                    backgroundColor: "#fff3e0",
-                    border: "2px solid #F59F00",
-                    borderRadius: "12px",
-                    padding: screenSize.isMobile ? "16px" : "20px",
-                    marginBottom: "20px",
-                  }}
-                >
-                  <LockOutlined
-                    style={{
-                      fontSize: screenSize.isMobile ? "24px" : "28px",
-                      color: "#BF2500",
-                    }}
-                  />
-                  <Flex vertical gap={4} style={{ flex: 1 }}>
-                    <Typography.Text
-                      style={{
-                        fontSize: screenSize.isMobile ? "16px" : "18px",
-                        fontFamily: "GeneralSans",
-                        fontWeight: "600",
-                        color: "#BF2500",
-                        margin: 0,
-                      }}
-                    >
-                      Connexion requise
-                    </Typography.Text>
-                    <Typography.Text
-                      style={{
-                        fontSize: screenSize.isMobile ? "13px" : "14px",
-                        fontFamily: "GeneralSans",
-                        color: "#311715",
-                        margin: 0,
-                      }}
-                    >
-                      Veuillez vous connecter pour effectuer une réservation
-                    </Typography.Text>
-                  </Flex>
-                </Flex>
-              )}
+              {/* Anonymous reservations allowed — no login banner shown */}
 
               <div className="flex space-x-4">
                 <button
@@ -608,12 +567,7 @@ const Transferts: React.FC = () => {
                 </button>
                 <button
                   onClick={confirmBooking}
-                  disabled={!user}
-                  className={`flex-1 py-3 rounded-lg transition-colors ${
-                    !user
-                      ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                      : "bg-[#f59f00] text-white hover:bg-[#ff3100]"
-                  }`}
+                  className={`flex-1 py-3 rounded-lg transition-colors bg-[#f59f00] text-white hover:bg-[#ff3100]`}
                 >
                   Confirmer la réservation
                 </button>
@@ -630,6 +584,7 @@ const Transferts: React.FC = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
+      <FloatingCartButton />
       {/* Header avec NavBar */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="TRANSFERT" />

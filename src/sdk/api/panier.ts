@@ -66,11 +66,11 @@ export class PaniersAPI {
    * GetByID returns a panier by its id
    * @param id
    */
-  static GetPresenter(id: string): Promise<PanierPresenter> {
-    const url = this.getBaseURL() + "/" + id + "/presenter";
+  static GetPresenter(panier: Panier): Promise<PanierPresenter> {
+    const url = this.getBaseURL() + "/presenter";
     return new Promise((resolve, reject) => {
       axiosSiteData
-        .get(url, axiosSiteDataConfig)
+        .post(url, panier, axiosSiteDataConfig)
         .then((response: any) => {
           const data: PanierPresenter = response.data;
           resolve(data);

@@ -50,7 +50,7 @@ const PanierViewer: React.FC<PanierViewerProps> = ({
 
   const handlePayAll = () => {
     // Navigate to reservation / payment flow
-    window.location.href = "/reserver";
+    // window.location.href = "/reserver";
   };
   const formatDate = (date: Date | string) => {
     const d = typeof date === "string" ? new Date(date) : date;
