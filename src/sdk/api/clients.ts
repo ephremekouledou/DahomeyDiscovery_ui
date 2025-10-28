@@ -1,5 +1,6 @@
 import {
   IAddClientBody,
+  IAddClientBodyReservation,
   IAddUpdateClient,
   IClient,
   IClientHistory,
@@ -161,6 +162,22 @@ export class ClientsAPI {
           localStorage.setItem(lsUserTokenKey, response.data.Token);
           localStorage.setItem(lsUserKey, JSON.stringify(response.data.User));
           resolve(response.data.Token);
+        })
+        .catch((err: any) => {
+          reject(handleErr(err));
+        });
+    });
+  }
+
+  static SignUponReservation(
+    body: IAddClientBodyReservation
+  ): Promise<IClient> {
+    return new Promise((resolve, reject) => {
+      axiosSiteData
+        .post("/customer-reservation-signUp", body, axiosSiteDataConfig)
+        .then((response: any) => {
+          const data: IClient = response.data;
+          resolve(data);
         })
         .catch((err: any) => {
           reject(handleErr(err));

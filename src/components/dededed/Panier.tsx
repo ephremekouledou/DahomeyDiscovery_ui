@@ -18,6 +18,12 @@ import { removeItemById, emptyPanier } from "../../sdk/models/panier";
 import PaniersAPI from "../../sdk/api/panier";
 import { ClientsAPI } from "../../sdk/api/clients";
 import { HandleGetFileLink } from "../../pages/Circuits/CircuitsCartes";
+import { useState } from "react";
+import { IPaiementRequest } from "../../sdk/models/paiement";
+import { PaiementAPI } from "../../sdk/api/paiements";
+import { IAddUpdateReservation } from "../../sdk/models/reservations";
+import { ReservationsAPI } from "../../sdk/api/reservations";
+import { IAddClientBodyReservation } from "../../sdk/models/clients";
 
 interface PanierViewerProps {
   panier: PanierPresenter;
@@ -29,6 +35,13 @@ const PanierViewer: React.FC<PanierViewerProps> = ({
   current = false,
 }) => {
   const { panier: panierCtx, setPanier: setPanierCtx } = usePanier();
+  const [showEmailInput, setShowEmailInput] = useState(false);
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [firstName, setFirstName] = useState("");
+  const [firstNameError, setFirstNameError] = useState<string | null>(null);
+  const [lastName, setLastName] = useState("");
+  const [lastNameError, setLastNameError] = useState<string | null>(null);
 
   const handleRemoveItem = async (id: string) => {
     try {
@@ -48,9 +61,117 @@ const PanierViewer: React.FC<PanierViewerProps> = ({
     }
   };
 
-  const handlePayAll = () => {
-    // Navigate to reservation / payment flow
-    // window.location.href = "/reserver";
+  const handlePayAll = async (
+    email: string,
+    first_name: string,
+    last_name: string,
+    panier_id: string
+  ) => {
+    try {
+      // Build the payment request
+      const paymentRequest: IPaiementRequest = {
+        amount: calculateTotal(),
+        currency: "XOF",
+        description: "Règlement de votre panier",
+        return_url: "https://dahomeydiscovery.com",
+        customer: {
+          email: email,
+          first_name: first_name,
+          last_name: last_name,
+        },
+      };
+
+      // Initiate payment
+      const paymentResponse = await PaiementAPI.Initiate(paymentRequest);
+      console.log("Payment response:", paymentResponse);
+
+      // Create reservation referencing the panier and the payment transaction
+      const reservation: IAddUpdateReservation = {
+        panier_id: panier_id,
+        status: "pending",
+        transaction_id: paymentResponse.data.id,
+      };
+
+      const reservationResponse = await ReservationsAPI.Add(reservation);
+      console.log("Reservation created:", reservationResponse);
+
+      // Redirect to payment checkout
+      if (paymentResponse?.data?.checkout_url) {
+        window.location.href = paymentResponse.data.checkout_url;
+      } else {
+        console.warn("No checkout URL returned from payment initiation.");
+      }
+    } catch (error: any) {
+      console.error("Form submission error:", error);
+    }
+  };
+
+  const validateEmail = (e: string) => {
+    // Simple email validation
+    const re = /^\S+@\S+\.\S+$/;
+    return re.test(e);
+  };
+
+  const handlePayClick = async () => {
+    const getPanierId = () =>
+      (panierCtx && (panierCtx as any)._id) ||
+      (panier && (panier as any)._id) ||
+      "";
+
+    const user = ClientsAPI.GetUser ? ClientsAPI.GetUser() : null;
+
+    // If user is logged in, use their data and proceed
+    if (user && user._id) {
+      const userEmail = (user.email as string) || "";
+      const userFirst = (user.first_name as string) || "";
+      const userLast = (user.last_name as string) || "";
+      const panierId = getPanierId();
+      await handlePayAll(userEmail, userFirst, userLast, panierId);
+      return;
+    }
+
+    // Show the guest form on first click
+    if (!showEmailInput) {
+      setShowEmailInput(true);
+      setEmailError(null);
+      setFirstNameError(null);
+      setLastNameError(null);
+      return;
+    }
+
+    // Validate guest inputs
+    let hasError = false;
+    if (!firstName || firstName.trim().length === 0) {
+      setFirstNameError("Veuillez saisir le prénom.");
+      hasError = true;
+    }
+    if (!lastName || lastName.trim().length === 0) {
+      setLastNameError("Veuillez saisir le nom.");
+      hasError = true;
+    }
+    if (!email) {
+      setEmailError("Veuillez saisir une adresse e-mail.");
+      hasError = true;
+    } else if (!validateEmail(email)) {
+      setEmailError("Adresse e-mail invalide.");
+      hasError = true;
+    }
+    if (hasError) return;
+
+    // Proceed: create a temporary client (SignUponReservation), attach panier to that client and start payment
+    try {
+      const clientBody: IAddClientBodyReservation = { email };
+      const createdUser = await ClientsAPI.SignUponReservation(clientBody);
+      console.log("Client added", createdUser);
+
+      const updatedPanier = await PaniersAPI.Add(panierCtx ?? emptyPanier(), createdUser._id);
+      console.log("Panier updated with user", updatedPanier);
+
+      const panierId = updatedPanier && (updatedPanier as any)._id ? (updatedPanier as any)._id : getPanierId();
+      await handlePayAll(email, firstName, lastName, panierId);
+    } catch (err) {
+      console.error("Error during guest checkout:", err);
+    }
   };
   const formatDate = (date: Date | string) => {
     const d = typeof date === "string" ? new Date(date) : date;
@@ -263,14 +384,14 @@ const PanierViewer: React.FC<PanierViewerProps> = ({
                       <p className="font-bold text-lg text-gray-800">
                         {formatPrice(hebergement.price)}
                       </p>
-                        {current && (
-                          <button
-                            onClick={() => handleRemoveItem(hebergement._id)}
-                            className="mt-2 text-sm text-red-600 hover:underline"
-                          >
-                            Supprimer
-                          </button>
-                        )}
+                      {current && (
+                        <button
+                          onClick={() => handleRemoveItem(hebergement._id)}
+                          className="mt-2 text-sm text-red-600 hover:underline"
+                        >
+                          Supprimer
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -324,14 +445,14 @@ const PanierViewer: React.FC<PanierViewerProps> = ({
                       <p className="font-bold text-lg text-gray-800">
                         {formatPrice(circuit.price)}
                       </p>
-                        {current && (
-                          <button
-                            onClick={() => handleRemoveItem(circuit._id)}
-                            className="mt-2 text-sm text-red-600 hover:underline"
-                          >
-                            Supprimer
-                          </button>
-                        )}
+                      {current && (
+                        <button
+                          onClick={() => handleRemoveItem(circuit._id)}
+                          className="mt-2 text-sm text-red-600 hover:underline"
+                        >
+                          Supprimer
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -395,14 +516,14 @@ const PanierViewer: React.FC<PanierViewerProps> = ({
                         <p className="font-bold text-lg text-gray-800">
                           {formatPrice(transfer.price)}
                         </p>
-                          {current && (
-                            <button
-                              onClick={() => handleRemoveItem(transfer._id)}
-                              className="mt-2 text-sm text-red-600 hover:underline"
-                            >
-                              Supprimer
-                            </button>
-                          )}
+                        {current && (
+                          <button
+                            onClick={() => handleRemoveItem(transfer._id)}
+                            className="mt-2 text-sm text-red-600 hover:underline"
+                          >
+                            Supprimer
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -438,13 +559,84 @@ const PanierViewer: React.FC<PanierViewerProps> = ({
               </span>
             </div>
             {current && !isEmpty && (
-              <div className="mt-6 flex justify-end">
-                <button
-                  onClick={handlePayAll}
-                  className="px-6 py-3 bg-[#f59f00] text-white hover:bg-[#ff3100] text-white font-semibold rounded-lg"
-                >
-                  Payer
-                </button>
+              <div className="mt-6 flex flex-col items-end w-full">
+                {showEmailInput && (
+                  <div className="mb-3 w-full max-w-md space-y-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Prénom
+                        </label>
+                        <input
+                          type="text"
+                          value={firstName}
+                          onChange={(e) => {
+                            setFirstName(e.target.value);
+                            if (firstNameError) setFirstNameError(null);
+                          }}
+                          placeholder="Prénom"
+                          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#f59f00]"
+                        />
+                        {firstNameError && (
+                          <p className="mt-1 text-sm text-red-600">
+                            {firstNameError}
+                          </p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Nom
+                        </label>
+                        <input
+                          type="text"
+                          value={lastName}
+                          onChange={(e) => {
+                            setLastName(e.target.value);
+                            if (lastNameError) setLastNameError(null);
+                          }}
+                          placeholder="Nom"
+                          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#f59f00]"
+                        />
+                        {lastNameError && (
+                          <p className="mt-1 text-sm text-red-600">
+                            {lastNameError}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Adresse e-mail
+                      </label>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          if (emailError) setEmailError(null);
+                        }}
+                        placeholder="exemple@domaine.com"
+                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#f59f00]"
+                      />
+                      {emailError && (
+                        <p className="mt-1 text-sm text-red-600">
+                          {emailError}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex justify-end">
+                  <button
+                    onClick={handlePayClick}
+                    className="px-6 py-3 bg-[#f59f00] hover:bg-[#ff3100] text-white font-semibold rounded-lg"
+                  >
+                    Payer
+                  </button>
+                </div>
               </div>
             )}
           </div>

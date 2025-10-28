@@ -33,3 +33,7 @@ export interface IAddClientBody {
   phone: string;
   password: string;
 }
+
+export interface IAddClientBodyReservation {
+  email: string;
+}
