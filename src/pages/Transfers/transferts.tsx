@@ -364,6 +364,10 @@ const Transferts: React.FC = () => {
           </div>
         </div>
 
+        <Flex>
+          <CrossSelling history={history} maxItems={5} />
+        </Flex>
+
         {/* Footer */}
         <Footer />
       </Flex>
@@ -589,6 +593,9 @@ const Transferts: React.FC = () => {
             </div>
           </div>
         </div>
+        <Flex>
+          <CrossSelling history={history} maxItems={5} />
+        </Flex>
         {/* Footer */}
         <Footer />
       </Flex>

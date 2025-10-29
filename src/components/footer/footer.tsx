@@ -18,9 +18,9 @@ import { Link } from "react-router-dom";
 import "../../assets/Fonts/font.css";
 
 const SOCIAL_LINKS = {
-  facebook: "https://www.facebook.com/dahomey.discovery",
-  instagram: "https://www.instagram.com/dahomey.discovery/",
-  whatsapp: "https://api.whatsapp.com/send?phone=22995202020",
+  facebook: "https://www.facebook.com/profile.php?id=61554366813335&__cft__[0]=AZXtgubbg4HTp9tQVDkGPSCMp_1aFxdTVBY3yQzDGj-DpXmkGf_qibI-g5l4k4Q0Q3iOaTRYOFQInEAudjEMr2Y-wwC_zVTq_6HhO0dC8Vk2-VyIK3-zCbYXt9n37Pj7Fb2TsGzMPDOttUcAjgvVXmv5up9nGxRACLY7vrUGnkpkUw&__cft__[1]=AZXtgubbg4HTp9tQVDkGPSCMp_1aFxdTVBY3yQzDGj-DpXmkGf_qibI-g5l4k4Q0Q3iOaTRYOFQInEAudjEMr2Y-wwC_zVTq_6HhO0dC8Vk2-VyIK3-zCbYXt9n37Pj7Fb2TsGzMPDOttUcAjgvVXmv5up9nGxRACLY7vrUGnkpkUw&__tn__=-]H-R",
+  instagram: "https://www.instagram.com/dahomey_discovery",
+  whatsapp: "https://api.whatsapp.com/send?phone=2290167110220",
 };
 
 const BREAKPOINT = {
