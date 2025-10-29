@@ -11,7 +11,7 @@ import { MultiAppFile } from "../../sdk/models/models";
 import { HandleGetFileLink } from "./CircuitsCartes";
 import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { PageSettings } from "../../sdk/api/pageMedias";
-import FloatingCartButton from "../../components/dededed/PanierButton";
+
 
 interface TravelCardProps {
   _id: string;
@@ -314,7 +314,7 @@ const Circuits = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
-      <FloatingCartButton />
+      
       {/* Header avec NavBar */}
       <div>
         <NavBar menu="CIRCUITS" />

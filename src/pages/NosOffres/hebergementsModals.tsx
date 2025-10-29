@@ -52,7 +52,7 @@ import {
   IAccommodationData,
   IAccommodationOption,
 } from "../../sdk/models/hebergements";
-import { Modal, DatePicker, InputNumber } from "antd";
+import { Modal, DatePicker } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import { usePanier } from "../../context/panierContext";
 import PaniersAPI from "../../sdk/api/panier";
@@ -605,6 +605,15 @@ const HotelServicesModal: React.FC<HotelServicesModalProps> = ({
   );
 };
 
+interface FeatureItem {
+  key: string;
+  text: string;
+  badge?: string;
+  icon: React.ReactNode;
+  category: string;
+  available: boolean;
+}
+
 interface AccommodationOptionModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -614,14 +623,7 @@ interface AccommodationOptionModalProps {
   getFileLink?: (file: string) => string;
 }
 
-interface FeatureItem {
-  key: string;
-  text: string;
-  badge?: string;
-  icon: React.ReactNode;
-  category: string;
-  available: boolean;
-}
+
 
 const AccommodationOptionModal: React.FC<AccommodationOptionModalProps> = ({
   isOpen,
@@ -633,7 +635,8 @@ const AccommodationOptionModal: React.FC<AccommodationOptionModalProps> = ({
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { panier, addHebergementToPanier } = usePanier();
 
-  // Reservation inputs: date and number of days
+  // Reservation inputs: date range -> derive start date and number of days
+  const [selectedRange, setSelectedRange] = useState<[Dayjs, Dayjs] | null>(null);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [days, setDays] = useState<number | null>(null);
 
@@ -1037,25 +1040,35 @@ const AccommodationOptionModal: React.FC<AccommodationOptionModalProps> = ({
               <div className="text-sm text-gray-600">par nuit</div>
             </div>
             <div className="mb-4 grid grid-cols-1 gap-3">
-              <DatePicker
-                value={selectedDate}
-                onChange={(d) => setSelectedDate(d)}
-                format="DD/MM/YYYY"
-                placeholder="Date d'arrivée"
+              <DatePicker.RangePicker
+                value={selectedRange ?? undefined}
+                onChange={(dates) => {
+                  if (!dates || !dates[0] || !dates[1]) {
+                    setSelectedRange(null);
+                    setSelectedDate(null);
+                    setDays(null);
+                    return;
+                  }
+
+                  // dates is a tuple [start, end]
+                  setSelectedRange([dates[0], dates[1]]);
+                  setSelectedDate(dates[0]);
+
+                  // Number of nights = difference in days (end - start)
+                  const diff = dates[1].diff(dates[0], "day");
+                  setDays(diff > 0 ? diff : 1);
+                }}
+                format={["DD/MM/YYYY", "DD/MM/YYYY"]}
+                placeholder={["Date d'arrivée", "Date de départ"]}
                 size="large"
                 disabledDate={(current) => current && current < dayjs().startOf("day")}
                 style={{ width: "100%" }}
               />
 
-              <InputNumber
-                min={1}
-                max={365}
-                value={days}
-                onChange={(v) => setDays(typeof v === "number" ? v : 1)}
-                style={{ width: "100%" }}
-                size="large"
-                placeholder="Nombre de nuits"
-              />
+              {/* Optionally show computed nights when available */}
+              {days !== null && (
+                <div className="text-sm text-gray-600 mt-1">{days} nuit{days > 1 ? "s" : ""}</div>
+              )}
             </div>
 
             <button
@@ -1091,6 +1104,8 @@ const AccommodationOptionModal: React.FC<AccommodationOptionModalProps> = ({
                 } catch (err) {
                   console.error("Error persisting hebergement to panier:", err);
                 }
+
+                onClose();
               }}
               disabled={!isFormValid}
               className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-xl transition-colors"

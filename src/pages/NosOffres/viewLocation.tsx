@@ -10,7 +10,6 @@ import {
   Rate,
   DatePicker,
   Switch,
-  InputNumber,
 } from "antd";
 import NavBar from "../../components/navBar/navBar";
 import {
@@ -36,53 +35,52 @@ import { ICarRentalData } from "../../sdk/models/vehicules";
 import { VehiculesAPI } from "../../sdk/api/vehicules";
 import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
 import { EquipmentModal, TarificationModal } from "./locationsModal";
-import {
-  CalendarOutlined,
-  DollarCircleFilled,
-} from "@ant-design/icons";
+import { DollarCircleFilled } from "@ant-design/icons";
 import dayjs, { Dayjs } from "dayjs";
 import { IClientHistory } from "../../sdk/models/clients";
 import { ClientsAPI } from "../../sdk/api/clients";
 import SimilarSelling from "../../components/dededed/similarSelling";
 import CrossSelling from "../../components/dededed/crossSelling";
 import { useScreenSize } from "../../components/CircuitView/Timeline";
-import FloatingCartButton from "../../components/dededed/PanierButton";
+
 
 const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
   const [isHovered, setIsHovered] = useState(false);
   const { panier, setPanier, addVehiculeToPanier } = usePanier();
   const screenSize = useScreenSize();
-  // local preview of panier can be accessed from context directly when needed
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
-  // form states
+
+  // Remplacer les états individuels par un range picker
+  const [selectedRange, setSelectedRange] = useState<[Dayjs, Dayjs] | null>(
+    null
+  );
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
-  const [days, setDays] = useState<number>(1);
+  const [days, setDays] = useState<number | null>(null);
+
   const [chauffeur, setChauffeur] = useState<boolean>(false);
   const [showEquipmentModal, setShowEquipmentModal] = useState(false);
   const [showTarificationModal, setShowTarificationModal] = useState(false);
   const [_, setImageHeights] = useState<number[]>([]);
-  const [maxHeight, setMaxHeight] = useState<number>(400); // hauteur par défaut augmentée
+  const [maxHeight, setMaxHeight] = useState<number>(400);
 
-  // Vérifier si le formulaire est valide (allow anonymous users)
+  // Vérifier si le formulaire est valide
   const isFormValid =
-    selectedDate !== null && chauffeur !== null && days !== null && days > 0;
+    selectedDate !== null &&
+    days !== null &&
+    typeof days === "number" &&
+    days > 0;
 
-  // Calculer le prix total en fonction des tranches de tarification
+  // Calculer le prix total
   const totalPrice = useMemo(() => {
-    // days must be a positive integer
     const nbrDays = Math.max(1, Math.floor(days || 1));
 
-    // If there is a tarification table, try to find a matching tranche
     if (car.tarification && car.tarification.length > 0) {
-      // Find tranche where from <= nbrDays <= to
       const matched = car.tarification.find((t) => {
-        // some tranches might have to === 0 meaning unlimited upper bound
         const from = typeof t.from === "number" ? t.from : 0;
         const to = typeof t.to === "number" && t.to > 0 ? t.to : Infinity;
         return nbrDays >= from && nbrDays <= to;
       });
 
-      // Use matched per-day price if found, otherwise fallback to price_per_day
       const perDay = matched
         ? chauffeur
           ? matched.price_driver
@@ -91,7 +89,6 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
       return perDay * nbrDays;
     }
 
-    // Fallback: use car.price_per_day
     return (car.price_per_day || 0) * nbrDays;
   }, [days, chauffeur, car.tarification, car.price_per_day]);
 
@@ -123,10 +120,6 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
     [screenSize]
   );
 
-  // we no longer require a logged-in user to fill the form; backend persistence
-  // will be skipped for anonymous users (ClientsAPI.GetUser() checked at call time)
-
-  // Fonction pour charger les images et déterminer la hauteur max
   useEffect(() => {
     const loadImages = async () => {
       const heights: number[] = [];
@@ -136,8 +129,7 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
         return new Promise<void>((resolve) => {
           const img = new window.Image();
           img.onload = () => {
-            // Calculer la hauteur en gardant le ratio aspect
-            const containerWidth = window.innerWidth; // ou la largeur de votre conteneur
+            const containerWidth = window.innerWidth;
             const aspectRatio = img.width / img.height;
             const calculatedHeight = containerWidth / aspectRatio;
 
@@ -148,7 +140,7 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
             resolve();
           };
           img.onerror = () => {
-            heights[index] = 320; // hauteur par défaut en cas d'erreur
+            heights[index] = 320;
             resolve();
           };
           img.src = HandleGetFileLink(image.file as string);
@@ -157,7 +149,7 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
 
       await Promise.all(imagePromises);
       setImageHeights(heights);
-      setMaxHeight(Math.min(max, 500)); // limiter la hauteur maximale à 500px
+      setMaxHeight(Math.min(max, 500));
     };
 
     if (car.images && car.images.length > 0) {
@@ -174,18 +166,6 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
       (prev) => (prev - 1 + car.images.length) % car.images.length
     );
   };
-  //   return Array.from({ length: 5 }, (_, i) => (
-  //     <Star
-  //       key={i}
-  //       size={16}
-  //       className={
-  //         i < Math.floor(rating)
-  //           ? "fill-yellow-400 text-yellow-400"
-  //           : "text-gray-300"
-  //       }
-  //     />
-  //   ));
-  // };
 
   const getFuelIcon = (fuelType: string): LucideIcon => {
     switch (fuelType) {
@@ -201,7 +181,6 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
   return (
     <div className="flex-1">
       <div>
-        {/* En-tête avec le nom du véhicule */}
         <div className="bg-white shadow-md p-6">
           <h2 className="text-2xl font-bold text-gray-800">
             {car.brand} {car.model}
@@ -209,7 +188,7 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
         </div>
       </div>
 
-      {/* Galerie d'images avec hauteur adaptive */}
+      {/* Galerie d'images */}
       <div className="relative bg-gray-100">
         <div
           className="w-full overflow-hidden flex items-center justify-center"
@@ -253,7 +232,6 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
           </>
         )}
 
-        {/* Miniatures */}
         <div className="absolute bottom-4 left-4 flex space-x-2 z-10">
           {car.images.map((image, index) => (
             <button
@@ -281,22 +259,11 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-1">
-              {/* {renderStars(car.rating)} */}
               <Rate allowHalf disabled defaultValue={car.rating} />
               <span className="font-semibold ml-2 text-lg">{car.rating}</span>
               <span className="text-gray-600">({car.review_count} avis)</span>
             </div>
-            {/* <div className="flex items-center text-gray-600">
-              <MapPin size={16} className="mr-1" />
-              <span>{car.location}</span>
-            </div> */}
           </div>
-          {/* <div className="text-left md:text-right">
-            <div className="text-3xl font-bold text-blue-600">
-              {car.price_per_day} FCFA
-            </div>
-            <div className="text-gray-600">par jour</div>
-          </div> */}
         </div>
 
         {/* Spécifications détaillées */}
@@ -384,20 +351,8 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
           />
         </div>
 
-        {/* Équipements avec distribution équilibrée */}
-        {/* <div className="mb-8">
-          <h3 className="text-xl font-semibold mb-6 text-gray-800 border-b pb-2">
-            Équipements et options
-          </h3>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {car.features}
-          </div>
-        </div> */}
-
-        {/* Reservation form */}
+        {/* Formulaire de réservation avec RangePicker */}
         <Flex vertical style={{ ...formStyles.container }}>
-
           <Typography.Title
             level={3}
             style={{
@@ -417,46 +372,51 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
             vertical={screenSize.isMobile}
             gap={screenSize.isMobile ? 15 : 20}
           >
-            {/* Date */}
-            <Flex vertical style={{ flex: 1 }}>
-              <Typography.Text style={formStyles.label}>Date:</Typography.Text>
-              <DatePicker
-                value={selectedDate}
-                onChange={(date) => setSelectedDate(date)}
-                format="DD/MM/YYYY"
-                placeholder="Sélectionnez une date"
-                suffixIcon={<CalendarOutlined style={{ color: "#BF2500" }} />}
-                style={formStyles.input}
-                size="large"
-                disabledDate={(current) => {
-                  return current && current < dayjs().startOf("day");
-                }}
-              />
-            </Flex>
-
-            {/* Nombre de jours */}
+            {/* RangePicker pour les dates */}
             <Flex vertical style={{ flex: 1 }}>
               <Typography.Text style={formStyles.label}>
-                Nombre de jours:
+                Période de location:
               </Typography.Text>
-              <InputNumber
-                min={1}
-                max={30}
-                value={days}
-                onChange={(value) =>
-                  setDays(typeof value === "number" ? value : 1)
-                }
-                style={formStyles.input}
+              <DatePicker.RangePicker
+                value={selectedRange ?? undefined}
+                onChange={(dates) => {
+                  if (!dates || !dates[0] || !dates[1]) {
+                    setSelectedRange(null);
+                    setSelectedDate(null);
+                    setDays(null);
+                    return;
+                  }
+
+                  // dates est un tuple [début, fin]
+                  setSelectedRange([dates[0], dates[1]]);
+                  setSelectedDate(dates[0]);
+
+                  // Nombre de jours = différence en jours (fin - début)
+                  const diff = dates[1].diff(dates[0], "day");
+                  setDays(diff > 0 ? diff : 1);
+                }}
+                format={["DD/MM/YYYY", "DD/MM/YYYY"]}
+                placeholder={["Date de prise", "Date de retour"]}
                 size="large"
-                placeholder="Nombre de jours"
+                disabledDate={(current) =>
+                  current && current < dayjs().startOf("day")
+                }
+                style={{ width: "100%" }}
               />
+
+              {/* Affichage du nombre de jours calculé */}
+              {days !== null && (
+                <div className="text-sm text-gray-600 mt-2">
+                  {days} jour{days > 1 ? "s" : ""} de location
+                </div>
+              )}
             </Flex>
           </Flex>
 
           {/* Chauffeur */}
-          <Flex vertical style={{ marginTop: 10 }}>
+          <Flex vertical style={{ marginTop: 20 }}>
             <Typography.Text style={formStyles.label}>
-              Chauffeur:
+              Avec chauffeur:
             </Typography.Text>
             <Switch
               style={{ width: "fit-content" }}
@@ -530,24 +490,21 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
               onMouseEnter={() => isFormValid && setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
               onClick={() => {
-                // Build PanierVehiculeInfos
                 const vehInfo: PanierVehiculeInfos = {
                   _id: v4(),
                   vehicule_id: car._id,
                   price: car.price_per_day,
                   chauffeur: chauffeur,
                   date: (selectedDate || dayjs()).toDate(),
-                  jour: days,
+                  jour: days || 1,
                 };
 
-                // Add locally to context
                 try {
                   addVehiculeToPanier(vehInfo);
                 } catch (e) {
                   console.error("Error adding vehicle to panier (local):", e);
                 }
 
-                // Persist to backend only if user is logged in
                 const toSend = addVehicule(panier ?? emptyPanier(), vehInfo);
                 const userId = (ClientsAPI.GetUser()?._id as string) || "";
                 if (userId) {
@@ -555,18 +512,20 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
                     .then((data) => {
                       console.log("Panier updated with vehicle", data);
                       setPanier(data);
-                      // we clear form
+                      // Réinitialisation du formulaire
+                      setSelectedRange(null);
                       setSelectedDate(null);
-                      setDays(1);
+                      setDays(null);
                       setChauffeur(false);
                     })
                     .catch((err) => {
                       console.error("Error updating panier with vehicle", err);
                     });
                 } else {
-                  // anonymous: skip backend, clear form after local update
+                  // Utilisateur anonyme : réinitialisation après mise à jour locale
+                  setSelectedRange(null);
                   setSelectedDate(null);
-                  setDays(1);
+                  setDays(null);
                   setChauffeur(false);
                 }
               }}
@@ -575,67 +534,6 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
             </Button>
           </Flex>
         </Flex>
-
-        {/* Bouton de location
-        <div className="mt-8 pt-6 border-t">
-          <Button
-            type="primary"
-            size="large"
-            style={{
-              backgroundColor: isHovered ? "#ff3100" : "#F59F00",
-              color: isHovered ? "white" : "black",
-              borderRadius: "7px",
-              border: "none",
-              fontFamily: "GeneralSans",
-              transition: "all 0.3s ease",
-              fontSize: "16px",
-              height: "40px",
-              padding: "0 20px",
-              fontWeight: "bold",
-              width: "100%",
-            }}
-            disabled={!car.availability}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            onClick={() => {
-              // Build PanierVehiculeInfos
-              const vehInfo: PanierVehiculeInfos = {
-                _id: v4(),
-                vehicule_id: car._id,
-                price: car.price_per_day,
-                chauffeur: chauffeur,
-                date: (selectedDate || dayjs()).toDate(),
-                jour: days,
-              };
-
-              // Add locally to context
-              try {
-                addVehiculeToPanier(vehInfo);
-              } catch (e) {
-                console.error("Error adding vehicle to panier (local):", e);
-              }
-
-              // Persist to backend
-              const toSend = addVehicule(panier ?? emptyPanier(), vehInfo);
-              PaniersAPI.Add(
-                toSend,
-                (ClientsAPI.GetUser()?._id as string) || ""
-              )
-                .then((data) => {
-                  console.log("Panier updated with vehicle", data);
-                  setPanier(data);
-                  navigate("/reservations-vehicules");
-                })
-                .catch((err) => {
-                  console.error("Error updating panier with vehicle", err);
-                });
-            }}
-          >
-            {car.availability
-              ? "Réserver maintenant"
-              : "Véhicule non disponible"}
-          </Button>
-        </div> */}
       </div>
     </div>
   );
@@ -714,7 +612,7 @@ const ViewLocation = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
-      <FloatingCartButton />
+      
       {/* Header avec NavBar - Responsive */}
       <div
         className="relative z-20 flex items-center justify-center"

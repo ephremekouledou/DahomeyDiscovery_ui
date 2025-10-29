@@ -7,7 +7,7 @@ import PanierViewer from "../../components/dededed/Panier";
 import { usePanier } from "../../context/panierContext";
 import PaniersAPI from "../../sdk/api/panier";
 import { emptyPanierPresenter, PanierPresenter } from "../../sdk/models/panier";
-import FloatingCartButton from "../../components/dededed/PanierButton";
+
 
 const Reservation = () => {
   const { panier } = usePanier();
@@ -36,7 +36,7 @@ const Reservation = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
-      <FloatingCartButton />
+      
       {/* Header avec NavBar */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="" />

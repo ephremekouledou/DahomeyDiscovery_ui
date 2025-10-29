@@ -1,5 +1,5 @@
-import { Button, Divider, Flex, Typography } from "antd";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Button, Divider, Flex, Typography, DatePicker, Select, Switch } from "antd";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import NavBar from "../navBar/navBar";
 import Footer from "../footer/footer";
 import { useState, useEffect, useMemo } from "react";
@@ -16,7 +16,13 @@ import { PageSettings } from "../../sdk/api/pageMedias";
 import { HandleGetFileLink } from "../../pages/Circuits/CircuitsCartes";
 import CrossSelling, { IClientHistory } from "../dededed/crossSelling";
 import { ClientsAPI } from "../../sdk/api/clients";
-import FloatingCartButton from "../dededed/PanierButton";
+import { CalendarOutlined, UserOutlined } from "@ant-design/icons";
+import { usePanier } from "../../context/panierContext";
+import { addCircuit, PanierCircuitInfos } from "../../sdk/models/panier";
+import PaniersAPI from "../../sdk/api/panier";
+import { v4 } from "uuid";
+import dayjs, { Dayjs } from "dayjs";
+
 
 interface VilleCardOtherProps {
   ville: IVille;
@@ -125,11 +131,37 @@ export const CircuitCarteView = () => {
   const [ville, setVille] = useState<IVille>(emptyIVille());
   const [villes, setVilles] = useState<IVille[]>([]);
   const [isHovered, setIsHovered] = useState(false);
+  const { panier, setPanier, addCircuitToPanier } = usePanier();
   const [loading, setLoading] = useState<boolean>(true);
   const screenSize = useScreenSize();
   const [loadingSettgins, setLoadingSettgins] = useState<boolean>(true);
   const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
   const [history, setHistory] = useState<IClientHistory[]>([]);
+
+  // Reservation form state (copied from CircuitView)
+  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
+  const [participants, setParticipants] = useState<number | null>(null);
+  const [chauffeur, setChauffeur] = useState<boolean>(false);
+
+  const isFormValid = selectedDate !== null && participants !== null && participants > 0;
+
+  const computePriceForN = (n: number) => {
+    if (!n || !ville.price) return 0;
+    const base = ville.price || 0;
+    // For 1 participant, price = base. For more: base + base*0.25*(n-1)
+    let total = n === 1 ? base : base + base * 0.25 * (n - 1);
+    // If chauffeur required, add first vehicule_tarification price if present
+    const vehPrice = (ville.vehicule_tarification && ville.vehicule_tarification[0] && ville.vehicule_tarification[0].price) || 0;
+    if (chauffeur) total += vehPrice;
+    return Math.round(total);
+  };
+
+  const vehiculePrice = (ville.vehicule_tarification && ville.vehicule_tarification[0] && ville.vehicule_tarification[0].price) || 0;
+
+  const totalPrice = useMemo(() => {
+    if (!participants) return 0;
+    return computePriceForN(participants);
+  }, [participants, ville.price, chauffeur, ville.vehicule_tarification]);
 
   const circuitCardStyles = useMemo(() => {
     if (screenSize.isMobile) {
@@ -238,7 +270,7 @@ export const CircuitCarteView = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
-      <FloatingCartButton />
+      
       {/* Header avec NavBar */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="CIRCUITS" />
@@ -428,18 +460,105 @@ export const CircuitCarteView = () => {
             />
           </Flex>
 
-          {/* Bouton de réservation */}
-          <Flex
-            justify="center"
-            style={{ padding: screenSize.isMobile ? "20px 0" : "0" }}
-          >
-            <Link to="/reservations-circuits">
+          {/* Formulaire de réservation (inspiré de CircuitView) */}
+          <Flex vertical style={{ ...{ backgroundColor: "#f8f9fa", border: "1px solid #e0e0e0", borderRadius: "12px", padding: screenSize.isMobile ? "20px" : "30px", marginBottom: screenSize.isMobile ? "20px" : "30px", position: "relative" }, width: "100%" }}>
+            <Typography.Title
+              level={3}
+              style={{
+                fontSize: screenSize.isMobile ? "20px" : "24px",
+                fontFamily: "GeneralSans",
+                fontWeight: "600",
+                color: "#BF2500",
+                marginBottom: screenSize.isMobile ? "15px" : "20px",
+                borderLeft: "4px solid #BF2500",
+                paddingLeft: "15px",
+              }}
+            >
+              Réserver cette offre
+            </Typography.Title>
+
+            <Flex vertical={screenSize.isMobile} gap={screenSize.isMobile ? 15 : 20}>
+              {/* Date */}
+              <Flex vertical style={{ flex: 1 }}>
+                <Typography.Text style={{ fontSize: screenSize.isMobile ? "14px" : "16px", fontFamily: "GeneralSans", fontWeight: "500", color: "#311715", marginBottom: "8px" }}>
+                  Date:
+                </Typography.Text>
+                <DatePicker
+                  value={selectedDate}
+                  onChange={(date) => setSelectedDate(date)}
+                  format="DD/MM/YYYY"
+                  placeholder="Sélectionnez une date"
+                  suffixIcon={<CalendarOutlined style={{ color: "#BF2500" }} />}
+                  style={{ width: "100%", height: screenSize.isMobile ? "45px" : "50px", borderRadius: "8px", fontSize: screenSize.isMobile ? "14px" : "16px", fontFamily: "GeneralSans" }}
+                  size="large"
+                  disabledDate={(current) => {
+                    return current && current < dayjs().startOf("day");
+                  }}
+                />
+              </Flex>
+
+              {/* Participants */}
+              <Flex vertical style={{ flex: 1 }}>
+                <Typography.Text style={{ fontSize: screenSize.isMobile ? "14px" : "16px", fontFamily: "GeneralSans", fontWeight: "500", color: "#311715", marginBottom: "8px" }}>
+                  Nombre de participants:
+                </Typography.Text>
+                <Select
+                  value={participants}
+                  onChange={(value) => setParticipants(value)}
+                  style={{ width: "100%", height: screenSize.isMobile ? "45px" : "50px", borderRadius: "8px", fontSize: screenSize.isMobile ? "14px" : "16px", fontFamily: "GeneralSans" }}
+                  size="large"
+                  placeholder="Sélectionnez le nombre"
+                  suffixIcon={<UserOutlined style={{ color: "#BF2500" }} />}
+                >
+                  {[...Array(5)].map((_, i) => {
+                    const n = i + 1;
+                    const priceForN = computePriceForN(n);
+                    const perPerson = n > 0 ? Math.round(priceForN / n) : 0;
+                    return (
+                      <Select.Option key={n} value={n}>
+                        {n} {n === 1 ? "participant" : "participants"} — {priceForN.toLocaleString("fr-FR")} CFA — ({perPerson.toLocaleString("fr-FR")} / pers.)
+                      </Select.Option>
+                    );
+                  })}
+                </Select>
+
+                <div className="mt-3 flex items-center justify-between">
+                  <div>
+                    <Typography.Text style={{ fontSize: "14px", color: "#311715", marginRight: "8px" }}>
+                      Avec transport (véhicule, chauffeur, carburant)
+                    </Typography.Text>
+                    {vehiculePrice > 0 && (
+                      <Typography.Text style={{ fontSize: "13px", color: "#666", display: "block", marginTop: "4px" }}>
+                        Prix véhicule: {vehiculePrice.toLocaleString("fr-FR")} CFA
+                      </Typography.Text>
+                    )}
+                  </div>
+                  <Switch checked={chauffeur} onChange={(val) => setChauffeur(val)} />
+                </div>
+              </Flex>
+            </Flex>
+
+            {/* Prix total */}
+            {participants && participants > 0 && (
+              <Flex justify="space-between" align="center" style={{ marginTop: "20px", padding: "15px 20px", backgroundColor: "#fff3e0", borderRadius: "8px", border: "2px solid #F59F00" }}>
+                <Typography.Text style={{ fontSize: screenSize.isMobile ? "16px" : "18px", fontFamily: "GeneralSans", fontWeight: "600", color: "#311715" }}>
+                  Prix total:
+                </Typography.Text>
+                <Typography.Text style={{ fontSize: screenSize.isMobile ? "20px" : "24px", fontFamily: "GeneralSans", fontWeight: "700", color: "#BF2500" }}>
+                  {totalPrice.toLocaleString("fr-FR")} CFA
+                </Typography.Text>
+              </Flex>
+            )}
+
+            {/* Bouton réserver */}
+            <Flex justify="center" style={{ marginTop: "25px" }}>
               <Button
                 type="primary"
                 size="large"
+                disabled={!isFormValid}
                 style={{
-                  backgroundColor: isHovered ? "#ff3100" : "#F59F00",
-                  color: isHovered ? "white" : "black",
+                  backgroundColor: !isFormValid ? "#d9d9d9" : isHovered ? "#ff3100" : "#F59F00",
+                  color: !isFormValid ? "#999" : isHovered ? "white" : "black",
                   borderRadius: "25px",
                   border: "none",
                   fontFamily: "GeneralSans",
@@ -448,13 +567,48 @@ export const CircuitCarteView = () => {
                   fontWeight: "200",
                   padding: screenSize.isMobile ? "8px 24px" : "12px 32px",
                   height: "auto",
+                  width: screenSize.isMobile ? "100%" : "auto",
+                  minWidth: "200px",
+                  cursor: !isFormValid ? "not-allowed" : "pointer",
+                  opacity: !isFormValid ? 0.6 : 1,
                 }}
-                onMouseEnter={() => setIsHovered(true)}
+                onMouseEnter={() => isFormValid && setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
+                onClick={() => {
+                  // handle reservation similar to CircuitView
+                  if (!isFormValid) return;
+
+                  const circuitReservationInfos: PanierCircuitInfos = {
+                    _id: v4(),
+                    circuit_type: "carte",
+                    circuit_id: ville._id,
+                    price: totalPrice,
+                    date: selectedDate!.toDate(),
+                    participants: participants!,
+                    villes: [],
+                    chauffeur: chauffeur,
+                  };
+
+                  addCircuitToPanier(circuitReservationInfos);
+
+                  // persist backend only when user is logged in
+                  const toSend = addCircuit(panier, circuitReservationInfos);
+                  const userId = (ClientsAPI.GetUser()?._id as string) || "";
+                  if (userId) {
+                    PaniersAPI.Add(toSend, userId)
+                      .then((data) => {
+                        console.log("Panier updated with circuit a la carte", data);
+                        setPanier(data);
+                      })
+                      .catch((err) => {
+                        console.error("Error updating panier with circuit a la carte", err);
+                      });
+                  }
+                }}
               >
                 RÉSERVER
               </Button>
-            </Link>
+            </Flex>
           </Flex>
 
           {/* Section Inclus/Non Inclus */}

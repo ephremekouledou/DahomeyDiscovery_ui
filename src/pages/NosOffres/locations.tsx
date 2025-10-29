@@ -36,7 +36,7 @@ import { ICarRentalData } from "../../sdk/models/vehicules";
 import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
 import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { PageSettings } from "../../sdk/api/pageMedias";
-import FloatingCartButton from "../../components/dededed/PanierButton";
+
 // import { useScreenSizeResponsive } from "../../components/CircuitView/Timeline";
 
 const ServicesSection = () => {
@@ -853,7 +853,7 @@ const Locations = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
-      <FloatingCartButton />
+      
       {/* Header avec NavBar */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="LOCATION" />

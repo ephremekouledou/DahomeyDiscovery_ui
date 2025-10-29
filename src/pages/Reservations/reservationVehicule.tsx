@@ -14,7 +14,7 @@ import { useTransaction } from "../../context/transactionContext";
 import Footer from "../../components/footer/footer";
 import NavBar from "../../components/navBar/navBar";
 import BeginningButton from "../../components/dededed/BeginingButton";
-import FloatingCartButton from "../../components/dededed/PanierButton";
+
 
 const { Title } = Typography;
 
@@ -316,7 +316,7 @@ const ReservationVehicule = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
-      <FloatingCartButton />
+      
       {/* Header avec NavBar */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="" />

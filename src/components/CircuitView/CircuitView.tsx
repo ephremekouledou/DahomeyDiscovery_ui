@@ -28,7 +28,7 @@ import { CalendarOutlined, UserOutlined } from "@ant-design/icons";
 import { addCircuit, PanierCircuitInfos } from "../../sdk/models/panier";
 import PaniersAPI from "../../sdk/api/panier";
 import { v4 } from "uuid";
-import FloatingCartButton from "../dededed/PanierButton";
+
 
 interface CircuitCardOtherProps {
   circuit: ICircuitPresenter;
@@ -779,7 +779,7 @@ export const CircuitView = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
-      <FloatingCartButton />
+      
       {/* Header avec NavBar */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="CIRCUITS" />
@@ -1057,7 +1057,7 @@ export const CircuitView = () => {
                   placeholder="Sélectionnez le nombre"
                   suffixIcon={<UserOutlined style={{ color: "#BF2500" }} />}
                 >
-                  {[...Array(6)].map((_, i) => (
+                  {[...Array(5)].map((_, i) => (
                     <Select.Option key={i + 1} value={i + 1}>
                       {i + 1} {i === 0 ? "participant" : "participants"}
                     </Select.Option>

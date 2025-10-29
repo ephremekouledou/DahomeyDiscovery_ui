@@ -26,7 +26,7 @@ import { IClient } from "../../sdk/models/clients";
 import BeginningButton from "../../components/dededed/BeginingButton";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
-import FloatingCartButton from "../../components/dededed/PanierButton";
+
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -621,7 +621,7 @@ const ReservationCircuit = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
-      <FloatingCartButton />
+      
       {/* Header avec NavBar */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="" />

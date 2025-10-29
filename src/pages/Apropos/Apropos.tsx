@@ -11,7 +11,7 @@ import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { useScreenSizeResponsive } from "../../components/CircuitView/Timeline";
 import { PageSettings } from "../../sdk/api/pageMedias";
 import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
-import FloatingCartButton from "../../components/dededed/PanierButton";
+
 
 const { Content } = Layout;
 const { Title, Paragraph } = Typography;
@@ -43,7 +43,7 @@ const Apropos = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
-      <FloatingCartButton />
+      
       {/* Navigation */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="A PROPOS" />

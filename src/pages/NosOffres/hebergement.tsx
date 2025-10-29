@@ -26,7 +26,7 @@ import { PageSettings } from "../../sdk/api/pageMedias";
 import CrossSelling from "../../components/dededed/crossSelling";
 import { IClientHistory } from "../../sdk/models/clients";
 import { ClientsAPI } from "../../sdk/api/clients";
-import FloatingCartButton from "../../components/dededed/PanierButton";
+
 
 // Liste des villes disponibles
 export const CITIES = [
@@ -886,7 +886,7 @@ const Hebergements: React.FC = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
-      <FloatingCartButton />
+      
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="HÉBERGEMENT" />
       </div>

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Footer from "../../components/footer/footer";
 import { useLocation } from "react-router-dom";
 import BeginningButton from "../../components/dededed/BeginingButton";
-import FloatingCartButton from "../../components/dededed/PanierButton";
+
 
 function Actualites() {
   const { pathname } = useLocation();
@@ -18,7 +18,7 @@ function Actualites() {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
-      <FloatingCartButton />
+      
       {/* Navigation */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="ACTUALITES" />

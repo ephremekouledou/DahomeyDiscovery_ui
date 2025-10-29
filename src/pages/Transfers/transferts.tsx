@@ -29,7 +29,9 @@ import {
 } from "../../sdk/models/panier";
 import PaniersAPI from "../../sdk/api/panier";
 import { v4 } from "uuid";
-import FloatingCartButton from "../../components/dededed/PanierButton";
+import CrossSelling from "../../components/dededed/crossSelling";
+import { IClientHistory } from "../../sdk/models/clients";
+
 // no UI lock icon needed when anonymous booking is allowed
 
 const Transferts: React.FC = () => {
@@ -52,9 +54,21 @@ const Transferts: React.FC = () => {
   const [settings, setSettings] = useState<IPageMedia>(emptyIPageMedia());
   // We don't require a logged-in user to fill the form or confirm a transfer.
   const { panier, addTransferToPanier } = usePanier();
+  const [history, setHistory] = useState<IClientHistory[]>([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    ClientsAPI.ListClientHistory(ClientsAPI.GetClientHistoryLocal())
+      .then((data) => {
+        setHistory(data.history);
+        console.log("History fetched", data.history);
+      })
+      .catch((err) => {
+        console.error("History added not added", err);
+      });
   }, []);
 
   // backend persistence will be guarded at the moment of saving (ClientsAPI.GetUser())
@@ -202,7 +216,7 @@ const Transferts: React.FC = () => {
     return (
       <Flex justify="center" vertical>
         <BeginningButton />
-        <FloatingCartButton />
+
         {/* Header avec NavBar */}
         <div className="relative z-20 flex items-center justify-center">
           <NavBar menu="TRANSFERT" />
@@ -361,7 +375,7 @@ const Transferts: React.FC = () => {
     return (
       <Flex justify="center" vertical>
         <BeginningButton />
-        <FloatingCartButton />
+
         {/* Header avec NavBar */}
         <div className="relative z-20 flex items-center justify-center">
           <NavBar menu="TRANSFERT" />
@@ -584,7 +598,7 @@ const Transferts: React.FC = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
-      <FloatingCartButton />
+
       {/* Header avec NavBar */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="TRANSFERT" />
@@ -1028,6 +1042,10 @@ const Transferts: React.FC = () => {
             Contactez-nous
           </Button>
         </Flex>
+      </Flex>
+
+      <Flex>
+        <CrossSelling history={history} maxItems={5} />
       </Flex>
 
       {/* Footer */}

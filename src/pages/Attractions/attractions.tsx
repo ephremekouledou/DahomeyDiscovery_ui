@@ -10,7 +10,7 @@ import { IAttraction } from "../../sdk/models/attraction";
 import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
 import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { PageSettings } from "../../sdk/api/pageMedias";
-import FloatingCartButton from "../../components/dededed/PanierButton";
+
 
 interface Category {
   id: string;
@@ -143,7 +143,7 @@ const Attractions = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
-      <FloatingCartButton />
+      
       {/* Header avec NavBar */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="ATTRACTION" />

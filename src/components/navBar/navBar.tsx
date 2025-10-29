@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import "./navBar.css";
 import logo from "/images/Logo/logo-belge.png";
-import menuVector from "../../assets../../assets/icons/menuVector.png";
-import { Button, Flex, Drawer, Dropdown, Avatar } from "antd";
+import menuVector from "../../assets/icons/menuVector.png";
+import { Button, Flex, Drawer, Dropdown, Avatar, Badge } from "antd";
 import { useState, useEffect } from "react";
 import {
   MenuOutlined,
@@ -10,8 +10,11 @@ import {
   DownOutlined,
   UserOutlined,
   LogoutOutlined,
+  ShoppingCartOutlined,
 } from "@ant-design/icons";
 import { ClientsAPI } from "../../sdk/api/clients";
+import { usePanier } from "../../context/panierContext";
+import PaniersAPI from "../../sdk/api/panier";
 
 type SubMenuItem = {
   key: string;
@@ -37,6 +40,7 @@ interface IClient {
   first_name: string;
   last_name: string;
   phone?: string;
+  _id?: string;
 }
 
 const NavBar: React.FC<NavBarProps> = ({ menu }) => {
@@ -45,13 +49,14 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [isTablet, setIsTablet] = useState<boolean>(false);
   const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
-  const [isHovered, setIsHovered] = useState(false);
   const [isLoginHovered, setIsLoginHovered] = useState(false);
   const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>(
     null
   );
   const [scrolled, setScrolled] = useState<boolean>(false);
   const [user, setUser] = useState<IClient | null>(null);
+  const [cartItemCount, setCartItemCount] = useState(0);
+  const { panier, setPanier } = usePanier();
 
   // Enhanced responsive breakpoints
   useEffect(() => {
@@ -83,6 +88,54 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
     setUser(loggedUser);
   }, []);
 
+  // Fetch panier when user is logged in
+  useEffect(() => {
+    if (user != null) {
+      PaniersAPI.GetActuelCustomer(user._id as string)
+        .then((data) => {
+          setPanier(data);
+        })
+        .catch((err) => {
+          console.error("Error fetching current panier", err);
+        });
+    }
+  }, [user, setPanier]);
+
+  // Calculate cart item count
+  useEffect(() => {
+    const getCartItemCount = () => {
+      if (!panier) {
+        setCartItemCount(0);
+        return;
+      }
+
+      const attractionsCount = panier.attractions
+        ? panier.attractions.length
+        : 0;
+      const vehiculesCount = panier.vehicules ? panier.vehicules.length : 0;
+      const hebergementsCount = panier.hebergements
+        ? panier.hebergements.length
+        : 0;
+      const circuitsCount = panier.circuits ? panier.circuits.length : 0;
+      const transfersCount = panier.transfers ? panier.transfers.length : 0;
+
+      let count =
+        attractionsCount +
+        vehiculesCount +
+        hebergementsCount +
+        circuitsCount +
+        transfersCount;
+
+      if (panier.catalogue) {
+        count += 1;
+      }
+
+      setCartItemCount(count);
+    };
+
+    getCartItemCount();
+  }, [panier]);
+
   const handleMenuClick = (menuItem: string) => {
     setMenuSelected(menuItem);
     setDrawerVisible(false);
@@ -93,7 +146,7 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("user"); // Ajustez la clé selon votre implémentation
+    localStorage.removeItem("user");
     setUser(null);
     window.location.href = "/";
   };
@@ -211,7 +264,10 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
   // Get user initials for avatar
   const getUserInitials = () => {
     if (!user) return "";
-    return `${user.first_name.charAt(0)}`.toUpperCase() + `${user.last_name.charAt(0)}`.toUpperCase();
+    return (
+      `${user.first_name.charAt(0)}`.toUpperCase() +
+      `${user.last_name.charAt(0)}`.toUpperCase()
+    );
   };
 
   const renderDesktopNavItem = (item: NavItem) => {
@@ -568,27 +624,6 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
               SE CONNECTER
             </Button>
           </Link>
-
-          <Link to="/reserver" style={{ width: "100%" }}>
-            <Button
-              type="primary"
-              size="large"
-              block
-              style={{
-                backgroundColor: "#F59F00",
-                color: "black",
-                borderRadius: "25px",
-                border: "none",
-                height: isMobile ? "48px" : "50px",
-                fontSize: isMobile ? "15px" : "16px",
-                fontWeight: "600",
-                fontFamily: "GeneralSans",
-              }}
-              onClick={() => setDrawerVisible(false)}
-            >
-              RÉSERVER
-            </Button>
-          </Link>
         </Flex>
       )}
     </Drawer>
@@ -683,7 +718,7 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
                     </Link>
                   </Flex>
 
-                  {/* First part of nav items */}
+                  {/* Nav items and action buttons */}
                   <Flex
                     align="center"
                     gap={isTablet ? "8px" : "16px"}
@@ -692,187 +727,151 @@ const NavBar: React.FC<NavBarProps> = ({ menu }) => {
                   >
                     {navItems.map((item) => renderDesktopNavItem(item))}
 
+                    {/* Cart Button - Always visible */}
+                    <Link to="/reserver">
+                      <Badge count={cartItemCount} overflowCount={99}>
+                        <Button
+                          type="text"
+                          icon={<ShoppingCartOutlined />}
+                          style={{
+                            fontSize: isTablet ? "20px" : "22px",
+                            color: cartItemCount > 0 ? "#F59F00" : "black",
+                            transition: "all 0.3s ease",
+                            width: isTablet ? "36px" : "40px",
+                            height: isTablet ? "36px" : "40px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        />
+                      </Badge>
+                    </Link>
+
                     {user ? (
-                      // User is logged in - show avatar with dropdown and reserve button
-                      <>
-                        <Dropdown
-                          menu={{ items: userMenuItems }}
-                          trigger={["hover"]}
-                          placement="bottomRight"
-                          overlayStyle={{
-                            paddingTop: "8px",
-                            minWidth: "180px",
+                      // User is logged in - show avatar with dropdown
+                      <Dropdown
+                        menu={{ items: userMenuItems }}
+                        trigger={["hover"]}
+                        placement="bottomRight"
+                        overlayStyle={{
+                          paddingTop: "8px",
+                          minWidth: "180px",
+                        }}
+                      >
+                        <Avatar
+                          style={{
+                            backgroundColor: "#fff",
+                            borderColor: "#F59F00",
+                            border: "2px solid",
+                            color: "black",
+                            cursor: "pointer",
+                            fontFamily: "GeneralSans",
+                            fontWeight: "600",
+                            fontSize: isTablet ? "14px" : "16px",
+                            width: isTablet
+                              ? scrolled
+                                ? "36px"
+                                : "40px"
+                              : scrolled
+                              ? "40px"
+                              : "44px",
+                            height: isTablet
+                              ? scrolled
+                                ? "36px"
+                                : "40px"
+                              : scrolled
+                              ? "40px"
+                              : "44px",
+                            transition: "all 0.3s ease",
                           }}
                         >
-                          <Avatar
-                            style={{
-                              backgroundColor: "#fff",
-                              borderColor: "#F59F00",
-                              color: "black",
-                              cursor: "pointer",
-                              fontFamily: "GeneralSans",
-                              fontWeight: "600",
-                              fontSize: isTablet ? "14px" : "16px",
-                              width: isTablet
-                                ? scrolled
-                                  ? "36px"
-                                  : "40px"
-                                : scrolled
-                                ? "40px"
-                                : "44px",
-                              height: isTablet
-                                ? scrolled
-                                  ? "36px"
-                                  : "40px"
-                                : scrolled
-                                ? "40px"
-                                : "44px",
-                              transition: "all 0.3s ease",
-                            }}
-                          >
-                            {getUserInitials()}
-                          </Avatar>
-                        </Dropdown>
-
-                        <Link to="/reservations-circuits">
-                          <Button
-                            type="primary"
-                            size={scrolled ? "middle" : "large"}
-                            style={{
-                              backgroundColor: isHovered
-                                ? "#ff3100"
-                                : "#F59F00",
-                              color: isHovered ? "white" : "black",
-                              borderRadius: "25px",
-                              border: "none",
-                              fontFamily: "GeneralSans",
-                              transition: "all 0.3s ease",
-                              fontSize: isTablet
-                                ? "13px"
-                                : getResponsiveFontSize(14),
-                              height: isTablet
-                                ? scrolled
-                                  ? "32px"
-                                  : "36px"
-                                : scrolled
-                                ? "36px"
-                                : "40px",
-                              padding: isTablet
-                                ? "0 12px"
-                                : scrolled
-                                ? "0 16px"
-                                : "0 20px",
-                              fontWeight: "600",
-                              whiteSpace: "nowrap",
-                            }}
-                            onMouseEnter={() => setIsHovered(true)}
-                            onMouseLeave={() => setIsHovered(false)}
-                          >
-                            RÉSERVER
-                          </Button>
-                        </Link>
-                      </>
+                          {getUserInitials()}
+                        </Avatar>
+                      </Dropdown>
                     ) : (
-                      // User is not logged in - show login and reserve buttons
-                      <>
-                        <Link to="/login">
-                          <Button
-                            type="default"
-                            size={scrolled ? "middle" : "large"}
-                            style={{
-                              backgroundColor: isLoginHovered
-                                ? "#F59F00"
-                                : "transparent",
-                              color: isLoginHovered ? "black" : "black",
-                              borderRadius: "25px",
-                              border: "2px solid #F59F00",
-                              fontFamily: "GeneralSans",
-                              transition: "all 0.3s ease",
-                              fontSize: isTablet
-                                ? "12px"
-                                : getResponsiveFontSize(13),
-                              height: isTablet
-                                ? scrolled
-                                  ? "32px"
-                                  : "36px"
-                                : scrolled
-                                ? "36px"
-                                : "40px",
-                              padding: isTablet
-                                ? "0 10px"
-                                : scrolled
-                                ? "0 14px"
-                                : "0 16px",
-                              fontWeight: "600",
-                              whiteSpace: "nowrap",
-                            }}
-                            onMouseEnter={() => setIsLoginHovered(true)}
-                            onMouseLeave={() => setIsLoginHovered(false)}
-                          >
-                            SE CONNECTER
-                          </Button>
-                        </Link>
-
-                        <Link to="/reservations-circuits">
-                          <Button
-                            type="primary"
-                            size={scrolled ? "middle" : "large"}
-                            style={{
-                              backgroundColor: isHovered
-                                ? "#ff3100"
-                                : "#F59F00",
-                              color: isHovered ? "white" : "black",
-                              borderRadius: "25px",
-                              border: "none",
-                              fontFamily: "GeneralSans",
-                              transition: "all 0.3s ease",
-                              fontSize: isTablet
-                                ? "13px"
-                                : getResponsiveFontSize(14),
-                              height: isTablet
-                                ? scrolled
-                                  ? "32px"
-                                  : "36px"
-                                : scrolled
-                                ? "36px"
-                                : "40px",
-                              padding: isTablet
-                                ? "0 12px"
-                                : scrolled
-                                ? "0 16px"
-                                : "0 20px",
-                              fontWeight: "600",
-                              whiteSpace: "nowrap",
-                            }}
-                            onMouseEnter={() => setIsHovered(true)}
-                            onMouseLeave={() => setIsHovered(false)}
-                          >
-                            RÉSERVER
-                          </Button>
-                        </Link>
-                      </>
+                      // User is not logged in - show login button
+                      <Link to="/login">
+                        <Button
+                          type="default"
+                          size={scrolled ? "middle" : "large"}
+                          style={{
+                            backgroundColor: isLoginHovered
+                              ? "#F59F00"
+                              : "transparent",
+                            color: isLoginHovered ? "black" : "black",
+                            borderRadius: "25px",
+                            border: "2px solid #F59F00",
+                            fontFamily: "GeneralSans",
+                            transition: "all 0.3s ease",
+                            fontSize: isTablet
+                              ? "12px"
+                              : getResponsiveFontSize(13),
+                            height: isTablet
+                              ? scrolled
+                                ? "32px"
+                                : "36px"
+                              : scrolled
+                              ? "36px"
+                              : "40px",
+                            padding: isTablet
+                              ? "0 10px"
+                              : scrolled
+                              ? "0 14px"
+                              : "0 16px",
+                            fontWeight: "600",
+                            whiteSpace: "nowrap",
+                          }}
+                          onMouseEnter={() => setIsLoginHovered(true)}
+                          onMouseLeave={() => setIsLoginHovered(false)}
+                        >
+                          SE CONNECTER
+                        </Button>
+                      </Link>
                     )}
                   </Flex>
                 </>
               )}
 
-              {/* Mobile Menu Button */}
+              {/* Mobile: Cart and Menu Button */}
               {isMobile && (
-                <Button
-                  type="text"
-                  icon={<MenuOutlined />}
-                  onClick={() => setDrawerVisible(true)}
-                  style={{
-                    fontSize: "18px",
-                    padding: "8px",
-                    height: "40px",
-                    width: "40px",
-                    color: "black",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                />
+                <Flex align="center" gap="8px">
+                  {/* Cart Button */}
+                  <Link to="/reserver">
+                    <Badge count={cartItemCount} overflowCount={99}>
+                      <Button
+                        type="text"
+                        icon={<ShoppingCartOutlined />}
+                        style={{
+                          fontSize: "20px",
+                          color: cartItemCount > 0 ? "#F59F00" : "black",
+                          padding: "8px",
+                          height: "40px",
+                          width: "40px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      />
+                    </Badge>
+                  </Link>
+
+                  {/* Menu Button */}
+                  <Button
+                    type="text"
+                    icon={<MenuOutlined />}
+                    onClick={() => setDrawerVisible(true)}
+                    style={{
+                      fontSize: "18px",
+                      padding: "8px",
+                      height: "40px",
+                      width: "40px",
+                      color: "black",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  />
+                </Flex>
               )}
             </Flex>
           </nav>

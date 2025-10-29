@@ -16,6 +16,7 @@ import {
   PanierHebergementInfos,
   PanierTransferInfos,
 } from "../sdk/models/panier";
+import { message } from "antd";
 
 interface PanierContextType {
   panier: Panier;
@@ -34,25 +35,46 @@ const PanierContext = createContext<PanierContextType | undefined>(undefined);
 
 export const PanierProvider = ({ children }: { children: ReactNode }) => {
   const [panier, setPanier] = useState<Panier>(emptyPanier());
+  const [messageApi, contextHolder] = message.useMessage();
 
   const addCircuitToPanier = (c: PanierCircuitInfos) => {
     setPanier((prev) => addCircuit(prev ?? emptyPanier(), c));
+    messageApi.open({
+      type: "success",
+      content: "Ce circuit a été ajouté à votre panier.",
+    });
   };
 
   const addAttractionToPanier = (a: PanierAttractionInfos) => {
     setPanier((prev) => addAttraction(prev ?? emptyPanier(), a));
+    messageApi.open({
+      type: "success",
+      content: "Cette attraction a été ajouté à votre panier.",
+    });
   };
 
   const addVehiculeToPanier = (v: PanierVehiculeInfos) => {
     setPanier((prev) => addVehicule(prev ?? emptyPanier(), v));
+    messageApi.open({
+      type: "success",
+      content: "Cette voiture a été ajouté à votre panier.",
+    });
   };
 
   const addHebergementToPanier = (h: PanierHebergementInfos) => {
     setPanier((prev) => addHebergement(prev ?? emptyPanier(), h));
+    messageApi.open({
+      type: "success",
+      content: "Cette hébergement a été ajouté à votre panier.",
+    });
   };
 
   const addTransferToPanier = (t: PanierTransferInfos) => {
     setPanier((prev) => addTransfer(prev ?? emptyPanier(), t));
+    messageApi.open({
+      type: "success",
+      content: "Ce transfert a été ajouté à votre panier.",
+    });
   };
 
   const removeItemFromPanier = (id: string) => {
@@ -61,6 +83,10 @@ export const PanierProvider = ({ children }: { children: ReactNode }) => {
 
   const setCatalogueTrueInPanier = () => {
     setPanier((prev) => setCatalogueTrue(prev ?? emptyPanier()));
+    messageApi.open({
+      type: "success",
+      content: "Le catalogue des restaurants a été ajouté à votre panier.",
+    });
   };
 
   const setCatalogueFalseInPanier = () => {
@@ -82,6 +108,7 @@ export const PanierProvider = ({ children }: { children: ReactNode }) => {
         setCatalogueFalseInPanier,
       }}
     >
+      {contextHolder}
       {children}
     </PanierContext.Provider>
   );

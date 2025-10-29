@@ -164,10 +164,16 @@ const PanierViewer: React.FC<PanierViewerProps> = ({
       const createdUser = await ClientsAPI.SignUponReservation(clientBody);
       console.log("Client added", createdUser);
 
-      const updatedPanier = await PaniersAPI.Add(panierCtx ?? emptyPanier(), createdUser._id);
+      const updatedPanier = await PaniersAPI.Add(
+        panierCtx ?? emptyPanier(),
+        createdUser._id
+      );
       console.log("Panier updated with user", updatedPanier);
 
-      const panierId = updatedPanier && (updatedPanier as any)._id ? (updatedPanier as any)._id : getPanierId();
+      const panierId =
+        updatedPanier && (updatedPanier as any)._id
+          ? (updatedPanier as any)._id
+          : getPanierId();
       await handlePayAll(email, firstName, lastName, panierId);
     } catch (err) {
       console.error("Error during guest checkout:", err);
@@ -197,6 +203,22 @@ const PanierViewer: React.FC<PanierViewerProps> = ({
     panier.circuits?.forEach((c) => (total += c.price));
     panier.transfers?.forEach((t) => (total += t.price));
     return total;
+  };
+
+  const handleEmptyCart = async () => {
+    try {
+      // empty locally
+      setPanierCtx(emptyPanier());
+
+      // persist for logged in user if any
+      const userId = (ClientsAPI.GetUser()?._id as string) || "";
+      if (userId) {
+        // send empty panier to server (Add is used elsewhere to persist panier)
+        await PaniersAPI.Add(emptyPanier(), userId);
+      }
+    } catch (err) {
+      console.error("Error emptying panier:", err);
+    }
   };
 
   const isEmpty =
@@ -629,7 +651,14 @@ const PanierViewer: React.FC<PanierViewerProps> = ({
                   </div>
                 )}
 
-                <div className="flex justify-end">
+                <div className="flex items-center justify-end gap-3">
+                  <button
+                    onClick={handleEmptyCart}
+                    className="px-4 py-2 bg-red-50 text-red-700 border border-red-200 rounded-md hover:bg-red-100"
+                  >
+                    Vider le panier
+                  </button>
+
                   <button
                     onClick={handlePayClick}
                     className="px-6 py-3 bg-[#f59f00] hover:bg-[#ff3100] text-white font-semibold rounded-lg"

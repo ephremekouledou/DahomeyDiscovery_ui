@@ -23,7 +23,7 @@ import { usePanier } from "../../context/panierContext";
 import { addCircuit, PanierCircuitInfos } from "../../sdk/models/panier";
 import { v4 } from "uuid";
 import PaniersAPI from "../../sdk/api/panier";
-import FloatingCartButton from "../../components/dededed/PanierButton";
+
 
 // Optimisation: Hook personnalisé pour la détection de la taille d'écran
 const useScreenSize = () => {
@@ -265,8 +265,8 @@ const CircuitsSignature = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
-      <FloatingCartButton />
-      <FloatingCartButton />
+      
+      
       {/* Header avec NavBar */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="CIRCUITS" />
@@ -575,7 +575,7 @@ const CircuitsSignature = () => {
                 placeholder="Sélectionnez le nombre"
                 suffixIcon={<UserOutlined style={{ color: "#BF2500" }} />}
               >
-                {[...Array(6)].map((_, i) => (
+                {[...Array(5)].map((_, i) => (
                   <Select.Option key={i + 1} value={i + 1}>
                     {i + 1} {i === 0 ? "participant" : "participants"}
                   </Select.Option>

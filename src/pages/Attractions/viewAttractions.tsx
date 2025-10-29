@@ -38,7 +38,7 @@ import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { PageSettings } from "../../sdk/api/pageMedias";
 import ItemLocation, { MapItem } from "../../components/dededed/Map";
 import { CalendarOutlined } from "@ant-design/icons";
-import FloatingCartButton from "../../components/dededed/PanierButton";
+
 
 const AttractionDetailPage = () => {
   const { id } = useParams();
@@ -226,7 +226,7 @@ const AttractionDetailPage = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
-      <FloatingCartButton />
+      
       {/* Header avec NavBar */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="ATTRACTION" />
@@ -644,9 +644,9 @@ const AttractionDetailPage = () => {
                           {attraction.timeSlots.map((slot) => (
                             <button
                               key={slot._id}
-                              onClick={() => setSelectedTimeSlot(slot._id)}
+                              onClick={() => setSelectedTimeSlot(slot.time)}
                               className={`p-3 text-sm rounded-lg border transition-colors ${
-                                selectedTimeSlot === slot._id
+                                selectedTimeSlot === slot.time
                                   ? "border-blue-500 bg-blue-50 text-blue-700"
                                   : "border-gray-200 hover:border-gray-300"
                               }`}
