@@ -493,7 +493,7 @@ const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
                 const vehInfo: PanierVehiculeInfos = {
                   _id: v4(),
                   vehicule_id: car._id,
-                  price: car.price_per_day,
+                  price: totalPrice,
                   chauffeur: chauffeur,
                   date: (selectedDate || dayjs()).toDate(),
                   jour: days || 1,

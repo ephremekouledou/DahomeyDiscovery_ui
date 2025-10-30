@@ -189,16 +189,18 @@ const AttractionDetailPage = () => {
     try {
       // Build panier attraction infos and add to panier before reservation
       const tarif = getSelectedTarif();
-      const price = tarif ? tarif.price : getCurrentPrice();
+      // const price = tarif ? tarif.price : getCurrentPrice();
       const panierItem: PanierAttractionInfos = {
         _id: v4(),
         attraction_id: attraction._id,
         option_id: tarif ? tarif._id : "",
-        price: price,
+        price: totalPrice,
         date: selectedDate!.toDate(),
         time: selectedTimeSlot,
         participants: participants,
       };
+
+      console.log("Panier", panierItem)
 
       try {
         addAttractionToPanier(panierItem);

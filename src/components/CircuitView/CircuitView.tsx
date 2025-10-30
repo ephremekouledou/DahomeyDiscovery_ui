@@ -707,7 +707,7 @@ export const CircuitView = () => {
         _id: v4(),
         circuit_type: circuitInfos.type,
         circuit_id: circuitInfos._id,
-        price: circuitInfos.price,
+        price: totalPrice,
         date: selectedDate!.toDate(),
         participants: participants!,
         villes: [],
