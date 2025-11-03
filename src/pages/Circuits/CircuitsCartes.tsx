@@ -12,7 +12,7 @@ import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { PageSettings } from "../../sdk/api/pageMedias";
 import { CircuitsAPI } from "../../sdk/api/circuits";
 import { ICircuitPresenter } from "../../sdk/models/circuits";
-
+import { UsersAPI } from "../../sdk/api/User";
 
 export const HandleGetFileLink = (id: string) => {
   return FileAPI.Download("villes", id);
@@ -316,7 +316,7 @@ const CircuitsCartes = () => {
   }, []);
 
   useEffect(() => {
-    CircuitsAPI.List()
+    CircuitsAPI.List(UsersAPI.GetUser()?._id || "")
       .then((data) => {
         console.log("the circuits are:", data);
         setCircuits(data);
@@ -334,7 +334,7 @@ const CircuitsCartes = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
-      
+
       {/* Header avec NavBar */}
       <div
         className="relative z-20 flex items-center justify-center"

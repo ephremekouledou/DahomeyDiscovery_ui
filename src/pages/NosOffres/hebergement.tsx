@@ -9,7 +9,7 @@ import {
   X,
   Building,
 } from "lucide-react";
-import { Button, Flex, Typography, Drawer, Rate } from "antd";
+import { Button, Flex, Typography, Drawer, Rate, Tooltip } from "antd";
 import NavBar from "../../components/navBar/navBar";
 import { useLocation, useNavigate } from "react-router-dom";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
@@ -26,22 +26,10 @@ import { PageSettings } from "../../sdk/api/pageMedias";
 import CrossSelling from "../../components/dededed/crossSelling";
 import { IClientHistory } from "../../sdk/models/clients";
 import { ClientsAPI } from "../../sdk/api/clients";
+import { LikeAPI } from "../../sdk/api/like";
+import { UsersAPI } from "../../sdk/api/User";
 
-
-// Liste des villes disponibles
-export const CITIES = [
-  "Ouidah",
-  "Possotomè",
-  "Abomey",
-  "Porto-Novo",
-  "Dassa",
-  "Ganvie",
-  "Gogotinkpon",
-  "Grand-Popo",
-  "Cotonou",
-] as const;
-
-export type City = (typeof CITIES)[number];
+export type City = string;
 
 // Types d'hébergement disponibles
 export const ACCOMMODATION_TYPES = [
@@ -139,7 +127,7 @@ export interface AccommodationData {
   mainImage: string;
   images: string[];
   description: string;
-  ville: City;
+  ville: string;
   amenities?: AmenitiesGroup;
   options?: AccommodationOption[];
   owner: boolean;
@@ -185,10 +173,10 @@ const AccommodationCard: React.FC<AccommodationCardProps> = React.memo(
       return `${accommodation.price} FCFA`;
     }, [accommodation.options, accommodation.price]);
 
-    const getTypeLabel = useCallback((type: string): string => {
-      const typeObj = ACCOMMODATION_TYPES.find((t) => t.value === type);
-      return typeObj ? typeObj.label : type;
-    }, []);
+    // const getTypeLabel = useCallback((type: string): string => {
+    //   const typeObj = ACCOMMODATION_TYPES.find((t) => t.value === type);
+    //   return typeObj ? typeObj.label : type;
+    // }, []);
 
     const handleNavigate = useCallback(() => {
       navigate("/hebergements/" + accommodation._id);
@@ -202,6 +190,27 @@ const AccommodationCard: React.FC<AccommodationCardProps> = React.memo(
         ? HandleGetFileLink(accommodation.main_image[0].file as string)
         : "";
     }, [accommodation.main_image]);
+
+    const [liked, setLiked] = useState<boolean>(!!(accommodation as any).liked);
+    const [likeLoading, setLikeLoading] = useState<boolean>(false);
+    const user = ClientsAPI.GetUser();
+
+    const handleToggleLike = (e: any) => {
+      e.stopPropagation();
+      const newLiked = !liked;
+      setLiked(newLiked);
+      if (likeLoading) return;
+      if (!user) return;
+
+      setLikeLoading(true);
+      LikeAPI.ToggleLike({ customer_id: user._id, item_id: accommodation._id })
+        .then(() => {})
+        .catch((err) => {
+          console.error("Error toggling like:", err);
+          setLiked(!newLiked);
+        })
+        .finally(() => setLikeLoading(false));
+    };
 
     return (
       <div
@@ -218,18 +227,85 @@ const AccommodationCard: React.FC<AccommodationCardProps> = React.memo(
               className={`w-full object-cover ${isMobile ? "h-40" : "h-48"}`}
             />
           )}
-          <div className="absolute top-3 left-3 bg-white bg-opacity-90 rounded-full px-3 py-1">
+          {/* Like button */}
+          {user ? (
+            <button
+              onClick={handleToggleLike}
+              aria-label={liked ? "Retirer des favoris" : "Ajouter aux favoris"}
+              className="absolute top-3 left-3 z-30 bg-white bg-opacity-90 p-2 rounded-full shadow-md hover:scale-105 transform transition-transform"
+            >
+              {liked ? (
+                <svg
+                  className="w-5 h-5 text-red-500"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M12.001 4.529c1.349-1.535 3.516-2.07 5.334-1.174 1.514.77 2.91 2.47 2.91 5.035 0 4.656-4.43 7.83-8.244 10.61-.6.42-1.46.42-2.06 0-3.813-2.78-8.244-5.954-8.244-10.61 0-2.565 1.396-4.265 2.91-5.035 1.818-.896 3.985-.361 5.334 1.174l.06.068.06-.068z" />
+                </svg>
+              ) : (
+                <svg
+                  className="w-5 h-5 text-gray-400"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M20.8 8.6c0 4.5-4.6 7.7-8.8 10.5-.45.32-1.03.32-1.48 0C7.8 16.3 3.2 13.1 3.2 8.6 3.2 6.6 4.2 5 5.6 4c1.38-1.02 3.2-.6 4.36.64l.84.92.84-.92c1.16-1.24 2.98-1.66 4.36-.64 1.4 1 2.4 2.6 2.4 4.6z" />
+                </svg>
+              )}
+            </button>
+          ) : (
+            <Tooltip title="Connectez-vous pour aimer" placement="left">
+              <button
+                onClick={handleToggleLike}
+                aria-label={
+                  liked ? "Retirer des favoris" : "Ajouter aux favoris"
+                }
+                className="absolute top-3 left-3 z-30 bg-white bg-opacity-90 p-2 rounded-full shadow-md hover:scale-105 transform transition-transform"
+              >
+                {liked ? (
+                  <svg
+                    className="w-5 h-5 text-red-500"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M12.001 4.529c1.349-1.535 3.516-2.07 5.334-1.174 1.514.77 2.91 2.47 2.91 5.035 0 4.656-4.43 7.83-8.244 10.61-.6.42-1.46.42-2.06 0-3.813-2.78-8.244-5.954-8.244-10.61 0-2.565 1.396-4.265 2.91-5.035 1.818-.896 3.985-.361 5.334 1.174l.06.068.06-.068z" />
+                  </svg>
+                ) : (
+                  <svg
+                    className="w-5 h-5 text-gray-400"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M20.8 8.6c0 4.5-4.6 7.7-8.8 10.5-.45.32-1.03.32-1.48 0C7.8 16.3 3.2 13.1 3.2 8.6 3.2 6.6 4.2 5 5.6 4c1.38-1.02 3.2-.6 4.36.64l.84.92.84-.92c1.16-1.24 2.98-1.66 4.36-.64 1.4 1 2.4 2.6 2.4 4.6z" />
+                  </svg>
+                )}
+              </button>
+            </Tooltip>
+          )}
+
+          <div className="absolute top-3 right-3 bg-white bg-opacity-90 rounded-full px-3 py-1">
             <span className="text-xs font-semibold text-gray-700 flex items-center gap-1">
               <MapPin size={12} />
               {accommodation.ville}
             </span>
           </div>
-          <div className="absolute top-3 right-3 bg-blue-500 bg-opacity-90 rounded-full px-3 py-1">
+          {/* <div className="absolute top-3 right-3 bg-blue-500 bg-opacity-90 rounded-full px-3 py-1">
             <span className="text-xs font-semibold text-white flex items-center gap-1">
               <Building size={12} />
               {getTypeLabel(accommodation.type)}
             </span>
-          </div>
+          </div> */}
         </div>
 
         <div className={`${isMobile ? "p-3" : "p-4"}`}>
@@ -313,7 +389,7 @@ interface FilterOptions {
   selectedAmenities: string[];
   accommodationType: "all" | "owner" | "partner";
   searchTerm: string;
-  selectedCities: City[];
+  selectedCities: string[];
   selectedTypes: AccommodationType[];
 }
 
@@ -322,10 +398,11 @@ interface FilterSectionProps {
   setFilters: React.Dispatch<React.SetStateAction<FilterOptions>>;
   accommodations: IAccommodationData[];
   isMobile: boolean;
+  cities: string[];
 }
 
 const FilterSection: React.FC<FilterSectionProps> = React.memo(
-  ({ filters, setFilters, accommodations, isMobile }) => {
+  ({ filters, setFilters, accommodations, isMobile, cities }) => {
     const [openSections, setOpenSections] = useState({
       type: true,
       cities: true,
@@ -370,7 +447,7 @@ const FilterSection: React.FC<FilterSectionProps> = React.memo(
     );
 
     const handleCityToggle = useCallback(
-      (city: City) => {
+      (city: string) => {
         setFilters((prev) => {
           const newCities = prev.selectedCities.includes(city)
             ? prev.selectedCities.filter((c) => c !== city)
@@ -500,7 +577,7 @@ const FilterSection: React.FC<FilterSectionProps> = React.memo(
           </button>
           {openSections.cities && (
             <div className="space-y-2 max-h-60 overflow-y-auto">
-              {CITIES.map((city) => (
+              {cities.map((city: string) => (
                 <label key={`city-${city}`} className="flex items-center">
                   <input
                     type="checkbox"
@@ -656,6 +733,7 @@ FilterSection.displayName = "FilterSection";
 
 const Hebergements: React.FC = () => {
   const [hebergements, setHebergements] = useState<IAccommodationData[]>([]);
+  const [cities, setCities] = useState<string[]>([]);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [isTablet, setIsTablet] = useState<boolean>(false);
   const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
@@ -714,7 +792,7 @@ const Hebergements: React.FC = () => {
       }
 
       if (filters.selectedCities.length > 0) {
-        if (!filters.selectedCities.includes(accommodation.ville as City)) {
+        if (!filters.selectedCities.includes(accommodation.ville)) {
           return false;
         }
       }
@@ -794,12 +872,23 @@ const Hebergements: React.FC = () => {
       try {
         const [villesData, hebergementsData] = await Promise.all([
           VillesAPI.List(),
-          HebergementsAPI.List(),
+          HebergementsAPI.List(UsersAPI.GetUser()?._id || ""),
         ]);
 
         const villesMap = new Map(
           villesData.map((ville) => [ville._id, ville.name])
         );
+
+        // build unique sorted city name list for filters
+        const names = villesData
+          .map((v) => v.name)
+          .filter((n) => !!n)
+          .reduce<string[]>((acc, name) => {
+            if (!acc.includes(name)) acc.push(name);
+            return acc;
+          }, []);
+        names.sort();
+        setCities(names);
 
         const mappedHebergements = hebergementsData.map((hebergement) => ({
           ...hebergement,
@@ -886,7 +975,7 @@ const Hebergements: React.FC = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
-      
+
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="HÉBERGEMENT" />
       </div>
@@ -999,6 +1088,7 @@ const Hebergements: React.FC = () => {
                 setFilters={setFilters}
                 accommodations={hebergements}
                 isMobile={false}
+                cities={cities}
               />
             </div>
           </div>
@@ -1017,6 +1107,7 @@ const Hebergements: React.FC = () => {
             setFilters={setFilters}
             accommodations={hebergements}
             isMobile={true}
+            cities={cities}
           />
         </Drawer>
 

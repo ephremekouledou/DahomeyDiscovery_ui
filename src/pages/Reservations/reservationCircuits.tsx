@@ -26,6 +26,7 @@ import { IClient } from "../../sdk/models/clients";
 import BeginningButton from "../../components/dededed/BeginingButton";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
+import { UsersAPI } from "../../sdk/api/User";
 
 
 const { Title } = Typography;
@@ -101,7 +102,7 @@ const ReservationCircuit = () => {
 
   // On recupere les circuits disponibles
   useEffect(() => {
-    CircuitsAPI.List()
+    CircuitsAPI.List(UsersAPI.GetUser()?._id || "")
       .then((data) => {
         console.log("the circuits are:", data);
         setCircuits(data);

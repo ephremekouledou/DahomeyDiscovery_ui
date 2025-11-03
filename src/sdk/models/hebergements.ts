@@ -277,6 +277,7 @@ export interface IAccommodationData extends IDefault, IAccommodationEquipment {
   owner: boolean;
   latitude: number;
   longitude: number;
+  liked: boolean;
 }
 
 // Fonction helper pour créer un objet vide d'équipements
@@ -459,6 +460,7 @@ export const emptyIAccommodationData = (): IAccommodationData => ({
   latitude: 0,
   longitude: 0,
   has_options: false,
+  liked: false,
   ...emptyIAccommodationEquipment(),
 });
 

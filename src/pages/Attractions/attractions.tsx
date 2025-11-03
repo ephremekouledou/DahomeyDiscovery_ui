@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Search, MapPin, Star, Clock } from "lucide-react";
-import { Flex, Typography } from "antd";
+import { Flex, Typography, Tooltip } from "antd";
 import BeginningButton from "../../components/dededed/BeginingButton";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
@@ -8,9 +8,11 @@ import { useNavigate } from "react-router-dom";
 import { AttractionsAPI } from "../../sdk/api/attraction";
 import { IAttraction } from "../../sdk/models/attraction";
 import { HandleGetFileLink } from "../Circuits/CircuitsCartes";
+import { ClientsAPI } from "../../sdk/api/clients";
+import { LikeAPI } from "../../sdk/api/like";
 import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { PageSettings } from "../../sdk/api/pageMedias";
-
+import { UsersAPI } from "../../sdk/api/User";
 
 interface Category {
   id: string;
@@ -96,7 +98,7 @@ const Attractions = () => {
   }, []);
 
   useEffect(() => {
-    AttractionsAPI.List()
+    AttractionsAPI.List(UsersAPI.GetUser()?._id || "")
       .then((data) => {
         console.log("the attractions are:", data);
         setAttractions(data);
@@ -140,10 +142,168 @@ const Attractions = () => {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
+  // Card component for each attraction (manages its own liked state)
+  const AttractionCard: React.FC<{ attraction: IAttraction }> = ({
+    attraction,
+  }) => {
+    const navigateLocal = useNavigate();
+    const [liked, setLiked] = useState<boolean>(!!(attraction as any).liked);
+    const [likeLoading, setLikeLoading] = useState<boolean>(false);
+    const user = ClientsAPI.GetUser();
+
+    const handleToggleLike = (e: any) => {
+      e.stopPropagation();
+      const newLiked = !liked;
+      setLiked(newLiked);
+      if (likeLoading) return;
+      if (!user) return; // tooltip informs to connect
+
+      setLikeLoading(true);
+      LikeAPI.ToggleLike({ customer_id: user._id, item_id: attraction._id })
+        .then(() => {
+          // no-op, optimistic UI already updated
+        })
+        .catch((err) => {
+          console.error("Error toggling like:", err);
+          setLiked(!newLiked); // revert
+        })
+        .finally(() => setLikeLoading(false));
+    };
+
+    return (
+      <div
+        onClick={() => navigateLocal(`/attractions/${attraction._id}`)}
+        className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer transform hover:scale-105"
+      >
+        <div className="relative overflow-hidden">
+          <img
+            src={HandleGetFileLink(attraction.images[0].file as string)}
+            alt={attraction.title}
+            className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+          />
+
+          {/* Like button */}
+          {user ? (
+            <button
+              onClick={handleToggleLike}
+              aria-label={liked ? "Retirer des favoris" : "Ajouter aux favoris"}
+              className="absolute top-3 left-3 z-30 bg-white bg-opacity-90 p-2 rounded-full shadow-md hover:scale-105 transform transition-transform"
+            >
+              {liked ? (
+                <svg
+                  className="w-5 h-5 text-red-500"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M12.001 4.529c1.349-1.535 3.516-2.07 5.334-1.174 1.514.77 2.91 2.47 2.91 5.035 0 4.656-4.43 7.83-8.244 10.61-.6.42-1.46.42-2.06 0-3.813-2.78-8.244-5.954-8.244-10.61 0-2.565 1.396-4.265 2.91-5.035 1.818-.896 3.985-.361 5.334 1.174l.06.068.06-.068z" />
+                </svg>
+              ) : (
+                <svg
+                  className="w-5 h-5 text-gray-400"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M20.8 8.6c0 4.5-4.6 7.7-8.8 10.5-.45.32-1.03.32-1.48 0C7.8 16.3 3.2 13.1 3.2 8.6 3.2 6.6 4.2 5 5.6 4c1.38-1.02 3.2-.6 4.36.64l.84.92.84-.92c1.16-1.24 2.98-1.66 4.36-.64 1.4 1 2.4 2.6 2.4 4.6z" />
+                </svg>
+              )}
+            </button>
+          ) : (
+            <Tooltip title="Connectez-vous pour aimer" placement="left">
+              <button
+                onClick={handleToggleLike}
+                aria-label={
+                  liked ? "Retirer des favoris" : "Ajouter aux favoris"
+                }
+                className="absolute top-3 left-3 z-30 bg-white bg-opacity-90 p-2 rounded-full shadow-md hover:scale-105 transform transition-transform"
+              >
+                {liked ? (
+                  <svg
+                    className="w-5 h-5 text-red-500"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M12.001 4.529c1.349-1.535 3.516-2.07 5.334-1.174 1.514.77 2.91 2.47 2.91 5.035 0 4.656-4.43 7.83-8.244 10.61-.6.42-1.46.42-2.06 0-3.813-2.78-8.244-5.954-8.244-10.61 0-2.565 1.396-4.265 2.91-5.035 1.818-.896 3.985-.361 5.334 1.174l.06.068.06-.068z" />
+                  </svg>
+                ) : (
+                  <svg
+                    className="w-5 h-5 text-gray-400"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M20.8 8.6c0 4.5-4.6 7.7-8.8 10.5-.45.32-1.03.32-1.48 0C7.8 16.3 3.2 13.1 3.2 8.6 3.2 6.6 4.2 5 5.6 4c1.38-1.02 3.2-.6 4.36.64l.84.92.84-.92c1.16-1.24 2.98-1.66 4.36-.64 1.4 1 2.4 2.6 2.4 4.6z" />
+                  </svg>
+                )}
+              </button>
+            </Tooltip>
+          )}
+
+          {attraction.tag && (
+            <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+              {attraction.tag}
+            </div>
+          )}
+          {!attraction.free && (
+            <div className="absolute bottom-4 right-4 bg-white bg-opacity-90 backdrop-blur-sm px-3 py-1 rounded-full">
+              <span className="font-bold">
+                {attraction.price[0].price} FCFA
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div className="p-6">
+          <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
+            {attraction.title}
+          </h3>
+
+          <div className="flex items-center gap-2 text-gray-600 mb-3">
+            <MapPin className="w-4 h-4" />
+            <span className="text-sm">{attraction.location}</span>
+          </div>
+
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                <span className="font-semibold">{attraction.rating}</span>
+                <span className="text-gray-500 text-sm">
+                  ({attraction.reviewCount})
+                </span>
+              </div>
+            </div>
+
+            {attraction.duration != "" && (
+              <div className="flex items-center gap-1 text-gray-500">
+                <Clock className="w-4 h-4" />
+                <span className="text-sm">{attraction.duration}</span>
+              </div>
+            )}
+          </div>
+
+          <button className="w-full bg-[#f59f00] text-white py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer">
+            {attraction.free ? "Découvrer maintenant" : "Réserver maintenant"}
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
-      
+
       {/* Header avec NavBar */}
       <div className="relative z-20 flex items-center justify-center">
         <NavBar menu="ATTRACTION" />
@@ -336,72 +496,8 @@ const Attractions = () => {
 
             {/* Attractions Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredAttractions.map((attraction) => (
-                <div
-                  key={attraction._id}
-                  onClick={() => navigate(`/attractions/${attraction._id}`)}
-                  className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer transform hover:scale-105"
-                >
-                  <div className="relative overflow-hidden">
-                    <img
-                      src={HandleGetFileLink(
-                        attraction.images[0].file as string
-                      )}
-                      alt={attraction.title}
-                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    {attraction.tag && (
-                      <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                        {attraction.tag}
-                      </div>
-                    )}
-                    {!attraction.free && (
-                      <div className="absolute bottom-4 right-4 bg-white bg-opacity-90 backdrop-blur-sm px-3 py-1 rounded-full">
-                        <span className="font-bold">
-                          {attraction.price[0].price} FCFA
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
-                      {attraction.title}
-                    </h3>
-
-                    <div className="flex items-center gap-2 text-gray-600 mb-3">
-                      <MapPin className="w-4 h-4" />
-                      <span className="text-sm">{attraction.location}</span>
-                    </div>
-
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1">
-                          <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                          <span className="font-semibold">
-                            {attraction.rating}
-                          </span>
-                          <span className="text-gray-500 text-sm">
-                            ({attraction.reviewCount})
-                          </span>
-                        </div>
-                      </div>
-
-                      {attraction.duration != "" && (
-                        <div className="flex items-center gap-1 text-gray-500">
-                          <Clock className="w-4 h-4" />
-                          <span className="text-sm">{attraction.duration}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <button className="w-full bg-[#f59f00] text-white py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer">
-                      {attraction.free
-                        ? "Découvrer maintenant"
-                        : "Réserver maintenant"}
-                    </button>
-                  </div>
-                </div>
+              {filteredAttractions.map((a) => (
+                <AttractionCard key={a._id} attraction={a} />
               ))}
             </div>
 

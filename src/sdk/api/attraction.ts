@@ -11,8 +11,8 @@ export class AttractionsAPI {
   /**
    * Get returns all the attractions
    */
-  static List(): Promise<IAttraction[]> {
-    var url = this.getBaseURL();
+  static List(customer_id: string): Promise<IAttraction[]> {
+    var url = this.getBaseURL() + `?customerID=${customer_id}`;
     return new Promise((resolve, reject) => {
       axiosSiteData
         .get(url, axiosSiteDataConfig)

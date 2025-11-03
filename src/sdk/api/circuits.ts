@@ -15,8 +15,8 @@ export class CircuitsAPI {
   /**
    * Get returns all the circuits
    */
-  static List(): Promise<ICircuitPresenter[]> {
-    var url = this.getBaseURL();
+  static List(customer_id: string): Promise<ICircuitPresenter[]> {
+    var url = this.getBaseURL() + `?customerID=${customer_id}`;
     return new Promise((resolve, reject) => {
       axiosSiteData
         .get(url, axiosSiteDataConfig)

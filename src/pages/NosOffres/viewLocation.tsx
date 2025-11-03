@@ -42,6 +42,7 @@ import { ClientsAPI } from "../../sdk/api/clients";
 import SimilarSelling from "../../components/dededed/similarSelling";
 import CrossSelling from "../../components/dededed/crossSelling";
 import { useScreenSize } from "../../components/CircuitView/Timeline";
+import { UsersAPI } from "../../sdk/api/User";
 
 
 const ViewLocationContent: React.FC<CarRentalCardProps> = ({ car }) => {
@@ -588,7 +589,7 @@ const ViewLocation = () => {
   }, []);
 
   useEffect(() => {
-    VehiculesAPI.List()
+    VehiculesAPI.List(UsersAPI.GetUser()?._id || "")
       .then((data) => {
         setCars(data.filter((h) => h._id != id));
         console.log("Cars fetched successfully:", data);

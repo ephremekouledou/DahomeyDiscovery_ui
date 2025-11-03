@@ -1,4 +1,4 @@
-import { Flex, Typography } from "antd";
+import { Flex, Typography, Tooltip } from "antd";
 import NavBar from "../../components/navBar/navBar";
 import Footer from "../../components/footer/footer";
 import { useEffect, useState, useCallback } from "react";
@@ -6,12 +6,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import ImageCarousel from "../../components/ImageGallery/ImageCarousel";
 import BeginningButton from "../../components/dededed/BeginingButton";
 import { ICircuitPresenter } from "../../sdk/models/circuits";
+import { ClientsAPI } from "../../sdk/api/clients";
+import { LikeAPI } from "../../sdk/api/like";
 import { CircuitsAPI } from "../../sdk/api/circuits";
 import { MultiAppFile } from "../../sdk/models/models";
 import { HandleGetFileLink } from "./CircuitsCartes";
 import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { PageSettings } from "../../sdk/api/pageMedias";
-
+import { UsersAPI } from "../../sdk/api/User";
 
 interface TravelCardProps {
   _id: string;
@@ -22,6 +24,7 @@ interface TravelCardProps {
   day: number;
   night: number;
   price: string | number;
+  liked?: boolean;
 }
 
 // Composant TravelCard optimisé et responsive
@@ -34,8 +37,12 @@ const TravelCard = ({
   day,
   night,
   price,
+  liked: initialLiked,
 }: TravelCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [liked, setLiked] = useState<boolean>(!!initialLiked);
+  const [likeLoading, setLikeLoading] = useState<boolean>(false);
+  const user = ClientsAPI.GetUser();
   const navigate = useNavigate();
 
   const handleCardClick = useCallback(() => {
@@ -49,6 +56,41 @@ const TravelCard = ({
   const handleMouseLeave = useCallback(() => {
     setIsHovered(false);
   }, []);
+
+  // Toggle like - stop propagation so card click (navigate) doesn't fire
+  const handleToggleLike = useCallback(
+    (e: any) => {
+      e.stopPropagation();
+
+      // Optimistic UI
+      const newLiked = !liked;
+      setLiked(newLiked);
+
+      // If already processing, skip
+      if (likeLoading) return;
+
+      const user = ClientsAPI.GetUser();
+
+      if (!user) {
+        // If no user, keep it local only (could prompt to login here)
+        return;
+      }
+
+      setLikeLoading(true);
+
+      LikeAPI.ToggleLike({ customer_id: user._id, item_id: _id })
+        .then((_res) => {
+          // API success - nothing else for now (state already updated optimistically)
+        })
+        .catch((err) => {
+          console.error("Error toggling like:", err);
+          // revert optimistic update on error
+          setLiked(!newLiked);
+        })
+        .finally(() => setLikeLoading(false));
+    },
+    [liked, likeLoading, _id]
+  );
 
   return (
     <div
@@ -68,6 +110,72 @@ const TravelCard = ({
     >
       {/* Section Media - Responsive */}
       <div className="relative h-[45%] sm:h-1/2 overflow-hidden">
+        {/* Like button (absolute top-left) - tooltip when not connected */}
+        {user ? (
+          <button
+            onClick={handleToggleLike}
+            aria-label={liked ? "Retirer des favoris" : "Ajouter aux favoris"}
+            className="absolute top-2 left-2 z-30 bg-white bg-opacity-90 p-2 rounded-full shadow-md hover:scale-105 transform transition-transform"
+          >
+            {/* Heart icon: filled when liked */}
+            {liked ? (
+              <svg
+                className="w-5 h-5 text-red-500"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M12.001 4.529c1.349-1.535 3.516-2.07 5.334-1.174 1.514.77 2.91 2.47 2.91 5.035 0 4.656-4.43 7.83-8.244 10.61-.6.42-1.46.42-2.06 0-3.813-2.78-8.244-5.954-8.244-10.61 0-2.565 1.396-4.265 2.91-5.035 1.818-.896 3.985-.361 5.334 1.174l.06.068.06-.068z" />
+              </svg>
+            ) : (
+              <svg
+                className="w-5 h-5 text-gray-400"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.5}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M20.8 8.6c0 4.5-4.6 7.7-8.8 10.5-.45.32-1.03.32-1.48 0C7.8 16.3 3.2 13.1 3.2 8.6 3.2 6.6 4.2 5 5.6 4c1.38-1.02 3.2-.6 4.36.64l.84.92.84-.92c1.16-1.24 2.98-1.66 4.36-.64 1.4 1 2.4 2.6 2.4 4.6z" />
+              </svg>
+            )}
+          </button>
+        ) : (
+          <Tooltip title="Connectez-vous pour aimer" placement="left">
+            <button
+              onClick={handleToggleLike}
+              aria-label={liked ? "Retirer des favoris" : "Ajouter aux favoris"}
+              className="absolute top-2 left-2 z-30 bg-white bg-opacity-90 p-2 rounded-full shadow-md hover:scale-105 transform transition-transform"
+            >
+              {/* Heart icon: filled when liked */}
+              {liked ? (
+                <svg
+                  className="w-5 h-5 text-red-500"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M12.001 4.529c1.349-1.535 3.516-2.07 5.334-1.174 1.514.77 2.91 2.47 2.91 5.035 0 4.656-4.43 7.83-8.244 10.61-.6.42-1.46.42-2.06 0-3.813-2.78-8.244-5.954-8.244-10.61 0-2.565 1.396-4.265 2.91-5.035 1.818-.896 3.985-.361 5.334 1.174l.06.068.06-.068z" />
+                </svg>
+              ) : (
+                <svg
+                  className="w-5 h-5 text-gray-400"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M20.8 8.6c0 4.5-4.6 7.7-8.8 10.5-.45.32-1.03.32-1.48 0C7.8 16.3 3.2 13.1 3.2 8.6 3.2 6.6 4.2 5 5.6 4c1.38-1.02 3.2-.6 4.36.64l.84.92.84-.92c1.16-1.24 2.98-1.66 4.36-.64 1.4 1 2.4 2.6 2.4 4.6z" />
+                </svg>
+              )}
+            </button>
+          </Tooltip>
+        )}
         <img
           src={HandleGetFileLink(image[0].file as string)}
           alt={title}
@@ -252,7 +360,7 @@ const Circuits = () => {
 
   // On recupere les villes
   useEffect(() => {
-    CircuitsAPI.List()
+    CircuitsAPI.List(UsersAPI.GetUser()?._id || "")
       .then((data) => {
         console.log("the circuits are:", data);
         setCircuits(data);
@@ -314,7 +422,7 @@ const Circuits = () => {
   return (
     <Flex justify="center" vertical>
       <BeginningButton />
-      
+
       {/* Header avec NavBar */}
       <div>
         <NavBar menu="CIRCUITS" />

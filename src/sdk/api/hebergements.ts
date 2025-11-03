@@ -14,8 +14,8 @@ export class HebergementsAPI {
   /**
    * Get returns all the hebergements
    */
-  static List(): Promise<IAccommodationData[]> {
-    var url = this.getBaseURL();
+  static List(customer_id: string): Promise<IAccommodationData[]> {
+    var url = this.getBaseURL() + "?customerID=" + customer_id;
     return new Promise((resolve, reject) => {
       axiosSiteData
         .get(url, axiosSiteDataConfig)
@@ -161,7 +161,10 @@ export class HebergementsAPI {
    * Update updates a category
    * @param id
    */
-  static Update(id: string, data: IAddUpdateAccommodationData): Promise<IAccommodationData> {
+  static Update(
+    id: string,
+    data: IAddUpdateAccommodationData
+  ): Promise<IAccommodationData> {
     var url = this.getBaseURL() + "/" + id;
     return new Promise((resolve, reject) => {
       let mainImagePromise: Promise<void> | undefined;

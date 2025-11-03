@@ -130,6 +130,7 @@ export interface ICarRentalData extends IDefault, ICarEquipment {
   doors: number;
   features: string;
   tarification: ICarTarification[];
+  liked: boolean;
 }
 
 export const emptyICarRentalData = (): ICarRentalData => ({
@@ -167,6 +168,7 @@ export const emptyICarRentalData = (): ICarRentalData => ({
   doors: 0,
   features: "",
   tarification: [],
+  liked: false,
   ...emptyCarEquipment(),
 });
 

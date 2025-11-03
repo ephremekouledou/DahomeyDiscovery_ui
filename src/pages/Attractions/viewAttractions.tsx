@@ -38,6 +38,7 @@ import { emptyIPageMedia, IPageMedia } from "../../sdk/models/pagesMedias";
 import { PageSettings } from "../../sdk/api/pageMedias";
 import ItemLocation, { MapItem } from "../../components/dededed/Map";
 import { CalendarOutlined } from "@ant-design/icons";
+import { UsersAPI } from "../../sdk/api/User";
 
 
 const AttractionDetailPage = () => {
@@ -123,7 +124,7 @@ const AttractionDetailPage = () => {
   }, []);
 
   useEffect(() => {
-    AttractionsAPI.List()
+    AttractionsAPI.List(UsersAPI.GetUser()?._id || "")
       .then((data) => {
         console.log("the attractions are:", data);
         setAttractions(data.filter((h) => h._id != id));

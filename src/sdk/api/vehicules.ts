@@ -11,8 +11,8 @@ export class VehiculesAPI {
   /**
    * Get returns all the vehicules
    */
-  static List(): Promise<ICarRentalData[]> {
-    var url = this.getBaseURL();
+  static List(customer_id: string): Promise<ICarRentalData[]> {
+    var url = this.getBaseURL() + "?customerID=" + customer_id;
     return new Promise((resolve, reject) => {
       axiosSiteData
         .get(url, axiosSiteDataConfig)

@@ -74,6 +74,7 @@ export interface ICircuit extends IDefault {
   inclus: InclusList[];
   exclus: InclusList[];
   stops: ICircuitStop[];
+  liked: boolean;
 }
 
 export const emptyICircuit = (): ICircuit => ({
@@ -102,6 +103,7 @@ export const emptyICircuit = (): ICircuit => ({
   inclus: [],
   exclus: [],
   stops: [],
+  liked: false,
 });
 
 // AddUpdateCircuit interface (without DefaultModel fields)
@@ -144,6 +146,7 @@ export interface ICircuitPresenter extends IDefault {
   description: string;
   image: MultiAppFile[];
   video: MultiAppFile[];
+  liked: boolean;
 }
 
 export interface JsonCircuitStructure extends IDefault {

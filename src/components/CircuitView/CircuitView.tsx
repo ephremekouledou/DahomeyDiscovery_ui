@@ -28,6 +28,7 @@ import { CalendarOutlined, UserOutlined } from "@ant-design/icons";
 import { addCircuit, PanierCircuitInfos } from "../../sdk/models/panier";
 import PaniersAPI from "../../sdk/api/panier";
 import { v4 } from "uuid";
+import { UsersAPI } from "../../sdk/api/User";
 
 
 interface CircuitCardOtherProps {
@@ -679,7 +680,7 @@ export const CircuitView = () => {
   }, []);
 
   useEffect(() => {
-    CircuitsAPI.List()
+    CircuitsAPI.List(UsersAPI.GetUser()?._id || "")
       .then((data) => {
         setCircuits(data);
       })

@@ -22,6 +22,7 @@ import CrossSelling from "../../components/dededed/crossSelling";
 import { VillesAPI } from "../../sdk/api/villes";
 import SimilarSelling from "../../components/dededed/similarSelling";
 import ItemLocation from "../../components/dededed/Map";
+import { UsersAPI } from "../../sdk/api/User";
 
 
 interface ViewHebergementContentProps {
@@ -424,7 +425,7 @@ const ViewHebergement: React.FC = () => {
         // Fetch both datasets concurrently
         const [villesData, hebergementsData] = await Promise.all([
           VillesAPI.List(),
-          HebergementsAPI.List(),
+          HebergementsAPI.List(UsersAPI.GetUser()?._id || ""),
         ]);
 
         console.log("Villes fetched successfully:", villesData);
