@@ -897,6 +897,15 @@ const Acceuil = () => {
     }
   );
 
+  // Reset the hasRun flag when this component unmounts or when navigating away
+  // so the animation can run again when the user returns to the homepage.
+  useEffect(() => {
+    return () => {
+      // Ensure we reset the flag for future visits
+      setHasRun(false);
+    };
+  }, [setHasRun]);
+
   const handleButtonClick = useCallback(() => {
     console.log("Navigate to experience selection");
     // Add your navigation logic here
